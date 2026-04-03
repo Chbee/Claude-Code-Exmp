@@ -7,7 +7,7 @@
 	objects = {
 
 /* Begin PBXFileReference section */
-		3EDF35372F7622DB000CE8DA /* Infrean20260327.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Infrean20260327.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		3EDF35372F7622DB000CE8DA /* TravelCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -40,7 +40,7 @@
 		3EDF35382F7622DB000CE8DA /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				3EDF35372F7622DB000CE8DA /* Infrean20260327.app */,
+				3EDF35372F7622DB000CE8DA /* TravelCalculator.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -48,9 +48,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		3EDF35362F7622DB000CE8DA /* Infrean20260327 */ = {
+		3EDF35362F7622DB000CE8DA /* TravelCalculator */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 3EDF35422F7622DC000CE8DA /* Build configuration list for PBXNativeTarget "Infrean20260327" */;
+			buildConfigurationList = 3EDF35422F7622DC000CE8DA /* Build configuration list for PBXNativeTarget "TravelCalculator" */;
 			buildPhases = (
 				3EDF35332F7622DB000CE8DA /* Sources */,
 				3EDF35342F7622DB000CE8DA /* Frameworks */,
@@ -63,11 +63,11 @@
 			fileSystemSynchronizedGroups = (
 				3EDF35392F7622DB000CE8DA /* TravelCalculator */,
 			);
-			name = Infrean20260327;
+			name = TravelCalculator;
 			packageProductDependencies = (
 			);
-			productName = Infrean20260327;
-			productReference = 3EDF35372F7622DB000CE8DA /* Infrean20260327.app */;
+			productName = TravelCalculator;
+			productReference = 3EDF35372F7622DB000CE8DA /* TravelCalculator.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -85,7 +85,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 3EDF35322F7622DB000CE8DA /* Build configuration list for PBXProject "Infrean20260327" */;
+			buildConfigurationList = 3EDF35322F7622DB000CE8DA /* Build configuration list for PBXProject "TravelCalculator" */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -99,7 +99,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				3EDF35362F7622DB000CE8DA /* Infrean20260327 */,
+				3EDF35362F7622DB000CE8DA /* TravelCalculator */,
 			);
 		};
 /* End PBXProject section */
@@ -275,7 +275,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
@@ -317,7 +317,7 @@
 				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
 				SWIFT_EMIT_LOC_STRINGS = YES;
 				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
-				SWIFT_VERSION = 5.0;
+				SWIFT_VERSION = 6.0;
 				TARGETED_DEVICE_FAMILY = "1,2,7";
 				XROS_DEPLOYMENT_TARGET = 26.2;
 			};
@@ -326,7 +326,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		3EDF35322F7622DB000CE8DA /* Build configuration list for PBXProject "Infrean20260327" */ = {
+		3EDF35322F7622DB000CE8DA /* Build configuration list for PBXProject "TravelCalculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3EDF35402F7622DC000CE8DA /* Debug */,
@@ -335,7 +335,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		3EDF35422F7622DC000CE8DA /* Build configuration list for PBXNativeTarget "Infrean20260327" */ = {
+		3EDF35422F7622DC000CE8DA /* Build configuration list for PBXNativeTarget "TravelCalculator" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				3EDF35432F7622DC000CE8DA /* Debug */,

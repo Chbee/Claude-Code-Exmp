@@ -17,3 +17,6 @@ build/
 
 # Claude
 .claude/
+
+# API Keys (never commit)
+TravelCalculator/Config/APIKeys.swift

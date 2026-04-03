@@ -25,7 +25,7 @@ Claude Code(Opus 4.6)와 대화하며 기존
 
 | 항목 | 기술 |
 |------|------|
-| Language | Swift 5.0 |
+| Language | Swift 6.0 |
 | Framework | SwiftUI |
 | Architecture | MVI (Model-View-Intent) |
 | Min iOS | iOS 18 (95%+ market share) |
