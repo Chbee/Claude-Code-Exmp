@@ -15,7 +15,9 @@
 | 최소 iOS 버전 | **iOS 18** (95%+ 점유율, 현재-1 원칙) |
 | .xcodeproj | 기존 유지 (fileSystemSynchronization 활용) |
 | 보일러플레이트 | Infrean20260327 → TravelCalculator로 리네이밍 |
-| Figma MCP | 나중에 연결 |
+| Figma MCP | 양방향 워크플로우 (Code ↔ Canvas) |
+| AI 워크플로우 | Claude Code 오케스트레이터 + Gemini CLI + Codex CLI |
+| CLI 인증 | OAuth 로그인 기반 (API 키 X) |
 | API 키 | APIKeys.swift (.gitignore) + 템플릿 |
 
 ---
@@ -61,6 +63,65 @@ Presentation/ Calculator(9), CurrencySelect(4), Components(1), Toast(5)
 - `@Environment(Type.self)` 패턴 사용
 - `SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor` 유지
 - 순수 값 타입에 `nonisolated` 추가
+
+---
+
+## AI 워크플로우: Multi-AI 오케스트레이션
+
+### 아키텍처
+```
+Claude Code (Opus 4.6 — 오케스트레이터/최종 판단)
+  ├─ Gemini CLI: gemini -p "질문" → 딥 리서치, 웹 검색, API 문서
+  ├─ Codex CLI: codex exec "작업" → 세컨드 오피니언 코드 생성
+  ├─ /codex:rescue: 내장 스킬 → 디버깅, 리뷰
+  └─ 모델 스위칭: Opus(설계) / Sonnet(구현) / Haiku(단순)
+```
+
+### Setup (OAuth 로그인 기반)
+```bash
+# Gemini CLI — Google 계정 로그인
+npm install -g @google/gemini-cli
+gemini  # 첫 실행 시 브라우저 OAuth 로그인 → 토큰 자동 저장
+
+# Codex CLI — OpenAI 계정 로그인
+npm install -g @openai/codex
+codex auth login  # 브라우저 OAuth 로그인 → ~/.codex/auth.json 저장
+```
+
+### Phase별 도구 매핑
+| Phase | Claude 역할 | Gemini CLI | Codex CLI |
+|-------|------------|------------|-----------|
+| A: Domain+Core | Opus 설계 → Sonnet 구현 | - | - |
+| B: 컴포넌트 | Sonnet 구현 | - | - |
+| C: 계산기 MVI | Opus 설계 → Sonnet 구현 | - | 세컨드 오피니언 Reducer |
+| D: 통화 선택 | Sonnet 구현 | - | - |
+| E: Data 레이어 | Sonnet 구현 | **API 스펙 딥 리서치** | - |
+| F: 앱 진입점 | Sonnet 구현 | - | - |
+
+---
+
+## Figma 양방향 워크플로우 (토큰 최적화)
+
+### 토큰 비용 분석
+| 화면 | Figma 왕복 토큰 | 전략 |
+|------|----------------|------|
+| Calculator 키패드 | ~130K | Figma 활용 (복잡) |
+| Currency 선택기 | ~86.5K | Figma 활용 |
+| Toolbar | ~35.1K | Figma 활용 |
+| Toast | ~15.6K | **직접 코딩** (단순) |
+
+### 워크플로우
+```
+[Setup] Figma MCP 연결 (/mcp → figma → 인증)
+[토큰] get_variable_defs → DesignTokens.json 로컬 캐싱
+[복잡 화면] Claude SwiftUI → Code to Canvas → Figma 조정 → 읽기 → 업데이트
+[단순 화면] Claude가 직접 SwiftUI 생성 (Figma 스킵)
+```
+
+### 토큰 최적화 전략 (33% 절감)
+1. 디자인 토큰 1회 읽기 → `DesignTokens.json` 로컬 캐싱
+2. `get_metadata` 먼저 → 필요한 노드만 `get_design_context` (2단계)
+3. Toast 등 단순 컴포넌트는 Figma 스킵
 
 ---
 
