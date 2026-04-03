@@ -1,8 +1,6 @@
 //
 //  ContentView.swift
-//  Infrean20260327
-//
-//  Created by 손지영 on 3/27/26.
+//  TravelCalculator
 //
 
 import SwiftUI
