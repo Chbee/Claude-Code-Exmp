@@ -15,8 +15,8 @@ build/
 .AppleDouble
 .LSOverride
 
-# Claude
-.claude/
+# Claude (local settings only)
+.claude/settings.local.json
 
 # API Keys (never commit)
 TravelCalculator/Config/APIKeys.swift
