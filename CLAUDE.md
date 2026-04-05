@@ -76,6 +76,9 @@ ContentView → CalculatorView
 이 프로젝트는 Multi-AI 오케스트레이션을 사용 (자세한 내용은 `Plan.md` 참조):
 - **Gemini CLI** (`gemini -p "질문"`): 딥 리서치, API 문서 검색
 - **Codex CLI** (`codex exec "작업"`): 세컨드 오피니언 코드 생성
+- **Figma MCP** (공식 Figma MCP 서버): 디자인 토큰 추출, 화면 디자인 → SwiftUI 변환
+  - 디자인 파일: https://www.figma.com/design/RHAP7WVgoX220lRhWseaWE/여행가계부
+  - 컬러 페이지: node-id=99-875
 - 모델 스위칭: Opus(설계) / Sonnet(구현) / Haiku(단순)
 
 ## Important Notes
