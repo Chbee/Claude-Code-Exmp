@@ -66,7 +66,7 @@ ContentView → CalculatorView
 | # | Milestone | Status |
 |---|-----------|--------|
 | 0 | 온보딩 | 미착수 |
-| 1 | Calculator UI | 포팅 중 |
+| 1 | Calculator UI | Phase A(Foundation) 완료 / Phase B(UI) 대기 |
 | 2 | Exchange Rate (한국수출입은행 API) | 대기 |
 | 3 | Offline Support | 대기 |
 | 4 | Testing | 대기 |

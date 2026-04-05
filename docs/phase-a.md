@@ -96,11 +96,11 @@
 
 ## 완료 기준
 
-- [ ] `xcodebuild` 빌드 성공 (warning 0, error 0)
-- [ ] CalculatorReducer: 모든 엣지 케이스 코드 구현 완료
-- [ ] Toast: style별 색상 + 지속시간 반영
-- [ ] AppStore/AppCurrencyStore: UserDefaults 저장 동작 확인
-- [ ] Decimal+Format: 소수점 `.` / 천단위 `,` 로케일 고정
+- [x] `xcodebuild` 빌드 성공 (warning 0, error 0)
+- [x] CalculatorReducer: 모든 엣지 케이스 코드 구현 완료
+- [x] Toast: style별 색상 + 지속시간 반영
+- [x] AppStore/AppCurrencyStore: UserDefaults 저장 동작 확인
+- [x] Decimal+Format: 소수점 `.` / 천단위 `,` 로케일 고정
 
 ---
 
