@@ -6,17 +6,14 @@
 import SwiftUI
 
 struct ContentView: View {
+    let appStore: AppStore
+    let toastManager: ToastManager
+
     var body: some View {
-        VStack {
-            Image(systemName: "globe")
-                .imageScale(.large)
-                .foregroundStyle(.tint)
-            Text("Hello, world!")
-        }
-        .padding()
+        Text("Calculator — Phase B에서 구현 예정")
     }
 }
 
 #Preview {
-    ContentView()
+    ContentView(appStore: AppStore(), toastManager: ToastManager())
 }
