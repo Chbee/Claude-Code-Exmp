@@ -68,7 +68,7 @@ extension CalculatorDisplayModel {
         exchangeRate: Decimal,
         outputCurrency: Currency
     ) -> String {
-        guard let inputDecimal = Decimal(string: display), inputDecimal > 0 else {
+        guard let inputDecimal = Decimal(string: display), inputDecimal >= 0 else {
             return "0"
         }
         let converted = inputDecimal * exchangeRate

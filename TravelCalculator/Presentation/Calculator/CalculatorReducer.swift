@@ -30,8 +30,6 @@ enum CalculatorReducer {
         case .clearPressed:
             s.display = "0"
             s.isEnteringNewNumber = true
-            s.lastOperator = nil
-            s.lastOperand = nil
             s.isInputLimitExceeded = false
 
         case .allClearPressed:
@@ -331,20 +329,10 @@ enum CalculatorReducer {
     // MARK: - Helpers
 
     private static func formatResult(_ value: Decimal) -> String {
-        // 소수점 이하 불필요한 0 제거, 최대 maxFractionDigits 자리
         var result = value
         var rounded = Decimal()
         NSDecimalRound(&rounded, &result, maxFractionDigits, .plain)
-
-        // 정수면 정수 형태로
-        if rounded == rounded.rounded(scale: 0) {
-            let nsDecimal = rounded as NSDecimalNumber
-            return nsDecimal.stringValue
-        }
-
-        // 소수점 있는 경우
-        let nsDecimal = rounded as NSDecimalNumber
-        return nsDecimal.stringValue
+        return (rounded as NSDecimalNumber).stringValue
     }
 
     private static func exceedsResultLimit(_ value: Decimal) -> Bool {
