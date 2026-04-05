@@ -1,0 +1,85 @@
+# CLAUDE.md
+
+This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+
+## Project Overview
+
+TravelCalculator — 여행지 환율 계산기 iOS 앱. 현지 통화 금액 입력 → 실시간 KRW 변환.
+바이브 코딩 실험 프로젝트로, 기존 [Chbee/TravelCalculator](https://github.com/Chbee/TravelCalculator) (develop 브랜치)를 포팅 중.
+
+## Build & Run
+
+```bash
+# 빌드 (Xcode 프로젝트 파일명은 레거시: Infrean20260327, 스킴/타겟은 TravelCalculator)
+xcodebuild -project Infrean20260327.xcodeproj -scheme TravelCalculator -destination 'platform=iOS Simulator,name=iPhone 16' build
+
+# 테스트 (마일스톤 4에서 추가 예정)
+xcodebuild -project Infrean20260327.xcodeproj -scheme TravelCalculator -destination 'platform=iOS Simulator,name=iPhone 16' test
+```
+
+## Tech Constraints
+
+- **Swift 6.0**, SwiftUI, iOS 17+ (iPhone portrait only)
+- **Strict Concurrency**: `@MainActor` default, `@Sendable` 처리 필수
+- **@Observable** (not Combine's ObservableObject)
+- 숫자 포맷 로케일 고정: 소수점 `.`, 천단위 `,` — 기기 로케일 무시
+- 모든 금액 연산은 **Decimal** 타입 (Float/Double 사용 금지)
+
+## Architecture: MVI (Model-View-Intent)
+
+```
+View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → Store(@Observable) → View
+```
+
+- **Reducer는 순수 함수** — 사이드 이펙트 없음. 사이드 이펙트는 Store에서 처리
+- **Store는 @Observable** — 상태 보유 + API 호출, 위치 조회 등 비동기 처리
+
+### 전역 상태 흐름
+
+```
+AppStore (전역)
+├── AppCurrencyStore (selectedCurrency, conversionDirection, exchangeRateStatus)
+│   └── UserDefaults 저장: selectedCurrency, conversionDirection
+├── hasCompletedOnboarding (UserDefaults)
+└── ToastManager (전역 Toast)
+
+↓ @EnvironmentObject 주입
+
+ContentView → CalculatorView
+├── CalculatorStore(toastManager, currencyStore)
+└── CurrencySelectStore(toastManager, currencyStore)
+```
+
+통화 변경 시: `CurrencySelectStore` → `AppCurrencyStore` 업데이트 → `CalculatorStore`가 감지 → `.resetForCurrencyChange` Intent → Reducer 리셋
+
+## Key Specs
+
+기획서는 `specs/` 디렉토리에 분리되어 있고, `Spec.md`가 인덱스:
+- `specs/Spec-Overview.md` — 기능 명세 (계산기 엣지 케이스, 환율 API, 오프라인 대응, Toast)
+- `specs/Spec-UI.md` — 화면 설계, 디자인 시스템
+- `specs/Spec-Architecture.md` — MVI 아키텍처, 폴더 구조
+- `specs/Spec-DataModel.md` — 전체 데이터 모델 정의
+- `specs/Spec-Tasks.md` — 마일스톤별 태스크 목록 (74개)
+
+## Milestones
+
+| # | Milestone | Status |
+|---|-----------|--------|
+| 0 | 온보딩 | 미착수 |
+| 1 | Calculator UI | 포팅 중 |
+| 2 | Exchange Rate (한국수출입은행 API) | 대기 |
+| 3 | Offline Support | 대기 |
+| 4 | Testing | 대기 |
+
+## Multi-AI Workflow
+
+이 프로젝트는 Multi-AI 오케스트레이션을 사용 (자세한 내용은 `Plan.md` 참조):
+- **Gemini CLI** (`gemini -p "질문"`): 딥 리서치, API 문서 검색
+- **Codex CLI** (`codex exec "작업"`): 세컨드 오피니언 코드 생성
+- 모델 스위칭: Opus(설계) / Sonnet(구현) / Haiku(단순)
+
+## Important Notes
+
+- `TravelCalculator/Config/APIKeys.swift`는 `.gitignore` 처리됨 — 한국수출입은행 API 키 포함
+- 환율 API의 `deal_bas_r` 필드는 쉼표 포함 문자열 (`"1,350.50"`) — 파싱 시 쉼표 제거 필요
+- iOS 기본 계산기와 동일한 AC/C 토글, `=` 반복 동작을 정확히 따라야 함 (상세 엣지케이스는 `specs/Spec-Overview.md` §2.1 참조)
