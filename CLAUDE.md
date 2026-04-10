@@ -78,8 +78,18 @@ ContentView → CalculatorView
 - **Codex CLI** (`codex exec "작업"`): 세컨드 오피니언 코드 생성
 - **Figma MCP** (공식 Figma MCP 서버): 디자인 토큰 추출, 화면 디자인 → SwiftUI 변환
   - 디자인 파일: https://www.figma.com/design/RHAP7WVgoX220lRhWseaWE/여행가계부
-  - 컬러 페이지: node-id=99-875
+  - 계산기 화면: node-id=298-230
+  - Asset (컬러): node-id=99-875
+  - Component: node-id=397-230
+  - Icon: node-id=397-231
 - 모델 스위칭: Opus(설계) / Sonnet(구현) / Haiku(단순)
+
+## Harness Workflow
+
+모든 작업은 `/start-task`로 시작:
+1. **Plan Mode 진입** → 인터뷰 → Codex 검증 → 승인 (편집 차단)
+2. **승인 후 TDD**: Red(실패 테스트) → Yellow(최소 구현) → Green(리팩터링)
+3. **Anti Over-Engineering**: 요청된 것만 구현, 1회성 추상화 금지, 헬퍼는 3회 반복 시만
 
 ## Important Notes
 
