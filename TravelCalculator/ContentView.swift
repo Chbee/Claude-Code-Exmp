@@ -10,7 +10,10 @@ struct ContentView: View {
     let toastManager: ToastManager
 
     var body: some View {
-        Text("Calculator — Phase B에서 구현 예정")
+        CalculatorView(
+            toastManager: toastManager,
+            currencyStore: appStore.currencyStore
+        )
     }
 }
 
