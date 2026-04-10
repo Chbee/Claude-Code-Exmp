@@ -36,13 +36,15 @@ extension CalculatorDisplayModel {
         state: CalculatorState,
         inputCurrency: Currency,
         outputCurrency: Currency,
-        exchangeRate: Decimal
+        exchangeRate: Decimal,
+        isInputKRW: Bool = false
     ) -> CalculatorDisplayModel {
         let inputAmount = formatAmount(state.display, currency: inputCurrency)
         let convertedAmount = computeConvertedAmount(
             display: state.display,
             exchangeRate: exchangeRate,
-            outputCurrency: outputCurrency
+            outputCurrency: outputCurrency,
+            isInputKRW: isInputKRW
         )
         let outputAmount = formatAmount(convertedAmount, currency: outputCurrency)
 
@@ -66,15 +68,23 @@ extension CalculatorDisplayModel {
     private static func computeConvertedAmount(
         display: String,
         exchangeRate: Decimal,
-        outputCurrency: Currency
+        outputCurrency: Currency,
+        isInputKRW: Bool
     ) -> String {
         guard let inputDecimal = Decimal(string: display), inputDecimal >= 0 else {
             return "0"
         }
-        let converted = inputDecimal * exchangeRate
-        // 음수 결과는 0 처리
-        if converted < 0 { return "0" }
-        return "\(converted)"
+        if isInputKRW {
+            guard exchangeRate != 0 else { return "0" }
+            let converted = inputDecimal / exchangeRate
+            if converted < 0 { return "0" }
+            return "\(converted)"
+        } else {
+            let converted = inputDecimal * exchangeRate
+            // 음수 결과는 0 처리
+            if converted < 0 { return "0" }
+            return "\(converted)"
+        }
     }
 
     private static func formatAmount(_ raw: String, currency: Currency) -> String {

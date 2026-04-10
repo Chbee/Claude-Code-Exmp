@@ -43,6 +43,15 @@ enum CalculatorReducer {
 
         case .resetForCurrencyChange:
             s = .init()
+
+        case .directionTogglePressed(let value):
+            s.display = value
+            s.previousValue = nil
+            s.pendingOperator = nil
+            s.lastOperand = nil
+            s.lastOperator = nil
+            s.isEnteringNewNumber = true
+            s.isInputLimitExceeded = false
         }
 
         return s

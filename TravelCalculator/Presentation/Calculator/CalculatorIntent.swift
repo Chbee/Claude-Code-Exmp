@@ -10,4 +10,5 @@ enum CalculatorIntent {
     case backspacePressed
     case resetInputLimitFlag
     case resetForCurrencyChange
+    case directionTogglePressed(String)
 }
