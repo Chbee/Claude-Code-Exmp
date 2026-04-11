@@ -1,0 +1,5 @@
+// Exchange.xcconfig.example
+// 복사 후 Exchange.xcconfig로 이름 변경, 실제 API 키 입력
+// Exchange.xcconfig는 .gitignore 처리됨 — 절대 커밋하지 말 것
+
+EXCHANGE_RATE_API_KEY = YOUR_API_KEY_HERE

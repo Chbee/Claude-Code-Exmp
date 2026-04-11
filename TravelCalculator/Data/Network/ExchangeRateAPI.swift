@@ -66,7 +66,7 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
     nonisolated init(
         session: any URLSessionProtocol = URLSession.shared,
         cache: ExchangeRateCacheActor = ExchangeRateCacheActor(),
-        apiKey: String = APIKeys.exchangeRateAPIKey
+        apiKey: String = Bundle.main.infoDictionary?["EXCHANGE_RATE_API_KEY"] as? String ?? ""
     ) {
         self.session = session
         self.cache = cache
