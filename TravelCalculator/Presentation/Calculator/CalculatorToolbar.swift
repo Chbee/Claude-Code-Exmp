@@ -40,7 +40,7 @@ struct CalculatorToolbar: View {
 
             Spacer()
 
-            // 우측: 카메라 + 설정 아이콘
+            // 우측: 카메라 + 설정 아이콘 (V1 숨김 — 레이아웃 유지)
             HStack(spacing: 4) {
                 Button(action: {}) {
                     Image(systemName: "camera")
@@ -58,6 +58,9 @@ struct CalculatorToolbar: View {
                 }
                 .buttonStyle(.plain)
             }
+            .opacity(0)
+            .allowsHitTesting(false)
+            .accessibilityHidden(true)
         }
         .padding(.horizontal, 16)
     }
