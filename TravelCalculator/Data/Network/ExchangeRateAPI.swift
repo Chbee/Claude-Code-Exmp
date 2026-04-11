@@ -149,6 +149,8 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         let f = DateFormatter()
         f.dateFormat = "yyyyMMdd"
         f.locale = Locale(identifier: "ko_KR")
+        f.timeZone = TimeZone(identifier: "Asia/Seoul")
+        f.calendar = Calendar(identifier: .gregorian)
         return f
     }()
 

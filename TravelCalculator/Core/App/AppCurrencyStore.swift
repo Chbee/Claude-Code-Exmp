@@ -64,6 +64,17 @@ final class AppCurrencyStore {
         return searchDate != Self.todayString()
     }
 
+    var daysSinceSearchDate: Int? {
+        guard let searchDate,
+              let date = Self.dateFormatter.date(from: searchDate) else { return nil }
+        var cal = Calendar(identifier: .gregorian)
+        cal.timeZone = TimeZone(identifier: "Asia/Seoul")!
+        return cal.dateComponents([.day],
+            from: cal.startOfDay(for: date),
+            to: cal.startOfDay(for: Date.now)
+        ).day
+    }
+
     var currentError: ExchangeRateError? {
         guard case .error(let e) = exchangeRateStatus else { return nil }
         return e
@@ -124,6 +135,8 @@ final class AppCurrencyStore {
         let f = DateFormatter()
         f.dateFormat = "yyyyMMdd"
         f.locale = Locale(identifier: "ko_KR")
+        f.timeZone = TimeZone(identifier: "Asia/Seoul")
+        f.calendar = Calendar(identifier: .gregorian)
         return f
     }()
 

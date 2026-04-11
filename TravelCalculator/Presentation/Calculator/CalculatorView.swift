@@ -29,7 +29,10 @@ struct CalculatorView: View {
             CalculatorDisplay(
                 displayModel: calculatorStore.displayModel,
                 onToggleDirection: { calculatorStore.toggleDirection() },
-                onRefresh: {}
+                onRefresh: { Task { await calculatorStore.refreshRates() } },
+                daysSinceSearchDate: currencyStore.daysSinceSearchDate,
+                isRefreshEnabled: currencyStore.isRefreshEnabled,
+                isLoading: currencyStore.isLoading
             )
 
             CalculatorKeypad(

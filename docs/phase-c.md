@@ -77,15 +77,15 @@
 
 ## 완료 기준
 
-- [ ] `xcodebuild` 빌드 성공 (warning 0, error 0)
-- [ ] 앱 실행 시 한국수출입은행 API에서 실제 환율 로드
-- [ ] 환율 표시: "1 USD = X,XXX.XX KRW" + searchdate 기반 업데이트 시간
-- [ ] 새로고침 버튼: searchdate < 오늘이면 활성화, == 오늘이면 비활성화
-- [ ] 주말/공휴일: 순차 fallback으로 최근 영업일 환율 조회
-- [ ] 캐시: 24h 유효, API 실패 시 만료 캐시 fallback
-- [ ] API 실패 + 캐시 없음 → 전체화면 에러 + 재시도 버튼
-- [ ] deal_bas_r 쉼표 파싱 정상 동작
-- [ ] 비정상 환율값(0, 음수) 무시
+- [x] `xcodebuild` 빌드 성공 (warning 0, error 0)
+- [x] 앱 실행 시 한국수출입은행 API에서 실제 환율 로드
+- [x] 환율 표시: "1 USD = X,XXX.XX KRW" + searchdate 기반 업데이트 시간
+- [x] 새로고침 버튼: searchdate < 오늘이면 활성화, == 오늘이면 비활성화
+- [x] 주말/공휴일: 순차 fallback으로 최근 영업일 환율 조회
+- [x] 캐시: 24h 유효, API 실패 시 만료 캐시 fallback
+- [x] API 실패 + 캐시 없음 → 전체화면 에러 + 재시도 버튼
+- [x] deal_bas_r 쉼표 파싱 정상 동작
+- [x] 비정상 환율값(0, 음수) 무시
 
 ---
 

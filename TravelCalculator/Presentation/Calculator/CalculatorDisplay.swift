@@ -6,6 +6,9 @@ struct CalculatorDisplay: View {
     let displayModel: CalculatorDisplayModel
     let onToggleDirection: () -> Void
     let onRefresh: () -> Void
+    let daysSinceSearchDate: Int?
+    let isRefreshEnabled: Bool
+    let isLoading: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -25,21 +28,31 @@ struct CalculatorDisplay: View {
             Text(displayModel.rateDisplay)
                 .font(.footnote)
                 .foregroundStyle(Color.appTextSub)
-            Text("·")
-                .font(.footnote)
-                .foregroundStyle(Color.appTextSub)
-            Text("Mock 데이터")
-                .font(.footnote)
-                .foregroundStyle(Color.appTextSub)
+            if isLoading {
+                ProgressView()
+                    .scaleEffect(0.6)
+                    .tint(Color.appTextSub)
+            } else if let days = daysSinceSearchDate {
+                Text("·")
+                    .font(.footnote)
+                    .foregroundStyle(Color.appTextSub)
+                Text(Self.dateLabel(for: days))
+                    .font(.footnote)
+                    .foregroundStyle(Color.appTextSub)
+            }
             Spacer()
             Button(action: onRefresh) {
                 Image(systemName: "arrow.clockwise")
                     .font(.footnote.weight(.medium))
-                    .foregroundStyle(Color.appTextSub)
+                    .foregroundStyle(isRefreshEnabled ? Color.appPrimary : Color.appTextSub)
             }
-            .disabled(true)
+            .disabled(!isRefreshEnabled || isLoading)
             .buttonStyle(.plain)
         }
+    }
+
+    private static func dateLabel(for days: Int) -> String {
+        days == 0 ? "최신" : "\(days)일 전"
     }
 
     // MARK: - Input Row
@@ -102,7 +115,7 @@ struct CalculatorDisplay: View {
 
 // MARK: - Preview
 
-#Preview("Light") {
+#Preview("오늘 환율") {
     let state = CalculatorState()
     let model = CalculatorDisplayModel.make(
         state: state,
@@ -115,12 +128,57 @@ struct CalculatorDisplay: View {
     CalculatorDisplay(
         displayModel: model,
         onToggleDirection: {},
-        onRefresh: {}
+        onRefresh: {},
+        daysSinceSearchDate: 0,
+        isRefreshEnabled: false,
+        isLoading: false
     )
     .background(Color.appBackground)
 }
 
-#Preview("Dark") {
+#Preview("2일 전 기준 (새로고침 활성)") {
+    let state = CalculatorState()
+    let model = CalculatorDisplayModel.make(
+        state: state,
+        inputCurrency: .USD,
+        outputCurrency: .KRW,
+        selectedCurrency: .USD,
+        exchangeRate: 1350,
+        isInputKRW: false
+    )
+    CalculatorDisplay(
+        displayModel: model,
+        onToggleDirection: {},
+        onRefresh: {},
+        daysSinceSearchDate: 2,
+        isRefreshEnabled: true,
+        isLoading: false
+    )
+    .background(Color.appBackground)
+}
+
+#Preview("로딩 중") {
+    let state = CalculatorState()
+    let model = CalculatorDisplayModel.make(
+        state: state,
+        inputCurrency: .USD,
+        outputCurrency: .KRW,
+        selectedCurrency: .USD,
+        exchangeRate: 0,
+        isInputKRW: false
+    )
+    CalculatorDisplay(
+        displayModel: model,
+        onToggleDirection: {},
+        onRefresh: {},
+        daysSinceSearchDate: nil,
+        isRefreshEnabled: false,
+        isLoading: true
+    )
+    .background(Color.appBackground)
+}
+
+#Preview("Dark — 2일 전 기준") {
     let state = CalculatorState()
     let model = CalculatorDisplayModel.make(
         state: state,
@@ -133,7 +191,10 @@ struct CalculatorDisplay: View {
     CalculatorDisplay(
         displayModel: model,
         onToggleDirection: {},
-        onRefresh: {}
+        onRefresh: {},
+        daysSinceSearchDate: 2,
+        isRefreshEnabled: true,
+        isLoading: false
     )
     .background(Color.appBackground)
     .preferredColorScheme(.dark)

@@ -19,6 +19,9 @@ final class AppStore {
     init(userDefaults: UserDefaults = .standard, currencyStore: AppCurrencyStore? = nil) {
         self.userDefaults = userDefaults
         self.hasCompletedOnboarding = userDefaults.bool(forKey: Self.hasCompletedOnboardingKey)
-        self.currencyStore = currencyStore ?? AppCurrencyStore(userDefaults: userDefaults)
+        self.currencyStore = currencyStore ?? AppCurrencyStore(
+            userDefaults: userDefaults,
+            exchangeRateAPI: ExchangeRateAPI()
+        )
     }
 }

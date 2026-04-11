@@ -181,8 +181,8 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 #### 2.4.6 새로고침 전략 (searchdate 기반)
 | 조건 | 새로고침 버튼 | 동작 |
 |------|-------------|------|
-| 캐시의 searchdate = 오늘 | **비활성화** | "오늘 환율 적용 중" 표시 |
-| 캐시의 searchdate < 오늘 | 활성화 | 탭 시 API 호출 (2.4.3 fallback 적용) |
+| 캐시의 searchdate = 오늘 | **비활성화** | "최신" 표시 |
+| 캐시의 searchdate < 오늘 | 활성화 | "N일 전" 표시 + 탭 시 API 호출 (2.4.3 fallback 적용) |
 | 캐시 없음 | — | 앱 시작 시 자동 호출 |
 
 - 별도 throttle 불필요: 같은 날 데이터는 변하지 않으므로 searchdate 기반으로 자연스럽게 제한
