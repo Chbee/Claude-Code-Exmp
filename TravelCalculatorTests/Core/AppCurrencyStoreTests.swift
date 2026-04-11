@@ -24,8 +24,8 @@ private func todayYYYYMMDD() -> String {
     let f = DateFormatter()
     f.dateFormat = "yyyyMMdd"
     f.locale = Locale(identifier: "ko_KR")
-    f.timeZone = TimeZone(identifier: "Asia/Seoul")!
-    f.calendar = Calendar(identifier: .gregorian)
+    f.timeZone = TimeZone.kst
+    f.calendar = Calendar.kst
     return f.string(from: Date.now)
 }
 

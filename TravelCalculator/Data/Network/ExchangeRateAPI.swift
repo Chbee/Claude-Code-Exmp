@@ -80,10 +80,10 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         }
 
         // 오늘부터 최대 6일 전까지 순차 fallback (주말/공휴일 대응)
-        let today = Self.kstCalendar.startOfDay(for: Date.now)
+        let today = Calendar.kst.startOfDay(for: Date.now)
 
         for dayOffset in 0...6 {
-            guard let date = Self.kstCalendar.date(byAdding: .day, value: -dayOffset, to: today) else { continue }
+            guard let date = Calendar.kst.date(byAdding: .day, value: -dayOffset, to: today) else { continue }
             do {
                 let response = try await fetchFromAPI(currencies: currencies, searchDate: Self.formatDate(date))
                 try? await cache.save(response)
@@ -144,20 +144,12 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         return ExchangeRateResponse(rates: rates, fetchedAt: .now, searchDate: searchDate)
     }
 
-    private static let kstTimeZone = TimeZone(identifier: "Asia/Seoul")!
-
-    private static let kstCalendar: Calendar = {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = kstTimeZone
-        return cal
-    }()
-
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyyMMdd"
         f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = kstTimeZone
-        f.calendar = kstCalendar
+        f.timeZone = TimeZone.kst
+        f.calendar = .kst
         return f
     }()
 

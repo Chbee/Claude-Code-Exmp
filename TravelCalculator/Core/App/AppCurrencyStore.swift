@@ -67,9 +67,9 @@ final class AppCurrencyStore {
     var daysSinceSearchDate: Int? {
         guard let searchDate,
               let date = Self.dateFormatter.date(from: searchDate) else { return nil }
-        return Self.kstCalendar.dateComponents([.day],
-            from: Self.kstCalendar.startOfDay(for: date),
-            to: Self.kstCalendar.startOfDay(for: Date.now)
+        return Calendar.kst.dateComponents([.day],
+            from: Calendar.kst.startOfDay(for: date),
+            to: Calendar.kst.startOfDay(for: Date.now)
         ).day
     }
 
@@ -129,18 +129,12 @@ final class AppCurrencyStore {
         return dir
     }
 
-    private static let kstCalendar: Calendar = {
-        var cal = Calendar(identifier: .gregorian)
-        cal.timeZone = TimeZone(identifier: "Asia/Seoul")!
-        return cal
-    }()
-
     private static let dateFormatter: DateFormatter = {
         let f = DateFormatter()
         f.dateFormat = "yyyyMMdd"
         f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = TimeZone(identifier: "Asia/Seoul")
-        f.calendar = Calendar(identifier: .gregorian)
+        f.timeZone = TimeZone.kst
+        f.calendar = .kst
         return f
     }()
 
