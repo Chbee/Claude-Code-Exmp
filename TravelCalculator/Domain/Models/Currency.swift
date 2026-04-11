@@ -1,11 +1,11 @@
 import Foundation
 
-enum Currency: String, CaseIterable, Codable, Sendable {
+enum Currency: String, CaseIterable, Sendable {
     case KRW
     case USD
     case TWD
 
-    var symbol: String {
+    nonisolated var symbol: String {
         switch self {
         case .KRW: "₩"
         case .USD: "$"
@@ -13,7 +13,7 @@ enum Currency: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    var flag: String {
+    nonisolated var flag: String {
         switch self {
         case .KRW: "🇰🇷"
         case .USD: "🇺🇸"
@@ -21,7 +21,7 @@ enum Currency: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    var countryName: String {
+    nonisolated var countryName: String {
         switch self {
         case .KRW: "대한민국"
         case .USD: "미국"
@@ -29,14 +29,28 @@ enum Currency: String, CaseIterable, Codable, Sendable {
         }
     }
 
-    var currencyUnit: String {
-        rawValue
-    }
+    nonisolated var currencyUnit: String { rawValue }
 
-    var fractionDigits: Int {
+    nonisolated var fractionDigits: Int {
         switch self {
         case .KRW: 0
         case .USD, .TWD: 2
         }
+    }
+}
+
+extension Currency: Codable {
+    nonisolated func encode(to encoder: any Encoder) throws {
+        var container = encoder.singleValueContainer()
+        try container.encode(rawValue)
+    }
+
+    nonisolated init(from decoder: any Decoder) throws {
+        let container = try decoder.singleValueContainer()
+        let raw = try container.decode(String.self)
+        guard let value = Currency(rawValue: raw) else {
+            throw DecodingError.dataCorruptedError(in: container, debugDescription: "Unknown currency: \(raw)")
+        }
+        self = value
     }
 }

@@ -1,6 +1,6 @@
 import Foundation
 
-enum ExchangeRateError: Error, LocalizedError, Sendable {
+enum ExchangeRateError: Error, LocalizedError, Sendable, Equatable {
     case networkError
     case serverError(statusCode: Int)
     case noDataAvailable
