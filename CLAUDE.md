@@ -95,6 +95,10 @@ ContentView → CalculatorView
 
 ## Important Notes
 
-- `TravelCalculator/Config/APIKeys.swift`는 `.gitignore` 처리됨 — 한국수출입은행 API 키 포함
+- API 키는 **xcconfig** 방식으로 관리 (`APIKeys.swift` 방식 사용 안 함)
+  - `TravelCalculator/Config/Exchange.xcconfig` — gitignore 처리, 로컬 전용 (실제 키 입력)
+  - `TravelCalculator/Config/Exchange.xcconfig.example` — 커밋됨, placeholder
+  - 새 환경 셋업: `cp TravelCalculator/Config/Exchange.xcconfig.example TravelCalculator/Config/Exchange.xcconfig` 후 키 입력
+  - `ExchangeRateAPI`는 `Bundle.main.infoDictionary["EXCHANGE_RATE_API_KEY"]`로 읽음 (xcconfig → INFOPLIST_KEY → Info.plist 자동 주입)
 - 환율 API의 `deal_bas_r` 필드는 쉼표 포함 문자열 (`"1,350.50"`) — 파싱 시 쉼표 제거 필요
 - iOS 기본 계산기와 동일한 AC/C 토글, `=` 반복 동작을 정확히 따라야 함 (상세 엣지케이스는 `specs/Spec-Overview.md` §2.1 참조)
