@@ -78,9 +78,9 @@ struct CalculatorKeypad: View {
                     }
                 }
 
-                // Row 5: 0, ., = (Figma 기준 3등분)
+                // Row 5: 0 (double-width), ., =
                 HStack(spacing: spacing) {
-                    KeypadButton(label: "0", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "0", style: .number, width: buttonWidth * 2 + spacing, height: buttonHeight) {
                         onIntent(.numberPressed(0))
                     }
                     KeypadButton(label: ".", style: .number, width: buttonWidth, height: buttonHeight) {
@@ -89,9 +89,6 @@ struct CalculatorKeypad: View {
                     KeypadButton(label: "=", style: .equals, width: buttonWidth, height: buttonHeight) {
                         onIntent(.equalsPressed)
                     }
-                    // 4열 맞춤용 빈 공간
-                    Spacer()
-                        .frame(width: buttonWidth)
                 }
             }
         }
@@ -110,7 +107,7 @@ private enum ButtonStyle {
         switch self {
         case .number:    return .appCard
         case .operator_: return .appPrimary
-        case .utility:   return Color.appAccent.opacity(0.8)
+        case .utility:   return .appUtility
         case .equals:    return .appPrimary
         }
     }
