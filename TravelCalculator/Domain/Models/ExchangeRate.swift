@@ -9,7 +9,7 @@ struct ExchangeRate: Sendable {
 struct ExchangeRateResponse: Sendable {
     nonisolated let rates: [ExchangeRate]
     nonisolated let fetchedAt: Date
-    nonisolated let searchDate: String // "yyyy-MM-dd" KST 기준
+    nonisolated let searchDate: String // "yyyyMMdd" KST 기준
 
     nonisolated func rate(for currency: Currency) -> Decimal? {
         currency == .KRW ? 1 : rates.first { $0.currency == currency }?.rate
