@@ -30,16 +30,12 @@ enum CalculatorReducer {
         case .clearPressed:
             s.display = "0"
             s.isEnteringNewNumber = true
-            s.isInputLimitExceeded = false
 
         case .allClearPressed:
             s = .init()
 
         case .backspacePressed:
             s = handleBackspace(s)
-
-        case .resetInputLimitFlag:
-            s.isInputLimitExceeded = false
 
         case .resetForCurrencyChange:
             s = .init()
@@ -51,7 +47,6 @@ enum CalculatorReducer {
             s.lastOperand = nil
             s.lastOperator = nil
             s.isEnteringNewNumber = true
-            s.isInputLimitExceeded = false
         }
 
         return s
@@ -72,7 +67,6 @@ enum CalculatorReducer {
             if s.pendingOperator == nil {
                 s.previousValue = nil
             }
-            s.isInputLimitExceeded = false
             return s
         }
 
@@ -89,14 +83,11 @@ enum CalculatorReducer {
         } else {
             // 정수부 자릿수 초과 체크
             if integerDigits >= maxIntegerDigits {
-                if !s.isInputLimitExceeded {
-                    s.isInputLimitExceeded = true
-                    s.pendingToast = ToastPayload(
-                        style: .warning,
-                        title: "입력 한도 초과",
-                        message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있습니다"
-                    )
-                }
+                s.pendingToast = ToastPayload(
+                    style: .warning,
+                    title: "입력 한도 초과",
+                    message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있습니다"
+                )
                 return s
             }
         }
@@ -128,7 +119,6 @@ enum CalculatorReducer {
             if s.pendingOperator == nil {
                 s.previousValue = nil
             }
-            s.isInputLimitExceeded = false
             return s
         }
 
@@ -140,14 +130,11 @@ enum CalculatorReducer {
         // 정수부 10자리 초과면 소수점 추가 불가
         let integerDigits = s.display.filter { $0.isNumber }.count
         if integerDigits >= maxIntegerDigits {
-            if !s.isInputLimitExceeded {
-                s.isInputLimitExceeded = true
-                s.pendingToast = ToastPayload(
-                    style: .warning,
-                    title: "입력 한도 초과",
-                    message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있습니다"
-                )
-            }
+            s.pendingToast = ToastPayload(
+                style: .warning,
+                title: "입력 한도 초과",
+                message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있습니다"
+            )
             return s
         }
 
@@ -327,10 +314,6 @@ enum CalculatorReducer {
         s.isEnteringNewNumber = false
         s.lastOperator = nil
         s.lastOperand = nil
-
-        if newDisplay == "0" {
-            s.isInputLimitExceeded = false
-        }
 
         return s
     }
