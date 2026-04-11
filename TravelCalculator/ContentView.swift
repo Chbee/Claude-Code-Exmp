@@ -14,6 +14,16 @@ struct ContentView: View {
             toastManager: toastManager,
             currencyStore: appStore.currencyStore
         )
+        .task {
+            await appStore.currencyStore.loadExchangeRates()
+        }
+        .overlay {
+            if let error = appStore.currencyStore.unavailableRateError {
+                ExchangeRateErrorView(error: error) {
+                    Task { await appStore.currencyStore.loadExchangeRates() }
+                }
+            }
+        }
     }
 }
 

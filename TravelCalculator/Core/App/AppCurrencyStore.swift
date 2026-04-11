@@ -1,11 +1,10 @@
 import Foundation
 import Observation
 
-// Phase C에서 associated value 추가 예정
 enum ExchangeRateStatus: Sendable {
     case loading
-    case loaded   // Phase C: case loaded(ExchangeRateResponse)
-    case error    // Phase C: case error(ExchangeRateError)
+    case loaded(ExchangeRateResponse)
+    case error(ExchangeRateError)
 }
 
 enum ConversionDirection: String, Codable, Sendable {
@@ -19,6 +18,7 @@ final class AppCurrencyStore {
     @ObservationIgnored private let userDefaults: UserDefaults
     @ObservationIgnored private static let selectedCurrencyKey = "selectedCurrency"
     @ObservationIgnored private static let conversionDirectionKey = "conversionDirection"
+    @ObservationIgnored private let exchangeRateAPI: (any ExchangeRateAPIProtocol)?
 
     var selectedCurrency: Currency {
         didSet {
@@ -44,11 +44,85 @@ final class AppCurrencyStore {
         conversionDirection == .selectedToKRW ? .KRW : selectedCurrency
     }
 
-    init(userDefaults: UserDefaults = .standard) {
+    // MARK: - Computed Properties
+
+    var currentResponse: ExchangeRateResponse? {
+        guard case .loaded(let r) = exchangeRateStatus else { return nil }
+        return r
+    }
+
+    var currentRate: Decimal? {
+        currentResponse?.rate(for: selectedCurrency)
+    }
+
+    var searchDate: String? {
+        currentResponse?.searchDate
+    }
+
+    var isRefreshEnabled: Bool {
+        guard let searchDate else { return false }
+        return searchDate != Date.now.yyyyMMddKST()
+    }
+
+    var daysSinceSearchDate: Int? {
+        guard let searchDate,
+              let date = Date.fromYYYYMMDDKST(searchDate) else { return nil }
+        return Calendar.kst.dateComponents([.day],
+            from: Calendar.kst.startOfDay(for: date),
+            to: Calendar.kst.startOfDay(for: Date.now)
+        ).day
+    }
+
+    var currentError: ExchangeRateError? {
+        guard case .error(let e) = exchangeRateStatus else { return nil }
+        return e
+    }
+
+    var isLoading: Bool {
+        if case .loading = exchangeRateStatus { return true }
+        return false
+    }
+
+    var unavailableRateError: ExchangeRateError? {
+        currentRate == nil ? currentError : nil
+    }
+
+    // MARK: - Init
+
+    init(
+        userDefaults: UserDefaults = .standard,
+        exchangeRateAPI: (any ExchangeRateAPIProtocol)? = nil
+    ) {
         self.userDefaults = userDefaults
+        self.exchangeRateAPI = exchangeRateAPI
         self.selectedCurrency = Self.loadSelectedCurrency(from: userDefaults)
         self.conversionDirection = Self.loadConversionDirection(from: userDefaults)
     }
+
+    // MARK: - Exchange Rate Loading
+
+    func loadExchangeRates() async {
+        guard let api = exchangeRateAPI else {
+            exchangeRateStatus = .error(.noCacheAvailable)
+            return
+        }
+        exchangeRateStatus = .loading
+        do {
+            let response = try await api.fetchRates(for: Currency.allCases.filter { $0 != .KRW })
+            exchangeRateStatus = .loaded(response)
+        } catch let err as ExchangeRateError {
+            exchangeRateStatus = .error(err)
+        } catch {
+            exchangeRateStatus = .error(.networkError)
+        }
+    }
+
+    func refreshExchangeRates() async {
+        guard isRefreshEnabled else { return }
+        await loadExchangeRates()
+    }
+
+    // MARK: - Private Helpers
 
     private static func loadSelectedCurrency(from ud: UserDefaults) -> Currency {
         guard let raw = ud.string(forKey: selectedCurrencyKey),
@@ -61,4 +135,5 @@ final class AppCurrencyStore {
               let dir = ConversionDirection(rawValue: raw) else { return .selectedToKRW }
         return dir
     }
+
 }

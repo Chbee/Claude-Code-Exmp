@@ -19,4 +19,4 @@ build/
 .claude/settings.local.json
 
 # API Keys (never commit)
-TravelCalculator/Config/APIKeys.swift
+TravelCalculator/Config/Exchange.xcconfig

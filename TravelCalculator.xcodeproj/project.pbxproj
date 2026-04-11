@@ -6,14 +6,36 @@
 	objectVersion = 77;
 	objects = {
 
+/* Begin PBXBuildFile section */
+		F3E976C5A289F9B564721E08 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 43EC157E7D108B2099724CCF /* Foundation.framework */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		FDE854CB95948873EB0FA61E /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 3EDF352F2F7622DB000CE8DA /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 3EDF35362F7622DB000CE8DA;
+			remoteInfo = TravelCalculator;
+		};
+/* End PBXContainerItemProxy section */
+
 /* Begin PBXFileReference section */
+		2037D26B4DC548FC878987E3 /* Exchange.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Exchange.xcconfig; sourceTree = "<group>"; };
 		3EDF35372F7622DB000CE8DA /* TravelCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		43EC157E7D108B2099724CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
+		E6B466EDE7DCDA6DC202D597 /* TravelCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
 		3EDF35392F7622DB000CE8DA /* TravelCalculator */ = {
 			isa = PBXFileSystemSynchronizedRootGroup;
 			path = TravelCalculator;
+			sourceTree = "<group>";
+		};
+		7607893DF480C1CC080385A1 /* TravelCalculatorTests */ = {
+			isa = PBXFileSystemSynchronizedRootGroup;
+			path = TravelCalculatorTests;
 			sourceTree = "<group>";
 		};
 /* End PBXFileSystemSynchronizedRootGroup section */
@@ -26,6 +48,14 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		4A05F0D1901D4386B802DB01 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				F3E976C5A289F9B564721E08 /* Foundation.framework in Frameworks */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
@@ -33,7 +63,10 @@
 			isa = PBXGroup;
 			children = (
 				3EDF35392F7622DB000CE8DA /* TravelCalculator */,
+				E4833A4A2B8147FDBD177657 /* Config */,
 				3EDF35382F7622DB000CE8DA /* Products */,
+				BEACED67F6F7AE9CE77315AD /* Frameworks */,
+				7607893DF480C1CC080385A1 /* TravelCalculatorTests */,
 			);
 			sourceTree = "<group>";
 		};
@@ -41,13 +74,60 @@
 			isa = PBXGroup;
 			children = (
 				3EDF35372F7622DB000CE8DA /* TravelCalculator.app */,
+				E6B466EDE7DCDA6DC202D597 /* TravelCalculatorTests.xctest */,
 			);
 			name = Products;
+			sourceTree = "<group>";
+		};
+		BEACED67F6F7AE9CE77315AD /* Frameworks */ = {
+			isa = PBXGroup;
+			children = (
+				DAE3440561752C8467F2D8E9 /* iOS */,
+			);
+			name = Frameworks;
+			sourceTree = "<group>";
+		};
+		DAE3440561752C8467F2D8E9 /* iOS */ = {
+			isa = PBXGroup;
+			children = (
+				43EC157E7D108B2099724CCF /* Foundation.framework */,
+			);
+			name = iOS;
+			sourceTree = "<group>";
+		};
+		E4833A4A2B8147FDBD177657 /* Config */ = {
+			isa = PBXGroup;
+			children = (
+				2037D26B4DC548FC878987E3 /* Exchange.xcconfig */,
+			);
+			name = Config;
+			path = TravelCalculator/Config;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
+		3DEF59B6687E3B758816AEEA /* TravelCalculatorTests */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = F82A78EB402E14D1DA300866 /* Build configuration list for PBXNativeTarget "TravelCalculatorTests" */;
+			buildPhases = (
+				45EF7D353A344E74C6F5940F /* Sources */,
+				4A05F0D1901D4386B802DB01 /* Frameworks */,
+				E3E7284E18A9A89F3ADCD481 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				13847CBEBAAB3042FBC6B0D2 /* PBXTargetDependency */,
+			);
+			fileSystemSynchronizedGroups = (
+				7607893DF480C1CC080385A1 /* TravelCalculatorTests */,
+			);
+			name = TravelCalculatorTests;
+			productName = TravelCalculatorTests;
+			productReference = E6B466EDE7DCDA6DC202D597 /* TravelCalculatorTests.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
 		3EDF35362F7622DB000CE8DA /* TravelCalculator */ = {
 			isa = PBXNativeTarget;
 			buildConfigurationList = 3EDF35422F7622DC000CE8DA /* Build configuration list for PBXNativeTarget "TravelCalculator" */;
@@ -64,8 +144,6 @@
 				3EDF35392F7622DB000CE8DA /* TravelCalculator */,
 			);
 			name = TravelCalculator;
-			packageProductDependencies = (
-			);
 			productName = TravelCalculator;
 			productReference = 3EDF35372F7622DB000CE8DA /* TravelCalculator.app */;
 			productType = "com.apple.product-type.application";
@@ -100,12 +178,20 @@
 			projectRoot = "";
 			targets = (
 				3EDF35362F7622DB000CE8DA /* TravelCalculator */,
+				3DEF59B6687E3B758816AEEA /* TravelCalculatorTests */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXResourcesBuildPhase section */
 		3EDF35352F7622DB000CE8DA /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		E3E7284E18A9A89F3ADCD481 /* Resources */ = {
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -122,9 +208,58 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
+		45EF7D353A344E74C6F5940F /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
 /* End PBXSourcesBuildPhase section */
 
+/* Begin PBXTargetDependency section */
+		13847CBEBAAB3042FBC6B0D2 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			name = TravelCalculator;
+			target = 3EDF35362F7622DB000CE8DA /* TravelCalculator */;
+			targetProxy = FDE854CB95948873EB0FA61E /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
 /* Begin XCBuildConfiguration section */
+		3069297FB7CE6CAC1D3BC0D0 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				DEVELOPMENT_TEAM = NB4SQ6YKU4;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.study.TravelCalculatorTests;
+				PRODUCT_NAME = TravelCalculatorTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TravelCalculator";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		3D5677821FE0C668DC5E8795 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				BUNDLE_LOADER = "$(TEST_HOST)";
+				CLANG_ENABLE_OBJC_WEAK = NO;
+				DEVELOPMENT_TEAM = NB4SQ6YKU4;
+				GENERATE_INFOPLIST_FILE = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 18.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.study.TravelCalculatorTests;
+				PRODUCT_NAME = TravelCalculatorTests;
+				SDKROOT = iphoneos;
+				SWIFT_VERSION = 6.0;
+				TEST_HOST = "$(BUILT_PRODUCTS_DIR)/TravelCalculator.app/$(BUNDLE_EXECUTABLE_FOLDER_PATH)/TravelCalculator";
+			};
+			name = Debug;
+		};
 		3EDF35402F7622DC000CE8DA /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
@@ -241,6 +376,7 @@
 		};
 		3EDF35432F7622DC000CE8DA /* Debug */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2037D26B4DC548FC878987E3 /* Exchange.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -251,6 +387,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_EXCHANGE_RATE_API_KEY = "$(EXCHANGE_RATE_API_KEY)";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -285,6 +422,7 @@
 		};
 		3EDF35442F7622DC000CE8DA /* Release */ = {
 			isa = XCBuildConfiguration;
+			baseConfigurationReference = 2037D26B4DC548FC878987E3 /* Exchange.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -295,6 +433,7 @@
 				ENABLE_PREVIEWS = YES;
 				ENABLE_USER_SELECTED_FILES = readonly;
 				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_KEY_EXCHANGE_RATE_API_KEY = "$(EXCHANGE_RATE_API_KEY)";
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphoneos*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSceneManifest_Generation[sdk=iphonesimulator*]" = YES;
 				"INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents[sdk=iphoneos*]" = YES;
@@ -344,6 +483,15 @@
 			buildConfigurations = (
 				3EDF35432F7622DC000CE8DA /* Debug */,
 				3EDF35442F7622DC000CE8DA /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		F82A78EB402E14D1DA300866 /* Build configuration list for PBXNativeTarget "TravelCalculatorTests" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				3069297FB7CE6CAC1D3BC0D0 /* Release */,
+				3D5677821FE0C668DC5E8795 /* Debug */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
