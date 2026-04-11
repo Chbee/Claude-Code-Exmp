@@ -83,8 +83,8 @@ final class AppCurrencyStore {
         return false
     }
 
-    var isRateUnavailable: Bool {
-        currentError != nil && currentRate == nil
+    var unavailableRateError: ExchangeRateError? {
+        currentRate == nil ? currentError : nil
     }
 
     // MARK: - Init
