@@ -17,20 +17,18 @@ final class CurrencySelectStore {
     }
 
     func send(_ intent: CurrencySelectIntent) {
-        switch intent {
-        case .selectCurrency(let currency):
-            guard currency != state.selectedCurrency else { return }
-            currencyStore.selectedCurrency = currency
-            state.selectedCurrency = currency
+        let previousCurrency = state.selectedCurrency
+        state = CurrencySelectReducer.reduce(state, intent: intent)
+
+        // Side effects: 통화가 실제로 변경된 경우에만
+        if state.selectedCurrency != previousCurrency {
+            currencyStore.selectedCurrency = state.selectedCurrency
+            Haptic.notification(.success)
             toastManager.show(ToastPayload(
                 style: .success,
                 title: "통화 변경 완료",
-                message: "\(currency.flag) \(currency.currencyUnit)"
+                message: "\(state.selectedCurrency.flag) \(state.selectedCurrency.currencyUnit)"
             ))
-            state.shouldDismiss = true
-
-        case .dismiss:
-            state.shouldDismiss = true
         }
     }
 }
