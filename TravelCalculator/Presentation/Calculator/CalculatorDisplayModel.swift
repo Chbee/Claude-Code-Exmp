@@ -5,27 +5,13 @@ struct CurrencyAmountDisplayModel {
     let symbol: String
     let flag: String
     let formattedAmount: String
+    let rawAmount: String
 }
 
 struct CalculatorDisplayModel {
     let inputDisplay: CurrencyAmountDisplayModel
     let resultDisplay: CurrencyAmountDisplayModel
-    let exchangeRate: Decimal
-
-    var rateDisplay: String {
-        let inputCode = inputDisplay.currencyCode
-        let resultCode = resultDisplay.currencyCode
-        let formatted = Self.formatRate(exchangeRate)
-        return "1 \(inputCode) = \(formatted) \(resultCode)"
-    }
-
-    private static func formatRate(_ rate: Decimal) -> String {
-        // rateDisplay는 항상 소수점 2자리 고정 ("1,350.00")
-        var value = rate
-        var rounded = Decimal()
-        NSDecimalRound(&rounded, &value, 2, .plain)
-        return rounded.formatDecimal(maxFractionDigits: 2)
-    }
+    let rateDisplay: String
 }
 
 // MARK: - Factory
@@ -36,6 +22,7 @@ extension CalculatorDisplayModel {
         state: CalculatorState,
         inputCurrency: Currency,
         outputCurrency: Currency,
+        selectedCurrency: Currency,
         exchangeRate: Decimal,
         isInputKRW: Bool = false
     ) -> CalculatorDisplayModel {
@@ -48,21 +35,39 @@ extension CalculatorDisplayModel {
         )
         let outputAmount = formatAmount(convertedAmount, currency: outputCurrency)
 
+        let rateDisplay = formatRateDisplay(
+            selectedCurrency: selectedCurrency,
+            exchangeRate: exchangeRate
+        )
+
         return CalculatorDisplayModel(
             inputDisplay: CurrencyAmountDisplayModel(
                 currencyCode: inputCurrency.currencyUnit,
                 symbol: inputCurrency.symbol,
                 flag: inputCurrency.flag,
-                formattedAmount: inputAmount
+                formattedAmount: inputAmount,
+                rawAmount: state.display
             ),
             resultDisplay: CurrencyAmountDisplayModel(
                 currencyCode: outputCurrency.currencyUnit,
                 symbol: outputCurrency.symbol,
                 flag: outputCurrency.flag,
-                formattedAmount: outputAmount
+                formattedAmount: outputAmount,
+                rawAmount: convertedAmount
             ),
-            exchangeRate: exchangeRate
+            rateDisplay: rateDisplay
         )
+    }
+
+    private static func formatRateDisplay(
+        selectedCurrency: Currency,
+        exchangeRate: Decimal
+    ) -> String {
+        var value = exchangeRate
+        var rounded = Decimal()
+        NSDecimalRound(&rounded, &value, 2, .plain)
+        let formatted = rounded.formatDecimal(maxFractionDigits: 2)
+        return "1 \(selectedCurrency.currencyUnit) = \(formatted) KRW"
     }
 
     private static func computeConvertedAmount(

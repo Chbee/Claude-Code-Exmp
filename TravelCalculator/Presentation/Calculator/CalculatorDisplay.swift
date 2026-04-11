@@ -108,6 +108,7 @@ struct CalculatorDisplay: View {
         state: state,
         inputCurrency: .USD,
         outputCurrency: .KRW,
+        selectedCurrency: .USD,
         exchangeRate: 1350,
         isInputKRW: false
     )
@@ -125,6 +126,7 @@ struct CalculatorDisplay: View {
         state: state,
         inputCurrency: .KRW,
         outputCurrency: .USD,
+        selectedCurrency: .USD,
         exchangeRate: 1350,
         isInputKRW: true
     )
