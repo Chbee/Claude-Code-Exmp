@@ -58,6 +58,7 @@ struct CalculatorDisplay: View {
                 .minimumScaleFactor(0.3)
                 .lineLimit(1)
         }
+        .frame(height: 56)
     }
 
     // MARK: - Toggle Button
@@ -95,6 +96,7 @@ struct CalculatorDisplay: View {
                 .minimumScaleFactor(0.3)
                 .lineLimit(1)
         }
+        .frame(height: 56)
     }
 }
 
