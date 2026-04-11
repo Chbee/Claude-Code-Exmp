@@ -18,8 +18,9 @@ struct ContentView: View {
             await appStore.currencyStore.loadExchangeRates()
         }
         .overlay {
-            if appStore.currencyStore.currentError == .noCacheAvailable {
-                ExchangeRateErrorView(error: .noCacheAvailable) {
+            if appStore.currencyStore.isRateUnavailable,
+               let error = appStore.currencyStore.currentError {
+                ExchangeRateErrorView(error: error) {
                     Task { await appStore.currencyStore.loadExchangeRates() }
                 }
             }

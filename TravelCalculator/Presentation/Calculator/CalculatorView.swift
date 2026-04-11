@@ -34,6 +34,7 @@ struct CalculatorView: View {
                 isRefreshEnabled: currencyStore.isRefreshEnabled,
                 isLoading: currencyStore.isLoading
             )
+            .opacity(!currencyStore.isLoading && currencyStore.currentRate == nil ? 0.4 : 1.0)
 
             CalculatorKeypad(
                 onIntent: { calculatorStore.send($0) }

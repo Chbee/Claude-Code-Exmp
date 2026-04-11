@@ -85,7 +85,7 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         for dayOffset in 0...6 {
             guard let date = Calendar.kst.date(byAdding: .day, value: -dayOffset, to: today) else { continue }
             do {
-                let response = try await fetchFromAPI(currencies: currencies, searchDate: Self.formatDate(date))
+                let response = try await fetchFromAPI(currencies: currencies, searchDate: date.yyyyMMddKST())
                 try? await cache.save(response)
                 return response
             } catch ExchangeRateError.noDataAvailable {
@@ -144,16 +144,4 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         return ExchangeRateResponse(rates: rates, fetchedAt: .now, searchDate: searchDate)
     }
 
-    private static let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyyMMdd"
-        f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = TimeZone.kst
-        f.calendar = .kst
-        return f
-    }()
-
-    private static func formatDate(_ date: Date) -> String {
-        dateFormatter.string(from: date)
-    }
 }

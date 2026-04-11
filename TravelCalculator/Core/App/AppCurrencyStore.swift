@@ -61,12 +61,12 @@ final class AppCurrencyStore {
 
     var isRefreshEnabled: Bool {
         guard let searchDate else { return false }
-        return searchDate != Self.todayString()
+        return searchDate != Date.now.yyyyMMddKST()
     }
 
     var daysSinceSearchDate: Int? {
         guard let searchDate,
-              let date = Self.dateFormatter.date(from: searchDate) else { return nil }
+              let date = Date.fromYYYYMMDDKST(searchDate) else { return nil }
         return Calendar.kst.dateComponents([.day],
             from: Calendar.kst.startOfDay(for: date),
             to: Calendar.kst.startOfDay(for: Date.now)
@@ -81,6 +81,10 @@ final class AppCurrencyStore {
     var isLoading: Bool {
         if case .loading = exchangeRateStatus { return true }
         return false
+    }
+
+    var isRateUnavailable: Bool {
+        currentError != nil && currentRate == nil
     }
 
     // MARK: - Init
@@ -98,7 +102,10 @@ final class AppCurrencyStore {
     // MARK: - Exchange Rate Loading
 
     func loadExchangeRates() async {
-        guard let api = exchangeRateAPI else { return }
+        guard let api = exchangeRateAPI else {
+            exchangeRateStatus = .error(.noCacheAvailable)
+            return
+        }
         exchangeRateStatus = .loading
         do {
             let response = try await api.fetchRates(for: Currency.allCases.filter { $0 != .KRW })
@@ -129,16 +136,4 @@ final class AppCurrencyStore {
         return dir
     }
 
-    private static let dateFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyyMMdd"
-        f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = TimeZone.kst
-        f.calendar = .kst
-        return f
-    }()
-
-    private static func todayString() -> String {
-        dateFormatter.string(from: Date.now)
-    }
 }

@@ -21,12 +21,7 @@ private struct MockExchangeRateAPI: ExchangeRateAPIProtocol {
 }
 
 private func todayYYYYMMDD() -> String {
-    let f = DateFormatter()
-    f.dateFormat = "yyyyMMdd"
-    f.locale = Locale(identifier: "ko_KR")
-    f.timeZone = TimeZone.kst
-    f.calendar = Calendar.kst
-    return f.string(from: Date.now)
+    Date.now.yyyyMMddKST()
 }
 
 private func makeResponse(searchDate: String = "20260410", rate: Decimal = 1350) -> ExchangeRateResponse {
@@ -69,15 +64,14 @@ struct AppCurrencyStoreLoadTests {
         }
     }
 
-    @Test func loadExchangeRates_nilAPI_statusUnchanged() async {
+    @Test func loadExchangeRates_nilAPI_setsNoCacheError() async {
         let store = AppCurrencyStore(exchangeRateAPI: nil)
-        // 초기 상태는 .loading
         await store.loadExchangeRates()
-        // API nil이면 guard 통과 못하므로 상태 변화 없음
-        if case .loading = store.exchangeRateStatus {
-            // OK
+        // API nil이면 .error(.noCacheAvailable)로 전환 (영구 .loading 방지)
+        if case .error(let e) = store.exchangeRateStatus {
+            #expect(e == .noCacheAvailable)
         } else {
-            Issue.record("Expected .loading, got \(store.exchangeRateStatus)")
+            Issue.record("Expected .error(.noCacheAvailable), got \(store.exchangeRateStatus)")
         }
     }
 }

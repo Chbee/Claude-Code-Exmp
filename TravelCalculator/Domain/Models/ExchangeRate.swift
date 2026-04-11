@@ -16,7 +16,7 @@ struct ExchangeRateResponse: Sendable {
     }
 }
 
-// MARK: - Codable (nonisolated — @MainActor 기본 격리 우회)
+// MARK: - Codable (nonisolated — JSONEncoder/Decoder의 비MainActor 호출 허용)
 
 extension ExchangeRate: Codable {
     private enum CodingKeys: String, CodingKey { case currency, currencyName, rate }
