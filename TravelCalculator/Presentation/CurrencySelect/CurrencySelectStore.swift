@@ -20,7 +20,7 @@ final class CurrencySelectStore {
         let previousCurrency = state.selectedCurrency
         state = CurrencySelectReducer.reduce(state, intent: intent)
 
-        // Side effects: 통화가 실제로 변경된 경우에만
+        // 동일 통화 재선택 시 중복 toast/haptic 방지
         if state.selectedCurrency != previousCurrency {
             currencyStore.selectedCurrency = state.selectedCurrency
             Haptic.notification(.success)

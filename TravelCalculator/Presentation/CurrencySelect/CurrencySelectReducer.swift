@@ -5,9 +5,7 @@ enum CurrencySelectReducer {
         var s = state
         switch intent {
         case .selectCurrency(let currency):
-            if currency != s.selectedCurrency {
-                s.selectedCurrency = currency
-            }
+            s.selectedCurrency = currency
             s.shouldDismiss = true
         case .dismiss:
             s.shouldDismiss = true
