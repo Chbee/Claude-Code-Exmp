@@ -19,7 +19,7 @@ final class CalculatorStore {
 
     var displayModel: CalculatorDisplayModel {
         let currency = currencyStore.selectedCurrency
-        let rate = mockRate(for: currency)
+        let rate = currencyStore.currentRate ?? 0
         let isInputKRW = currencyStore.conversionDirection == .krwToSelected
         return CalculatorDisplayModel.make(
             state: state,
@@ -62,11 +62,7 @@ final class CalculatorStore {
         Haptic.impact(.medium)
     }
 
-    private func mockRate(for currency: Currency) -> Decimal {
-        switch currency {
-        case .USD: return 1350
-        case .TWD: return 45
-        case .KRW: return 1
-        }
+    func refreshRates() async {
+        await currencyStore.refreshExchangeRates()
     }
 }
