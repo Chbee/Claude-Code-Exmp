@@ -10,91 +10,91 @@
 ### 마일스톤 0: 온보딩
 
 #### 0.1 온보딩 플로우
-- [ ] 0.1.1 `hasCompletedOnboarding` UserDefaults 플래그
+- [x] 0.1.1 `hasCompletedOnboarding` UserDefaults 플래그
 - [ ] 0.1.2 ContentView에서 온보딩/계산기 분기
 - [ ] 0.1.3 CurrencySelectView 온보딩 모드 (`isOnboarding: Bool`, KRW 제외)
 
 ### 마일스톤 1: 계산기 화면 완성
 
 #### 1.1 계산 로직 완성
-- [ ] 1.1.1 `Operator` 독립 enum 정의
-- [ ] 1.1.2 `CalculatorIntent` enum 정의 (의미 단위 분리)
-- [ ] 1.1.3 equals 연산 구현
-- [ ] 1.1.4 연속 연산 지원 (3+5+2)
-- [ ] 1.1.5 `=` 연속 입력 시 마지막 연산 반복 (`lastOperator` + `lastOperand`)
-- [ ] 1.1.6 `=` 후 연산자 → 결과를 previousValue로
-- [ ] 1.1.7 연산자 후 `=` (피연산자 없이) → display값 사용 (`5+=` → 10)
-- [ ] 1.1.8 `=` 단독 (pendingOperator=nil) → 무시
-- [ ] 1.1.9 AC/C 동작 분리 (C: display만, AC: 전체. iOS 토글 규칙)
-- [ ] 1.1.10 엣지 케이스 (연산자 교체, 0 나누기 Toast, 소수점 자동완성, 음수→변환 0)
-- [ ] 1.1.11 백스페이스 엣지 케이스 ("5"→"0", "0."→"0", "0"→무시, = 후 삭제)
-- [ ] 1.1.12 정수부 10자리 제한 + 초과 시 숫자/소수점만 차단
-- [ ] 1.1.13 `=` 결과 15자리 초과 시 Toast(error) + display 유지
+- [x] 1.1.1 `Operator` 독립 enum 정의
+- [x] 1.1.2 `CalculatorIntent` enum 정의 (의미 단위 분리)
+- [x] 1.1.3 equals 연산 구현
+- [x] 1.1.4 연속 연산 지원 (3+5+2)
+- [x] 1.1.5 `=` 연속 입력 시 마지막 연산 반복 (`lastOperator` + `lastOperand`)
+- [x] 1.1.6 `=` 후 연산자 → 결과를 previousValue로
+- [x] 1.1.7 연산자 후 `=` (피연산자 없이) → display값 사용 (`5+=` → 10)
+- [x] 1.1.8 `=` 단독 (pendingOperator=nil) → 무시
+- [x] 1.1.9 AC/C 동작 분리 (C: display만, AC: 전체. iOS 토글 규칙)
+- [x] 1.1.10 엣지 케이스 (연산자 교체, 0 나누기 Toast, 소수점 자동완성, 음수→변환 0)
+- [x] 1.1.11 백스페이스 엣지 케이스 ("5"→"0", "0."→"0", "0"→무시, = 후 삭제)
+- [x] 1.1.12 정수부 10자리 제한 + 초과 시 숫자/소수점만 차단
+- [x] 1.1.13 `=` 결과 15자리 초과 시 Toast(error) + display 유지
 
 #### 1.2 디스플레이 영역 개선
-- [ ] 1.2.1 천단위 콤마 포맷팅 (`Decimal+Format`, 로케일 고정)
-- [ ] 1.2.2 긴 숫자 처리 (폰트 자동 축소)
-- [ ] 1.2.3 `CurrencyAmountDisplayModel` 구현
+- [x] 1.2.1 천단위 콤마 포맷팅 (`Decimal+Format`, 로케일 고정)
+- [x] 1.2.2 긴 숫자 처리 (폰트 자동 축소)
+- [x] 1.2.3 `CurrencyAmountDisplayModel` 구현
 
 #### 1.3 통화 선택 UI
-- [ ] 1.3.1 Currency enum 정의 (`fractionDigits` 포함)
-- [ ] 1.3.2 통화 선택 버튼 UI
-- [ ] 1.3.3 통화 State 추가
-- [ ] 1.3.4 통화 선택 Intent 추가
-- [ ] 1.3.5 통화 변경 시 계산기 리셋 로직
+- [x] 1.3.1 Currency enum 정의 (`fractionDigits` 포함)
+- [x] 1.3.2 통화 선택 버튼 UI
+- [x] 1.3.3 통화 State 추가
+- [x] 1.3.4 통화 선택 Intent 추가
+- [x] 1.3.5 통화 변경 시 계산기 리셋 로직
 
 #### 1.4 환율 표시 영역
-- [ ] 1.4.1 환율 정보 표시 UI ("1 USD = 1,350 KRW")
-- [ ] 1.4.2 업데이트 시간 표시
-- [ ] 1.4.3 새로고침 ↻ 버튼 (환율 행 오른쪽)
-- [ ] 1.4.4 searchdate 기반 버튼 활성화/비활성화
+- [x] 1.4.1 환율 정보 표시 UI ("1 USD = 1,350 KRW")
+- [x] 1.4.2 업데이트 시간 표시
+- [x] 1.4.3 새로고침 ↻ 버튼 (환율 행 오른쪽)
+- [x] 1.4.4 searchdate 기반 버튼 활성화/비활성화
 
 #### 1.5 변환 방향 전환
-- [ ] 1.5.1 방향 전환 `↓` 버튼 UI
-- [ ] 1.5.2 방향 전환 시 결과값 → 새 입력값 이전 로직
-- [ ] 1.5.3 방향 전환 시 계산기 상태 리셋 (previousValue, pendingOperator, lastOperand, lastOperator)
-- [ ] 1.5.4 10자리 초과 변환값 이전 허용 처리
+- [x] 1.5.1 방향 전환 `↓` 버튼 UI
+- [x] 1.5.2 방향 전환 시 결과값 → 새 입력값 이전 로직
+- [x] 1.5.3 방향 전환 시 계산기 상태 리셋 (previousValue, pendingOperator, lastOperand, lastOperator)
+- [x] 1.5.4 10자리 초과 변환값 이전 허용 처리
 
 #### 1.6 변환 결과 표시
-- [ ] 1.6.1 변환 결과 영역 UI
-- [ ] 1.6.2 실시간 변환 표시
-- [ ] 1.6.3 display "0" → KRW 0 표시
-- [ ] 1.6.4 통화별 소수점 차등 적용 (fractionDigits)
-- [ ] 1.6.5 음수 결과 → 변환 0 + Toast
+- [x] 1.6.1 변환 결과 영역 UI
+- [x] 1.6.2 실시간 변환 표시
+- [x] 1.6.3 display "0" → KRW 0 표시
+- [x] 1.6.4 통화별 소수점 차등 적용 (fractionDigits)
+- [x] 1.6.5 음수 결과 → 변환 0 + Toast
 
 #### 1.7 통화 상태 구조 정리
-- [ ] 1.7.1 AppCurrencyStore + ExchangeRateStatus enum
-- [ ] 1.7.2 selectedCurrency, conversionDirection UserDefaults 저장
-- [ ] 1.7.3 Calculator DisplayModel 분리 마무리
-- [ ] 1.7.4 CurrencySelect 전역 통화 연동 정리
+- [x] 1.7.1 AppCurrencyStore + ExchangeRateStatus enum
+- [x] 1.7.2 selectedCurrency, conversionDirection UserDefaults 저장
+- [x] 1.7.3 Calculator DisplayModel 분리 마무리
+- [x] 1.7.4 CurrencySelect 전역 통화 연동 정리
 
 #### 1.8 V1 미지원 버튼 처리
-- [ ] 1.8.1 카메라/설정 버튼 숨김 처리 (opacity=0, 레이아웃 자리 유지)
+- [x] 1.8.1 카메라/설정 버튼 숨김 처리 (opacity=0, 레이아웃 자리 유지)
 
 ### 마일스톤 2: 환율 로직 구현
 
 #### 2.1 통화 모델 확장
-- [ ] 2.1.1 Currency 상세 정의 (통화코드, 이름, 기호, fractionDigits)
-- [ ] 2.1.2 지원 통화 필터링
+- [x] 2.1.1 Currency 상세 정의 (통화코드, 이름, 기호, fractionDigits)
+- [x] 2.1.2 지원 통화 필터링
 
 #### 2.2 환율 변환 로직
-- [ ] 2.2.1 환율 변환 함수 구현 (KRW 기준 양방향, Decimal 사용)
-- [ ] 2.2.2 소수점 처리 규칙 (통화별 fractionDigits)
-- [ ] 2.2.3 반올림 규칙 적용 (은행 반올림)
+- [x] 2.2.1 환율 변환 함수 구현 (KRW 기준 양방향, Decimal 사용)
+- [x] 2.2.2 소수점 처리 규칙 (통화별 fractionDigits)
+- [x] 2.2.3 반올림 규칙 적용 (은행 반올림)
 
 #### 2.3 State/Intent 확장
-- [ ] 2.3.1 ExchangeRateStatus State
-- [ ] 2.3.2 환율 Intent 추가
-- [ ] 2.3.3 환율 Reducer 로직
+- [x] 2.3.1 ExchangeRateStatus State
+- [x] 2.3.2 환율 Intent 추가
+- [x] 2.3.3 환율 Reducer 로직
 
 #### 2.4 Store 비동기 처리
-- [ ] 2.4.1 ExchangeRateAPIProtocol 정의 + 구현체 (deal_bas_r 쉼표 파싱 포함)
-- [ ] 2.4.2 주말/공휴일 순차 fallback (최대 7번 호출)
-- [ ] 2.4.3 앱 시작 시 환율 로드 (온보딩과 병렬)
-- [ ] 2.4.4 ExchangeRateStatus 로딩 상태 처리
-- [ ] 2.4.5 API 실패 + 캐시 없음 → 전체화면 에러
-- [ ] 2.4.6 searchdate 기반 새로고침 전략 구현
-- [ ] 2.4.7 비정상 환율값(0, 음수) 검증 + 무시
+- [x] 2.4.1 ExchangeRateAPIProtocol 정의 + 구현체 (deal_bas_r 쉼표 파싱 포함)
+- [x] 2.4.2 주말/공휴일 순차 fallback (최대 7번 호출)
+- [x] 2.4.3 앱 시작 시 환율 로드 (온보딩과 병렬)
+- [x] 2.4.4 ExchangeRateStatus 로딩 상태 처리
+- [x] 2.4.5 API 실패 + 캐시 없음 → 전체화면 에러
+- [x] 2.4.6 searchdate 기반 새로고침 전략 구현
+- [x] 2.4.7 비정상 환율값(0, 음수) 검증 + 무시
 
 ### 마일스톤 3: 오프라인 대응
 
@@ -136,12 +136,12 @@
 - [ ] 4.2.5 음수 → 변환 0 테스트
 
 #### 4.3 API 테스트
-- [ ] 4.3.1 MockExchangeRateAPI 구현 (Protocol 기반)
-- [ ] 4.3.2 캐시 로직 테스트 (searchDate 기반 새로고침 포함)
-- [ ] 4.3.3 주말/공휴일 순차 fallback 테스트
-- [ ] 4.3.4 API 실패 + 캐시 없음 에러 상태 테스트
-- [ ] 4.3.5 deal_bas_r 쉼표 파싱 테스트
-- [ ] 4.3.6 비정상 환율값(0, 음수) 검증 테스트
+- [x] 4.3.1 MockExchangeRateAPI 구현 (Protocol 기반)
+- [x] 4.3.2 캐시 로직 테스트 (searchDate 기반 새로고침 포함)
+- [x] 4.3.3 주말/공휴일 순차 fallback 테스트
+- [x] 4.3.4 API 실패 + 캐시 없음 에러 상태 테스트
+- [x] 4.3.5 deal_bas_r 쉼표 파싱 테스트
+- [x] 4.3.6 비정상 환율값(0, 음수) 검증 테스트
 
 ### 태스크 요약
 

@@ -67,11 +67,11 @@ ContentView → CalculatorView
 
 | # | Milestone | Status |
 |---|-----------|--------|
-| 0 | 온보딩 | 미착수 |
-| 1 | Calculator UI | Phase A(Foundation) 완료 / Phase B(UI) 대기 |
-| 2 | Exchange Rate (한국수출입은행 API) | 대기 |
-| 3 | Offline Support | 대기 |
-| 4 | Testing | 대기 |
+| 0 | 온보딩 | 일부 완료 (0.1.1만, 분기/모드 미착수) |
+| 1 | Calculator UI | 완료 (Phase A+B) |
+| 2 | Exchange Rate (한국수출입은행 API) | 완료 (Phase C) |
+| 3 | Offline Support | 미착수 |
+| 4 | Testing | 일부 완료 (4.3 API 테스트, 나머지 미착수) |
 
 ## Multi-AI Workflow
 
