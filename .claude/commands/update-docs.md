@@ -7,7 +7,8 @@
 1. 현재 git 브랜치에서 Phase를 감지 (예: `phase/a-foundation` → Phase A)
 2. 해당 Phase의 `docs/phase-X.md` 완료 기준 `[ ]` → `[x]` 체크
 3. `CLAUDE.md` Milestones 테이블 상태 업데이트
-4. 변경된 파일을 docs 커밋으로 저장 (선택: 커밋 여부 확인 후)
+4. `specs/Spec-Tasks.md` 완료된 태스크 `[ ]` → `[x]` 체크
+5. 변경된 파일을 docs 커밋으로 저장 (선택: 커밋 여부 확인 후)
 
 ## 실행 절차
 
@@ -31,7 +32,24 @@ git branch --show-current
 
 완료된 항목은 `[ ]` → `[x]` 로 변경하세요.
 
-### Step 3: CLAUDE.md 마일스톤 업데이트
+### Step 3: specs/Spec-Tasks.md 태스크 체크
+
+`specs/Spec-Tasks.md`를 읽고, 해당 Phase에서 구현된 태스크를 파악하세요.
+
+판단 기준:
+- 코드베이스에서 Glob/Grep으로 구현 여부 직접 확인
+- 구현된 태스크는 `[ ]` → `[x]` 로 변경
+
+Phase와 태스크 대응:
+- Phase A → MS1 1.1.x (계산 로직), 1.2.x (디스플레이), 1.3.x (통화), 1.7.x (상태 구조)
+- Phase B → MS1 1.4.x (환율 표시), 1.5.x (방향 전환), 1.6.x (변환 결과), 1.8.x (숨김 버튼)
+- Phase C → MS2 전체, MS4 4.3.x (API 테스트)
+- Phase D → MS0 전체
+- Phase E → MS3 전체, MS4 4.1.x~4.2.x
+
+미완료 항목은 절대 `[x]`로 표시하지 말 것.
+
+### Step 4: CLAUDE.md 마일스톤 업데이트
 
 `CLAUDE.md`의 `## Milestones` 테이블에서 현재 Phase에 해당하는 마일스톤 상태를 업데이트하세요.
 
@@ -46,7 +64,7 @@ Phase와 마일스톤 대응:
 - Phase D → Milestone 0 (온보딩)
 - Phase E → Milestone 3+4 (Offline + Testing)
 
-### Step 4: 커밋 여부 확인
+### Step 5: 커밋 여부 확인
 
 변경된 파일 목록을 보여주고, 커밋할지 사용자에게 확인하세요.
 
