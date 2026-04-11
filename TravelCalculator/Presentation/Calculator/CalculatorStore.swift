@@ -10,13 +10,11 @@ final class CalculatorStore {
     private let toastManager: ToastManager
     let currencyStore: AppCurrencyStore
 
-    @ObservationIgnored private var previousCurrency: Currency
     @ObservationIgnored private var wasNegative: Bool = false
 
     init(toastManager: ToastManager, currencyStore: AppCurrencyStore) {
         self.toastManager = toastManager
         self.currencyStore = currencyStore
-        self.previousCurrency = currencyStore.selectedCurrency
     }
 
     var displayModel: CalculatorDisplayModel {
@@ -27,6 +25,7 @@ final class CalculatorStore {
             state: state,
             inputCurrency: currencyStore.fromCurrency,
             outputCurrency: currencyStore.toCurrency,
+            selectedCurrency: currency,
             exchangeRate: rate,
             isInputKRW: isInputKRW
         )
@@ -52,32 +51,15 @@ final class CalculatorStore {
             ))
         }
         wasNegative = isNegativeNow
-
-        checkCurrencyChange()
     }
 
     func toggleDirection() {
         let model = displayModel
-        let rawValue = stripFormatting(model.resultDisplay.formattedAmount)
-        send(.directionTogglePressed(rawValue))
+        send(.directionTogglePressed(model.resultDisplay.rawAmount))
         currencyStore.conversionDirection = currencyStore.conversionDirection == .selectedToKRW
             ? .krwToSelected
             : .selectedToKRW
         Haptic.impact(.medium)
-    }
-
-    private func checkCurrencyChange() {
-        let current = currencyStore.selectedCurrency
-        if current != previousCurrency {
-            previousCurrency = current
-            send(.resetForCurrencyChange)
-        }
-    }
-
-    private func stripFormatting(_ formatted: String) -> String {
-        // Remove thousands separators (commas), keep digits, dot, minus sign
-        let stripped = formatted.filter { $0.isNumber || $0 == "." || $0 == "-" }
-        return stripped.isEmpty ? "0" : stripped
     }
 
     private func mockRate(for currency: Currency) -> Decimal {

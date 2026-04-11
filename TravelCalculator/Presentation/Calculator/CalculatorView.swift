@@ -40,6 +40,9 @@ struct CalculatorView: View {
             .padding(.bottom, 24)
         }
         .background(Color.appBackground.ignoresSafeArea())
+        .onChange(of: currencyStore.selectedCurrency) {
+            calculatorStore.send(.resetForCurrencyChange)
+        }
         .fullScreenCover(isPresented: $showCurrencySelect) {
             CurrencySelectView(
                 store: CurrencySelectStore(
