@@ -7,7 +7,6 @@ struct CalculatorState {
     var previousValue: Decimal?
     var lastOperand: Decimal?
     var lastOperator: Operator?
-    var isInputLimitExceeded: Bool = false
     var pendingToast: ToastPayload?
 
     // AC/C 토글: display="0"이고 pendingOperator=nil일 때 AC 표시

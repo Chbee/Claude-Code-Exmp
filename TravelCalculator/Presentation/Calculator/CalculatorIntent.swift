@@ -8,6 +8,6 @@ enum CalculatorIntent {
     case clearPressed
     case allClearPressed
     case backspacePressed
-    case resetInputLimitFlag
     case resetForCurrencyChange
+    case directionTogglePressed(String)
 }

@@ -21,6 +21,9 @@ extension Color {
     // MARK: Accent
     static let appAccent = Side.accent.adaptive
 
+    // MARK: Utility
+    static let appUtility = Gray.c200.adaptive
+
     // MARK: Status
     static let appSuccess = System.green500.adaptive
     static let appWarning = System.yellow500.adaptive
