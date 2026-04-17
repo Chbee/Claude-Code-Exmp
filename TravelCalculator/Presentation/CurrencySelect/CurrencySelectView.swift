@@ -11,20 +11,22 @@ struct CurrencySelectView: View {
             VStack(spacing: 0) {
                 // Top bar
                 ZStack {
-                    Text("여행 통화 설정")
+                    Text(store.state.isOnboarding ? "여행지 통화를 선택해주세요" : "여행 통화 설정")
                         .font(.headline)
                         .foregroundStyle(Color.appTextPrimary)
                         .frame(maxWidth: .infinity)
 
-                    HStack {
-                        Spacer()
-                        Button {
-                            store.send(.dismiss)
-                        } label: {
-                            Image(systemName: "xmark")
-                                .font(.body.weight(.semibold))
-                                .foregroundStyle(Color.appTextPrimary)
-                                .padding(8)
+                    if !store.state.isOnboarding {
+                        HStack {
+                            Spacer()
+                            Button {
+                                store.send(.dismiss)
+                            } label: {
+                                Image(systemName: "xmark")
+                                    .font(.body.weight(.semibold))
+                                    .foregroundStyle(Color.appTextPrimary)
+                                    .padding(8)
+                            }
                         }
                     }
                 }
@@ -81,6 +83,7 @@ struct CurrencySelectView: View {
                 }
             }
         }
+        .interactiveDismissDisabled(store.state.isOnboarding)
         .onChange(of: store.state.shouldDismiss) { _, newValue in
             if newValue {
                 dismiss()

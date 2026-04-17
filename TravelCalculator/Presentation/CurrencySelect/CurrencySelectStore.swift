@@ -9,26 +9,45 @@ final class CurrencySelectStore {
 
     private let toastManager: ToastManager
     private let currencyStore: AppCurrencyStore
+    private let onOnboardingComplete: (@MainActor @Sendable () -> Void)?
 
-    init(toastManager: ToastManager, currencyStore: AppCurrencyStore) {
+    init(
+        toastManager: ToastManager,
+        currencyStore: AppCurrencyStore,
+        isOnboarding: Bool = false,
+        onOnboardingComplete: (@MainActor @Sendable () -> Void)? = nil
+    ) {
         self.toastManager = toastManager
         self.currencyStore = currencyStore
-        self.state = CurrencySelectState(selectedCurrency: currencyStore.selectedCurrency)
+        self.onOnboardingComplete = onOnboardingComplete
+        var initial = CurrencySelectState(selectedCurrency: currencyStore.selectedCurrency)
+        initial.isOnboarding = isOnboarding
+        self.state = initial
     }
 
     func send(_ intent: CurrencySelectIntent) {
         let previousCurrency = state.selectedCurrency
         state = CurrencySelectReducer.reduce(state, intent: intent)
 
-        // 동일 통화 재선택 시 중복 toast/haptic 방지
-        if state.selectedCurrency != previousCurrency {
-            currencyStore.selectedCurrency = state.selectedCurrency
-            Haptic.notification(.success)
-            toastManager.show(ToastPayload(
-                style: .success,
-                title: "통화 변경 완료",
-                message: "\(state.selectedCurrency.flag) \(state.selectedCurrency.currencyUnit)"
-            ))
+        switch intent {
+        case .selectCurrency:
+            if state.selectedCurrency != previousCurrency {
+                currencyStore.selectedCurrency = state.selectedCurrency
+                Haptic.notification(.success)
+                if !state.isOnboarding {
+                    toastManager.show(ToastPayload(
+                        style: .success,
+                        title: "통화 변경 완료",
+                        message: "\(state.selectedCurrency.flag) \(state.selectedCurrency.currencyUnit)"
+                    ))
+                }
+            }
+            if state.isOnboarding {
+                currencyStore.conversionDirection = .selectedToKRW
+                onOnboardingComplete?()
+            }
+        case .dismiss:
+            break
         }
     }
 }
