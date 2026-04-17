@@ -12,8 +12,6 @@ final class CurrencySelectStore {
     private let onOnboardingComplete: (@MainActor @Sendable () -> Void)?
     private let locationService: (any CurrentCountryCodeProvider)?
 
-    private enum SelectionSource { case userTap, location }
-
     init(
         toastManager: ToastManager,
         currencyStore: AppCurrencyStore,
@@ -31,14 +29,13 @@ final class CurrencySelectStore {
     }
 
     func send(_ intent: CurrencySelectIntent) {
-        // .requestLocation 재진입 방지: 이미 로딩 중이면 reducer/side effect 모두 스킵
         if case .requestLocation = intent, state.isRequestingLocation { return }
 
         state = CurrencySelectReducer.reduce(state, intent: intent)
 
         switch intent {
         case .selectCurrency(let currency):
-            applySelectedCurrency(currency, source: .userTap)
+            applySelectedCurrency(currency, fromLocation: false)
         case .dismiss:
             break
         case .requestLocation:
@@ -50,7 +47,7 @@ final class CurrencySelectStore {
 
     // MARK: - Private
 
-    private func applySelectedCurrency(_ currency: Currency, source: SelectionSource) {
+    private func applySelectedCurrency(_ currency: Currency, fromLocation: Bool) {
         let previous = currencyStore.selectedCurrency
         let changed = previous != currency
 
@@ -62,7 +59,7 @@ final class CurrencySelectStore {
         if !state.isOnboarding, changed {
             toastManager.show(ToastPayload(
                 style: .success,
-                title: source == .location ? "위치로 통화 설정 완료" : "통화 변경 완료",
+                title: fromLocation ? "위치로 통화 설정 완료" : "통화 변경 완료",
                 message: "\(currency.flag) \(currency.currencyUnit)"
             ))
         }
@@ -95,7 +92,7 @@ final class CurrencySelectStore {
                 ))
                 return
             }
-            applySelectedCurrency(currency, source: .location)
+            applySelectedCurrency(currency, fromLocation: true)
         } catch LocationError.permissionDenied {
             toastManager.show(ToastPayload(
                 style: .info,
