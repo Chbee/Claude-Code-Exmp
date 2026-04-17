@@ -5,4 +5,5 @@ struct CurrencySelectState {
     var selectedCurrency: Currency
     var shouldDismiss: Bool = false
     var isOnboarding: Bool = false
+    var isRequestingLocation: Bool = false
 }

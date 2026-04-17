@@ -42,12 +42,16 @@ struct CurrencySelectView: View {
                     .padding(.horizontal, 20)
                     .padding(.bottom, 12)
 
-                // Location button placeholder
+                // Location button
                 Button {
-                    // Phase D에서 구현
+                    store.send(.requestLocation)
                 } label: {
                     HStack(spacing: 6) {
-                        Text("📍 현재 위치로 자동 설정")
+                        if store.state.isRequestingLocation {
+                            ProgressView()
+                                .controlSize(.small)
+                        }
+                        Text(store.state.isRequestingLocation ? "위치 확인 중…" : "📍 현재 위치로 자동 설정")
                             .font(.subheadline)
                     }
                     .foregroundStyle(Color.appTextSub)
@@ -57,7 +61,7 @@ struct CurrencySelectView: View {
                     .clipShape(RoundedRectangle(cornerRadius: 10))
                     .padding(.horizontal, 16)
                 }
-                .disabled(true)
+                .disabled(store.state.isRequestingLocation)
                 .padding(.bottom, 16)
 
                 // Currency list

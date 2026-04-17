@@ -9,6 +9,10 @@ enum CurrencySelectReducer {
             s.shouldDismiss = true
         case .dismiss:
             s.shouldDismiss = true
+        case .requestLocation:
+            s.isRequestingLocation = true
+        case .locationRequestFinished:
+            s.isRequestingLocation = false
         }
         return s
     }
