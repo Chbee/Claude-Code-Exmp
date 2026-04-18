@@ -30,4 +30,12 @@ extension Color {
     static let appError   = System.red500.adaptive
     static let appInfo    = System.blue500.adaptive
     static let appCheck   = Side.check.adaptive
+
+    // MARK: Toast (Figma 전용 — node-id=350:274)
+    static let toastSuccessTint = Toast.successTint.adaptive
+    static let toastErrorTint   = Toast.errorTint.adaptive
+    static let toastWarningTint = Toast.warningTint.adaptive
+    static let toastInfoTint    = Toast.infoTint.adaptive
+    static let toastBackground  = Toast.background.adaptive
+    static let toastMessageText = Toast.messageText.adaptive
 }
