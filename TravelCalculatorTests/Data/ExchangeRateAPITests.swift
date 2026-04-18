@@ -175,8 +175,10 @@ struct ExchangeRateAPINetworkTests {
         #expect(callCount == 0)
     }
 
-    // API 키 placeholder + 유효 캐시 → 캐시 반환, 네트워크 호출 없음
-    @Test func fetchRates_placeholderAPIKey_validCache_returnsCache() async throws {
+    // API 키 placeholder + TTL 만료 캐시 → stale 캐시 반환, 네트워크 호출 없음
+    // (TTL 유효 캐시는 상단 gate에서 반환되어 placeholder 가드에 도달하지 않으므로
+    //  placeholder 경로의 stale fallback을 검증하려면 fetchedAt이 24h 이전이어야 함)
+    @Test func fetchRates_placeholderAPIKey_staleCache_returnsStale() async throws {
         let counter = CallCounter()
         let session = MockURLSession { [counter] _ in
             await counter.increment()
@@ -185,7 +187,7 @@ struct ExchangeRateAPINetworkTests {
         let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
         let cached = ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1300)],
-            fetchedAt: .now,
+            fetchedAt: Date.now.addingTimeInterval(-90_000), // 25h 전 (TTL 24h 초과)
             searchDate: "2026-04-11"
         )
         try await cache.save(cached)
