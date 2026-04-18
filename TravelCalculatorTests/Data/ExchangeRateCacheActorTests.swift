@@ -10,11 +10,16 @@ struct ExchangeRateCacheActorTests {
             .appendingPathExtension("json")
     }
 
-    private func makeResponse(fetchedAt: Date = .now, searchDate: String) -> ExchangeRateResponse {
+    private func makeResponse(
+        fetchedAt: Date = .now,
+        searchDate: String = "20260410",
+        validUntil: Date = .distantFuture
+    ) -> ExchangeRateResponse {
         ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1350)],
             fetchedAt: fetchedAt,
-            searchDate: searchDate
+            searchDate: searchDate,
+            validUntil: validUntil
         )
     }
 
@@ -23,13 +28,14 @@ struct ExchangeRateCacheActorTests {
     @Test func saveAndLoad_roundTrips() async throws {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        let response = makeResponse(searchDate: Date.now.yyyyMMddKST())
+        let response = makeResponse()
 
         try await actor.save(response)
         let loaded = await actor.load()
 
         #expect(loaded?.searchDate == response.searchDate)
         #expect(loaded?.rates.first?.rate == response.rates.first?.rate)
+        #expect(loaded?.validUntil == response.validUntil)
     }
 
     @Test func load_whenFileDoesNotExist_returnsNil() async {
@@ -41,26 +47,43 @@ struct ExchangeRateCacheActorTests {
         #expect(loaded == nil)
     }
 
-    // MARK: - isValid (searchDate == todayKST)
+    // MARK: - isValid (Date.now < validUntil)
 
-    @Test func isValid_searchDateEqualsTodayKST_returnsTrue() async {
+    @Test func isValid_whenNowBeforeValidUntil_returnsTrue() async {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        let response = makeResponse(searchDate: Date.now.yyyyMMddKST())
+        let response = makeResponse(validUntil: Date(timeIntervalSinceNow: 3600))
 
         let valid = await actor.isValid(response)
 
         #expect(valid == true)
     }
 
-    @Test func isValid_searchDateNotToday_returnsFalse() async {
+    @Test func isValid_whenNowAfterValidUntil_returnsFalse() async {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        let yesterday = Date.now.addingTimeInterval(-86_400).yyyyMMddKST()
-        let response = makeResponse(searchDate: yesterday)
+        let response = makeResponse(validUntil: Date(timeIntervalSinceNow: -3600))
 
         let valid = await actor.isValid(response)
 
+        #expect(valid == false)
+    }
+
+    // MARK: - backward compat (old cache without validUntil)
+
+    @Test func load_legacyCacheWithoutValidUntil_decodesWithDistantPast() async throws {
+        let url = makeTempFileURL()
+        let legacyJSON = """
+        {"rates":[{"currency":"USD","currencyName":"미국 달러","rate":1350}],"fetchedAt":\(Date.now.timeIntervalSinceReferenceDate),"searchDate":"20260410"}
+        """
+        try legacyJSON.write(to: url, atomically: true, encoding: .utf8)
+        let actor = ExchangeRateCacheActor(fileURL: url)
+
+        let loaded = await actor.load()
+
+        #expect(loaded != nil)
+        #expect(loaded?.validUntil == .distantPast)
+        let valid = await actor.isValid(loaded!)
         #expect(valid == false)
     }
 
@@ -69,7 +92,7 @@ struct ExchangeRateCacheActorTests {
     @Test func deleteCache_removesFile() async throws {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        try await actor.save(makeResponse(searchDate: Date.now.yyyyMMddKST()))
+        try await actor.save(makeResponse())
 
         try await actor.delete()
 

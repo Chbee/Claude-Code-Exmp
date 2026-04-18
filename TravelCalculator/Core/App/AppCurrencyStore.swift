@@ -60,8 +60,8 @@ final class AppCurrencyStore {
     }
 
     var isRefreshEnabled: Bool {
-        guard let searchDate else { return false }
-        return searchDate != Date.now.yyyyMMddKST()
+        guard let r = currentResponse else { return false }
+        return Date.now >= r.validUntil
     }
 
     var daysSinceSearchDate: Int? {
@@ -101,8 +101,8 @@ final class AppCurrencyStore {
 
     // MARK: - Exchange Rate Loading
 
-    func loadExchangeRates() async {
-        if case .loaded = exchangeRateStatus { return }
+    func loadExchangeRates(force: Bool = false) async {
+        if !force, case .loaded = exchangeRateStatus { return }
         guard let api = exchangeRateAPI else {
             exchangeRateStatus = .error(.noCacheAvailable)
             return
@@ -120,7 +120,7 @@ final class AppCurrencyStore {
 
     func refreshExchangeRates() async {
         guard isRefreshEnabled else { return }
-        await loadExchangeRates()
+        await loadExchangeRates(force: true)
     }
 
     // MARK: - Private Helpers

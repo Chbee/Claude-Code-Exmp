@@ -5,14 +5,23 @@ import Foundation
 // MARK: - Mock
 
 private struct MockExchangeRateAPI: ExchangeRateAPIProtocol {
-    enum Behavior {
+    enum Behavior: Sendable {
         case success(ExchangeRateResponse)
         case failure(ExchangeRateError)
     }
 
     let behavior: Behavior
+    let counter: Counter?
+
+    actor Counter { private(set) var count = 0; func increment() { count += 1 } }
+
+    init(behavior: Behavior, counter: Counter? = nil) {
+        self.behavior = behavior
+        self.counter = counter
+    }
 
     nonisolated func fetchRates(for currencies: [Currency]) async throws -> ExchangeRateResponse {
+        await counter?.increment()
         switch behavior {
         case .success(let response): return response
         case .failure(let error): throw error
@@ -20,15 +29,16 @@ private struct MockExchangeRateAPI: ExchangeRateAPIProtocol {
     }
 }
 
-private func todayYYYYMMDD() -> String {
-    Date.now.yyyyMMddKST()
-}
-
-private func makeResponse(searchDate: String = "20260410", rate: Decimal = 1350) -> ExchangeRateResponse {
+private func makeResponse(
+    searchDate: String = "20260410",
+    rate: Decimal = 1350,
+    validUntil: Date = .distantFuture
+) -> ExchangeRateResponse {
     ExchangeRateResponse(
         rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: rate)],
         fetchedAt: .now,
-        searchDate: searchDate
+        searchDate: searchDate,
+        validUntil: validUntil
     )
 }
 
@@ -67,7 +77,6 @@ struct AppCurrencyStoreLoadTests {
     @Test func loadExchangeRates_nilAPI_setsNoCacheError() async {
         let store = AppCurrencyStore(exchangeRateAPI: nil)
         await store.loadExchangeRates()
-        // API nil이면 .error(.noCacheAvailable)로 전환 (영구 .loading 방지)
         if case .error(let e) = store.exchangeRateStatus {
             #expect(e == .noCacheAvailable)
         } else {
@@ -97,9 +106,8 @@ struct AppCurrencyStoreComputedTests {
         #expect(store.currentRate == nil)
     }
 
-    @Test func isRefreshEnabled_searchDateIsToday_returnsFalse() async {
-        let today = todayYYYYMMDD()
-        let response = makeResponse(searchDate: today)
+    @Test func isRefreshEnabled_whenCacheBeforeValidUntil_returnsFalse() async {
+        let response = makeResponse(validUntil: Date(timeIntervalSinceNow: 3600))
         let api = MockExchangeRateAPI(behavior: .success(response))
         let store = AppCurrencyStore(exchangeRateAPI: api)
 
@@ -108,8 +116,8 @@ struct AppCurrencyStoreComputedTests {
         #expect(store.isRefreshEnabled == false)
     }
 
-    @Test func isRefreshEnabled_searchDateIsPast_returnsTrue() async {
-        let response = makeResponse(searchDate: "20200101")
+    @Test func isRefreshEnabled_whenCacheAfterValidUntil_returnsTrue() async {
+        let response = makeResponse(validUntil: Date(timeIntervalSinceNow: -3600))
         let api = MockExchangeRateAPI(behavior: .success(response))
         let store = AppCurrencyStore(exchangeRateAPI: api)
 
@@ -130,37 +138,33 @@ struct AppCurrencyStoreComputedTests {
 struct AppCurrencyStoreRefreshTests {
 
     @Test func refreshExchangeRates_whenNotEnabled_noAPICall() async {
-        // 오늘 날짜 → isRefreshEnabled == false → API 미호출
-        let today = todayYYYYMMDD()
-        let initialResponse = makeResponse(searchDate: today)
-        let api = MockExchangeRateAPI(behavior: .success(initialResponse))
+        let validResponse = makeResponse(validUntil: .distantFuture)
+        let counter = MockExchangeRateAPI.Counter()
+        let api = MockExchangeRateAPI(behavior: .success(validResponse), counter: counter)
         let store = AppCurrencyStore(exchangeRateAPI: api)
-        await store.loadExchangeRates() // 오늘 날짜로 loaded
+        await store.loadExchangeRates()
+        let initial = await counter.count
 
-        // 새 API로 교체할 수 없으므로 상태가 바뀌지 않음을 확인
         await store.refreshExchangeRates()
 
-        // 상태가 여전히 loaded(오늘 날짜)
-        if case .loaded(let r) = store.exchangeRateStatus {
-            #expect(r.searchDate == today)
-        } else {
-            Issue.record("Expected .loaded, got \(store.exchangeRateStatus)")
-        }
+        let after = await counter.count
+        #expect(after == initial)
     }
 
-    @Test func refreshExchangeRates_whenEnabled_callsAPI() async {
-        let pastResponse = makeResponse(searchDate: "20200101", rate: 1200)
-        let api = MockExchangeRateAPI(behavior: .success(pastResponse))
+    @Test func refreshExchangeRates_whenEnabled_bypassesLoadedGate() async {
+        // 만료된 캐시 → .loaded 상태지만 isRefreshEnabled=true → 새 API 호출 트리거
+        let expiredResponse = makeResponse(validUntil: Date(timeIntervalSinceNow: -3600))
+        let counter = MockExchangeRateAPI.Counter()
+        let api = MockExchangeRateAPI(behavior: .success(expiredResponse), counter: counter)
         let store = AppCurrencyStore(exchangeRateAPI: api)
-        await store.loadExchangeRates() // 과거 날짜로 loaded → isRefreshEnabled == true
+        await store.loadExchangeRates()
+        let firstCount = await counter.count
+        #expect(firstCount == 1)
 
-        // 새로고침 실행 → 동일 mock이므로 같은 응답 반환
         await store.refreshExchangeRates()
 
-        if case .loaded(let r) = store.exchangeRateStatus {
-            #expect(r.rates.first?.rate == 1200)
-        } else {
-            Issue.record("Expected .loaded, got \(store.exchangeRateStatus)")
-        }
+        // force 경로로 .loaded 게이트를 우회하고 API 재호출되어야 함
+        let secondCount = await counter.count
+        #expect(secondCount == 2)
     }
 }

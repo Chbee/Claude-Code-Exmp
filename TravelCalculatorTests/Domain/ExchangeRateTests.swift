@@ -9,7 +9,8 @@ struct ExchangeRateTests {
         let response = ExchangeRateResponse(
             rates: [],
             fetchedAt: .now,
-            searchDate: "2026-04-11"
+            searchDate: "20260411",
+            validUntil: .distantFuture
         )
         #expect(response.rate(for: .KRW) == 1)
     }
@@ -18,7 +19,8 @@ struct ExchangeRateTests {
         let response = ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1350)],
             fetchedAt: .now,
-            searchDate: "2026-04-11"
+            searchDate: "20260411",
+            validUntil: .distantFuture
         )
         #expect(response.rate(for: .USD) == 1350)
     }
@@ -27,7 +29,8 @@ struct ExchangeRateTests {
         let response = ExchangeRateResponse(
             rates: [],
             fetchedAt: .now,
-            searchDate: "2026-04-11"
+            searchDate: "20260411",
+            validUntil: .distantFuture
         )
         #expect(response.rate(for: .USD) == nil)
     }

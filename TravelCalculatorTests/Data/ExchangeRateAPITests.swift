@@ -29,14 +29,16 @@ private func makeHTTPResponse(statusCode: Int = 200) -> HTTPURLResponse {
 private func makeOpenERJSON(
     result: String = "success",
     baseCode: String = "USD",
-    timestamp: TimeInterval = 1_713_398_402, // 2024-04-18 UTC → 2024-04-18/19 KST
+    timestamp: TimeInterval = 1_713_398_402,
+    nextTimestamp: TimeInterval? = nil,
     rates: [String: Double] = ["USD": 1.0, "KRW": 1350.5, "TWD": 32.0]
 ) -> Data {
     var ratesJSON = "{"
     ratesJSON += rates.map { "\"\($0.key)\":\($0.value)" }.joined(separator: ",")
     ratesJSON += "}"
+    let next = nextTimestamp ?? (timestamp + 86400)
     return Data("""
-    {"result":"\(result)","base_code":"\(baseCode)","time_last_update_unix":\(Int(timestamp)),"time_next_update_unix":\(Int(timestamp) + 86400),"rates":\(ratesJSON)}
+    {"result":"\(result)","base_code":"\(baseCode)","time_last_update_unix":\(Int(timestamp)),"time_next_update_unix":\(Int(next)),"rates":\(ratesJSON)}
     """.utf8)
 }
 
@@ -44,11 +46,6 @@ private func makeTempCacheURL() -> URL {
     FileManager.default.temporaryDirectory
         .appendingPathComponent(UUID().uuidString)
         .appendingPathExtension("json")
-}
-
-private func todayKST() -> String { Date.now.yyyyMMddKST() }
-private func yesterdayKST() -> String {
-    Date.now.addingTimeInterval(-86_400).yyyyMMddKST()
 }
 
 // MARK: - Network Tests
@@ -65,7 +62,8 @@ struct ExchangeRateAPINetworkTests {
         let cached = ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1300)],
             fetchedAt: .now,
-            searchDate: todayKST()
+            searchDate: "20260410",
+            validUntil: .distantFuture
         )
         try await cache.save(cached)
 
@@ -77,7 +75,7 @@ struct ExchangeRateAPINetworkTests {
         #expect(response.rates.first?.rate == 1300)
     }
 
-    @Test func fetchRates_cachedYesterdayKST_triggersNetworkCall() async throws {
+    @Test func fetchRates_cachedPastValidUntil_triggersNetworkCall() async throws {
         let counter = CallCounter()
         let session = MockURLSession { [counter] _ in
             await counter.increment()
@@ -87,7 +85,8 @@ struct ExchangeRateAPINetworkTests {
         let cached = ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1300)],
             fetchedAt: .now,
-            searchDate: yesterdayKST()
+            searchDate: "20260410",
+            validUntil: .distantPast
         )
         try await cache.save(cached)
 
@@ -244,7 +243,8 @@ struct ExchangeRateAPINetworkTests {
         let stale = ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1200)],
             fetchedAt: Date(timeIntervalSinceNow: -90_000),
-            searchDate: yesterdayKST()
+            searchDate: "20260410",
+            validUntil: .distantPast
         )
         try await cache.save(stale)
 
@@ -252,6 +252,43 @@ struct ExchangeRateAPINetworkTests {
         let response = try await api.fetchRates(for: [.USD])
 
         #expect(response.rates.first?.rate == 1200)
+    }
+
+    @Test func fetchRates_validUntilDerivedFromTimeNextUpdateUnix() async throws {
+        let next: TimeInterval = 1_713_484_800
+        let session = MockURLSession { _ in
+            (makeOpenERJSON(timestamp: 1_713_398_400, nextTimestamp: next), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache)
+
+        let response = try await api.fetchRates(for: [.USD])
+
+        #expect(response.validUntil == Date(timeIntervalSince1970: next))
+    }
+
+    @Test func fetchRates_invalidNextUpdate_zero_throwsNoDataAvailable() async throws {
+        let session = MockURLSession { _ in
+            (makeOpenERJSON(timestamp: 1_713_398_400, nextTimestamp: 0), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache)
+
+        await #expect(throws: ExchangeRateError.noCacheAvailable) {
+            try await api.fetchRates(for: [.USD])
+        }
+    }
+
+    @Test func fetchRates_invalidNextUpdate_beforeLast_throwsNoDataAvailable() async throws {
+        let session = MockURLSession { _ in
+            (makeOpenERJSON(timestamp: 1_713_398_400, nextTimestamp: 1_713_398_000), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache)
+
+        await #expect(throws: ExchangeRateError.noCacheAvailable) {
+            try await api.fetchRates(for: [.USD])
+        }
     }
 
     @Test func fetchRates_apiFailure_noCacheAvailable_throws() async throws {

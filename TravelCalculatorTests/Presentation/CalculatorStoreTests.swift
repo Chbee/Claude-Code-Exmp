@@ -6,7 +6,8 @@ private func makeResponse(rate: Decimal) -> ExchangeRateResponse {
     ExchangeRateResponse(
         rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: rate)],
         fetchedAt: .now,
-        searchDate: "20260410"
+        searchDate: "20260410",
+        validUntil: .distantFuture
     )
 }
 

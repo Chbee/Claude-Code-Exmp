@@ -160,8 +160,8 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 
 #### 2.4.4 캐싱 전략
 - 캐시 파일: `exchange_rates_cache.json` (Documents 디렉토리)
-- 유효성 판단: `searchDate == 오늘 KST` (24h TTL 아님)
-- API 실패 시: searchDate가 오늘이 아닌 stale 캐시라도 fallback으로 사용
+- 유효성 판단: `Date.now < response.validUntil` — API의 `time_next_update_unix`를 그대로 `validUntil`로 저장
+- API 실패 시: `validUntil` 지난 stale 캐시라도 fallback으로 사용
 - JSON 파싱 실패 시: 캐시 파일 삭제 후 재요청
 - 동시 읽기/쓰기: actor 기반 직렬화 보호
 

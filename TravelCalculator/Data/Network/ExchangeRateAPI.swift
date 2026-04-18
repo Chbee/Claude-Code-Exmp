@@ -39,7 +39,7 @@ actor ExchangeRateCacheActor {
     }
 
     func isValid(_ response: ExchangeRateResponse) -> Bool {
-        response.searchDate == Date.now.yyyyMMddKST()
+        Date.now < response.validUntil
     }
 
     func delete() throws {
@@ -53,6 +53,7 @@ private struct OpenERAPIResponse: Decodable {
     let result: String
     let base_code: String
     let time_last_update_unix: TimeInterval
+    let time_next_update_unix: TimeInterval
     let rates: [String: Decimal]
 }
 
@@ -115,7 +116,9 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         guard decoded.result == "success",
               decoded.base_code == "USD",
               let usdToKrw = decoded.rates["KRW"],
-              usdToKrw > 0 else {
+              usdToKrw > 0,
+              decoded.time_next_update_unix > 0,
+              decoded.time_next_update_unix > decoded.time_last_update_unix else {
             throw ExchangeRateError.noDataAvailable
         }
 
@@ -141,7 +144,8 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         guard !rates.isEmpty else { throw ExchangeRateError.noDataAvailable }
 
         let searchDate = Date(timeIntervalSince1970: decoded.time_last_update_unix).yyyyMMddKST()
-        return ExchangeRateResponse(rates: rates, fetchedAt: .now, searchDate: searchDate)
+        let validUntil = Date(timeIntervalSince1970: decoded.time_next_update_unix)
+        return ExchangeRateResponse(rates: rates, fetchedAt: .now, searchDate: searchDate, validUntil: validUntil)
     }
 
     private nonisolated func currencyName(for currency: Currency) -> String {

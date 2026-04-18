@@ -9,7 +9,10 @@ struct ExchangeRate: Sendable {
 struct ExchangeRateResponse: Sendable {
     nonisolated let rates: [ExchangeRate]
     nonisolated let fetchedAt: Date
-    nonisolated let searchDate: String // "yyyyMMdd" KST 기준
+    // 표시 전용 — cache validity 판정에 사용 금지 (API 발행 UTC→KST 변환이라 날짜 경계 어긋남).
+    nonisolated let searchDate: String
+    // API의 `time_next_update_unix` 기반 만료 시각 — isValid/isRefreshEnabled 기준.
+    nonisolated let validUntil: Date
 
     nonisolated func rate(for currency: Currency) -> Decimal? {
         currency == .KRW ? 1 : rates.first { $0.currency == currency }?.rate
@@ -37,13 +40,14 @@ extension ExchangeRate: Codable {
 }
 
 extension ExchangeRateResponse: Codable {
-    private enum CodingKeys: String, CodingKey { case rates, fetchedAt, searchDate }
+    private enum CodingKeys: String, CodingKey { case rates, fetchedAt, searchDate, validUntil }
 
     nonisolated func encode(to encoder: any Encoder) throws {
         var c = encoder.container(keyedBy: CodingKeys.self)
         try c.encode(rates, forKey: .rates)
         try c.encode(fetchedAt, forKey: .fetchedAt)
         try c.encode(searchDate, forKey: .searchDate)
+        try c.encode(validUntil, forKey: .validUntil)
     }
 
     nonisolated init(from decoder: any Decoder) throws {
@@ -51,5 +55,7 @@ extension ExchangeRateResponse: Codable {
         self.rates = try c.decode([ExchangeRate].self, forKey: .rates)
         self.fetchedAt = try c.decode(Date.self, forKey: .fetchedAt)
         self.searchDate = try c.decode(String.self, forKey: .searchDate)
+        // 레거시 캐시는 validUntil 필드가 없음 → distantPast로 두어 즉시 invalid 처리, 자동 재fetch.
+        self.validUntil = try c.decodeIfPresent(Date.self, forKey: .validUntil) ?? .distantPast
     }
 }
