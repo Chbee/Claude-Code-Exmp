@@ -34,7 +34,7 @@ struct ToastView: View {
             RoundedRectangle(cornerRadius: 12, style: .continuous)
                 .strokeBorder(payload.style.tintColor, lineWidth: 2)
         )
-        .allowsHitTesting(false)
+        .contentShape(RoundedRectangle(cornerRadius: 12, style: .continuous))
         .accessibilityElement(children: .combine)
     }
 }
