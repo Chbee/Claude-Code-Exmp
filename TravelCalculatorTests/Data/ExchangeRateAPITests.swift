@@ -139,6 +139,65 @@ struct ExchangeRateAPINetworkTests {
         }
     }
 
+    // API 키 빈 문자열 + 캐시 없음 → .missingAPIKey throw, 네트워크 호출 없음
+    @Test func fetchRates_emptyAPIKey_noCache_throwsMissingAPIKey() async throws {
+        let counter = CallCounter()
+        let session = MockURLSession { [counter] _ in
+            await counter.increment()
+            return (makeAPIJSON(), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+
+        let api = ExchangeRateAPI(session: session, cache: cache, apiKey: "")
+
+        await #expect(throws: ExchangeRateError.missingAPIKey) {
+            try await api.fetchRates(for: [.USD])
+        }
+        let callCount = await counter.count
+        #expect(callCount == 0)
+    }
+
+    // API 키 placeholder + 캐시 없음 → .missingAPIKey throw, 네트워크 호출 없음
+    @Test func fetchRates_placeholderAPIKey_noCache_throwsMissingAPIKey() async throws {
+        let counter = CallCounter()
+        let session = MockURLSession { [counter] _ in
+            await counter.increment()
+            return (makeAPIJSON(), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+
+        let api = ExchangeRateAPI(session: session, cache: cache, apiKey: "YOUR_API_KEY_HERE")
+
+        await #expect(throws: ExchangeRateError.missingAPIKey) {
+            try await api.fetchRates(for: [.USD])
+        }
+        let callCount = await counter.count
+        #expect(callCount == 0)
+    }
+
+    // API 키 placeholder + 유효 캐시 → 캐시 반환, 네트워크 호출 없음
+    @Test func fetchRates_placeholderAPIKey_validCache_returnsCache() async throws {
+        let counter = CallCounter()
+        let session = MockURLSession { [counter] _ in
+            await counter.increment()
+            return (makeAPIJSON(), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let cached = ExchangeRateResponse(
+            rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1300)],
+            fetchedAt: .now,
+            searchDate: "2026-04-11"
+        )
+        try await cache.save(cached)
+
+        let api = ExchangeRateAPI(session: session, cache: cache, apiKey: "YOUR_API_KEY_HERE")
+        let response = try await api.fetchRates(for: [.USD])
+
+        let callCount = await counter.count
+        #expect(callCount == 0)
+        #expect(response.rates.first?.rate == 1300)
+    }
+
     // 주말/공휴일: 첫 날 result != 1 → 다음 날 시도
     @Test func fetchRates_weekendFallback_triesNextDate() async throws {
         let counter = CallCounter()
