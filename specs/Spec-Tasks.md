@@ -11,8 +11,8 @@
 
 #### 0.1 온보딩 플로우
 - [x] 0.1.1 `hasCompletedOnboarding` UserDefaults 플래그
-- [ ] 0.1.2 ContentView에서 온보딩/계산기 분기
-- [ ] 0.1.3 CurrencySelectView 온보딩 모드 (`isOnboarding: Bool`, KRW 제외)
+- [x] 0.1.2 ContentView에서 온보딩/계산기 분기
+- [x] 0.1.3 CurrencySelectView 온보딩 모드 (`isOnboarding: Bool`, KRW 제외)
 
 ### 마일스톤 1: 계산기 화면 완성
 

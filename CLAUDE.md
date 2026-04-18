@@ -67,7 +67,7 @@ ContentView → CalculatorView
 
 | # | Milestone | Status |
 |---|-----------|--------|
-| 0 | 온보딩 | 일부 완료 (0.1.1만, 분기/모드 미착수) |
+| 0 | 온보딩 | 완료 (Phase D) |
 | 1 | Calculator UI | 완료 (Phase A+B) |
 | 2 | Exchange Rate (한국수출입은행 API) | 완료 (Phase C) |
 | 3 | Offline Support | 미착수 |
