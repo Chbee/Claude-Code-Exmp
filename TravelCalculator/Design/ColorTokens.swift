@@ -43,6 +43,7 @@ extension Color {
         static let baseText   = ColorPair(light: 0x0D1B2A, dark: 0xE3EAF2)
         static let subText    = ColorPair(light: 0x475A78, dark: 0xA0AEC0)
         static let accent     = ColorPair(light: 0xFFC107, dark: 0xFFCA28)
+        static let check      = ColorPair(light: 0x10B981, dark: 0x34D399)
     }
 
     enum Gray {

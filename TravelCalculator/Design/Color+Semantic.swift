@@ -29,4 +29,5 @@ extension Color {
     static let appWarning = System.yellow500.adaptive
     static let appError   = System.red500.adaptive
     static let appInfo    = System.blue500.adaptive
+    static let appCheck   = Side.check.adaptive
 }
