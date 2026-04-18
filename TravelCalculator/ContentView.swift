@@ -18,9 +18,9 @@ struct ContentView: View {
                     toastManager: toastManager,
                     currencyStore: appStore.currencyStore
                 )
-                .overlay {
+                .safeAreaInset(edge: .top, spacing: 0) {
                     if let error = appStore.currencyStore.unavailableRateError {
-                        ExchangeRateErrorView(error: error) {
+                        ExchangeRateErrorBanner(error: error) {
                             Task { await appStore.currencyStore.loadExchangeRates() }
                         }
                     }
