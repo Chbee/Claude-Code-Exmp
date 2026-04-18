@@ -30,7 +30,7 @@ struct ExchangeRateErrorBanner: View {
     ExchangeRateErrorBanner(error: .networkError, onRetry: {})
 }
 
-#Preview("API 키 없음 — Dark") {
-    ExchangeRateErrorBanner(error: .missingAPIKey, onRetry: {})
+#Preview("캐시 없음 — Dark") {
+    ExchangeRateErrorBanner(error: .noCacheAvailable, onRetry: {})
         .preferredColorScheme(.dark)
 }

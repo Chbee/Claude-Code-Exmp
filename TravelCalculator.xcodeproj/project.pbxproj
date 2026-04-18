@@ -21,7 +21,6 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		2037D26B4DC548FC878987E3 /* Exchange.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; path = Exchange.xcconfig; sourceTree = "<group>"; };
 		3EDF35372F7622DB000CE8DA /* TravelCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = TravelCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		43EC157E7D108B2099724CCF /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = Platforms/iPhoneOS.platform/Developer/SDKs/iPhoneOS18.0.sdk/System/Library/Frameworks/Foundation.framework; sourceTree = DEVELOPER_DIR; };
 		E6B466EDE7DCDA6DC202D597 /* TravelCalculatorTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = TravelCalculatorTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -111,7 +110,6 @@
 		E4833A4A2B8147FDBD177657 /* Config */ = {
 			isa = PBXGroup;
 			children = (
-				2037D26B4DC548FC878987E3 /* Exchange.xcconfig */,
 			);
 			name = Config;
 			path = TravelCalculator/Config;
@@ -389,7 +387,6 @@
 		};
 		3EDF35432F7622DC000CE8DA /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2037D26B4DC548FC878987E3 /* Exchange.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
@@ -425,7 +422,6 @@
 		};
 		3EDF35442F7622DC000CE8DA /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 2037D26B4DC548FC878987E3 /* Exchange.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;

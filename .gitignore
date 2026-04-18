@@ -17,6 +17,3 @@ build/
 
 # Claude (local settings only)
 .claude/settings.local.json
-
-# API Keys (never commit)
-TravelCalculator/Config/Exchange.xcconfig

@@ -95,10 +95,7 @@ ContentView → CalculatorView
 
 ## Important Notes
 
-- API 키는 **xcconfig** 방식으로 관리 (`APIKeys.swift` 방식 사용 안 함)
-  - `TravelCalculator/Config/Exchange.xcconfig` — gitignore 처리, 로컬 전용 (실제 키 입력)
-  - `TravelCalculator/Config/Exchange.xcconfig.example` — 커밋됨, placeholder
-  - 새 환경 셋업: `cp TravelCalculator/Config/Exchange.xcconfig.example TravelCalculator/Config/Exchange.xcconfig` 후 키 입력
-  - `ExchangeRateAPI`는 `Bundle.main.infoDictionary["EXCHANGE_RATE_API_KEY"]`로 읽음 (xcconfig → INFOPLIST_KEY → Info.plist 자동 주입)
-- 환율 API의 `deal_bas_r` 필드는 쉼표 포함 문자열 (`"1,350.50"`) — 파싱 시 쉼표 제거 필요
+- 환율 API는 `open.er-api.com/v6/latest/USD` (USD 기준, 인증 불필요, 24h 갱신) — API 키 없음
+  - KRW 환산은 `USD→KRW / USD→X`를 API 레이어에서 사전 계산 (spec 2.2.3 은행 반올림, scale 8)
+  - 캐시 유효성은 `searchDate == 오늘 KST` 기준 (24h TTL 아님)
 - iOS 기본 계산기와 동일한 AC/C 토글, `=` 반복 동작을 정확히 따라야 함 (상세 엣지케이스는 `specs/Spec-Overview.md` §2.1 참조)

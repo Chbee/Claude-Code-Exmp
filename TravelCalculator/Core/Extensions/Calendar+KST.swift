@@ -1,11 +1,11 @@
 import Foundation
 
 extension TimeZone {
-    static let kst = TimeZone(identifier: "Asia/Seoul")!
+    nonisolated static let kst = TimeZone(identifier: "Asia/Seoul")!
 }
 
 extension Calendar {
-    static let kst: Calendar = {
+    nonisolated static let kst: Calendar = {
         var cal = Calendar(identifier: .gregorian)
         cal.timeZone = .kst
         return cal
@@ -13,20 +13,18 @@ extension Calendar {
 }
 
 extension Date {
-    func yyyyMMddKST() -> String {
-        Self.kstFormatter.string(from: self)
+    nonisolated func yyyyMMddKST() -> String {
+        let c = Calendar.kst.dateComponents([.year, .month, .day], from: self)
+        return String(format: "%04d%02d%02d", c.year ?? 0, c.month ?? 0, c.day ?? 0)
     }
 
-    static func fromYYYYMMDDKST(_ string: String) -> Date? {
-        kstFormatter.date(from: string)
+    nonisolated static func fromYYYYMMDDKST(_ string: String) -> Date? {
+        guard string.count == 8,
+              let year = Int(string.prefix(4)),
+              let month = Int(string.dropFirst(4).prefix(2)),
+              let day = Int(string.suffix(2)) else { return nil }
+        var comps = DateComponents()
+        comps.year = year; comps.month = month; comps.day = day
+        return Calendar.kst.date(from: comps)
     }
-
-    private static let kstFormatter: DateFormatter = {
-        let f = DateFormatter()
-        f.dateFormat = "yyyyMMdd"
-        f.locale = Locale(identifier: "ko_KR")
-        f.timeZone = .kst
-        f.calendar = .kst
-        return f
-    }()
 }

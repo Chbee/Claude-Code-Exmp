@@ -39,7 +39,7 @@ actor ExchangeRateCacheActor {
     }
 
     func isValid(_ response: ExchangeRateResponse) -> Bool {
-        Date.now.timeIntervalSince(response.fetchedAt) < 86_400 // 24h
+        response.searchDate == Date.now.yyyyMMddKST()
     }
 
     func delete() throws {
@@ -49,30 +49,27 @@ actor ExchangeRateCacheActor {
 
 // MARK: - Raw API Response
 
-private struct RawExchangeRate: Codable {
-    let cur_unit: String
-    let cur_nm: String
-    let deal_bas_r: String
-    let result: Int
+private struct OpenERAPIResponse: Decodable {
+    let result: String
+    let base_code: String
+    let time_last_update_unix: TimeInterval
+    let rates: [String: Decimal]
 }
 
 // MARK: - ExchangeRateAPI
 
 struct ExchangeRateAPI: ExchangeRateAPIProtocol {
-    private static let placeholderAPIKey = "YOUR_API_KEY_HERE"
+    private static let endpoint = URL(string: "https://open.er-api.com/v6/latest/USD")!
 
     private let session: any URLSessionProtocol
     private let cache: ExchangeRateCacheActor
-    private let apiKey: String
 
     nonisolated init(
         session: any URLSessionProtocol = URLSession.shared,
-        cache: ExchangeRateCacheActor = ExchangeRateCacheActor(),
-        apiKey: String = Bundle.main.infoDictionary?["EXCHANGE_RATE_API_KEY"] as? String ?? ""
+        cache: ExchangeRateCacheActor = ExchangeRateCacheActor()
     ) {
         self.session = session
         self.cache = cache
-        self.apiKey = apiKey
     }
 
     func fetchRates(for currencies: [Currency]) async throws -> ExchangeRateResponse {
@@ -81,50 +78,25 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
             return cached
         }
 
-        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
-        guard !trimmedKey.isEmpty, trimmedKey != Self.placeholderAPIKey else {
+        do {
+            let response = try await fetchFromAPI(currencies: currencies)
+            try? await cache.save(response)
+            return response
+        } catch {
             if let stale = cachedResponse { return stale }
-            throw ExchangeRateError.missingAPIKey
+            throw ExchangeRateError.noCacheAvailable
         }
-
-        // 오늘부터 최대 6일 전까지 순차 fallback (주말/공휴일 대응)
-        let today = Calendar.kst.startOfDay(for: Date.now)
-
-        for dayOffset in 0...6 {
-            guard let date = Calendar.kst.date(byAdding: .day, value: -dayOffset, to: today) else { continue }
-            do {
-                let response = try await fetchFromAPI(currencies: currencies, searchDate: date.yyyyMMddKST())
-                try? await cache.save(response)
-                return response
-            } catch ExchangeRateError.noDataAvailable {
-                continue
-            } catch {
-                break
-            }
-        }
-
-        if let stale = cachedResponse { return stale }
-        throw ExchangeRateError.noCacheAvailable
     }
 
     // MARK: - Internal
 
-    nonisolated static func parseRate(_ raw: String) -> Decimal? {
-        let cleaned = raw.replacingOccurrences(of: ",", with: "")
-        guard let value = Decimal(string: cleaned), value > 0 else { return nil }
-        return value
-    }
-
-    private func fetchFromAPI(currencies: [Currency], searchDate: String) async throws -> ExchangeRateResponse {
-        var components = URLComponents(string: "https://www.koreaexim.go.kr/site/program/financial/exchangeJSON")!
-        components.queryItems = [
-            URLQueryItem(name: "authkey", value: apiKey),
-            URLQueryItem(name: "searchdate", value: searchDate),
-            URLQueryItem(name: "data", value: "AP01")
-        ]
-        guard let url = components.url else { throw ExchangeRateError.networkError }
-
-        let (data, response) = try await session.data(from: url)
+    private func fetchFromAPI(currencies: [Currency]) async throws -> ExchangeRateResponse {
+        let (data, response): (Data, URLResponse)
+        do {
+            (data, response) = try await session.data(from: Self.endpoint)
+        } catch {
+            throw ExchangeRateError.networkError
+        }
 
         guard let httpResponse = response as? HTTPURLResponse else {
             throw ExchangeRateError.networkError
@@ -133,23 +105,50 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
             throw ExchangeRateError.serverError(statusCode: httpResponse.statusCode)
         }
 
-        let rawRates = try JSONDecoder().decode([RawExchangeRate].self, from: data)
+        let decoded: OpenERAPIResponse
+        do {
+            decoded = try JSONDecoder().decode(OpenERAPIResponse.self, from: data)
+        } catch {
+            throw ExchangeRateError.parsingError
+        }
 
-        // result != 1: 해당 날짜 데이터 없음 (주말/공휴일)
-        guard rawRates.first?.result == 1 else {
+        guard decoded.result == "success",
+              decoded.base_code == "USD",
+              let usdToKrw = decoded.rates["KRW"],
+              usdToKrw > 0 else {
             throw ExchangeRateError.noDataAvailable
         }
 
-        let currencyRawValues = Set(currencies.filter { $0 != .KRW }.map { $0.rawValue })
-        let rates: [ExchangeRate] = rawRates.compactMap { (raw: RawExchangeRate) -> ExchangeRate? in
-            guard currencyRawValues.contains(raw.cur_unit),
-                  let currency = Currency(rawValue: raw.cur_unit),
-                  let rate = Self.parseRate(raw.deal_bas_r) else { return nil }
-            return ExchangeRate(currency: currency, currencyName: raw.cur_nm, rate: rate)
-        }
+        let rounding = NSDecimalNumberHandler(
+            roundingMode: .bankers,
+            scale: 8,
+            raiseOnExactness: false,
+            raiseOnOverflow: false,
+            raiseOnUnderflow: false,
+            raiseOnDivideByZero: false
+        )
+
+        let rates: [ExchangeRate] = currencies
+            .filter { $0 != .KRW }
+            .compactMap { currency -> ExchangeRate? in
+                guard let usdToX = decoded.rates[currency.rawValue], usdToX > 0 else { return nil }
+                let cross = (NSDecimalNumber(decimal: usdToKrw)
+                    .dividing(by: NSDecimalNumber(decimal: usdToX), withBehavior: rounding))
+                    .decimalValue
+                return ExchangeRate(currency: currency, currencyName: currencyName(for: currency), rate: cross)
+            }
 
         guard !rates.isEmpty else { throw ExchangeRateError.noDataAvailable }
+
+        let searchDate = Date(timeIntervalSince1970: decoded.time_last_update_unix).yyyyMMddKST()
         return ExchangeRateResponse(rates: rates, fetchedAt: .now, searchDate: searchDate)
     }
 
+    private nonisolated func currencyName(for currency: Currency) -> String {
+        switch currency {
+        case .KRW: "대한민국 원"
+        case .USD: "미국 달러"
+        case .TWD: "대만 달러"
+        }
+    }
 }

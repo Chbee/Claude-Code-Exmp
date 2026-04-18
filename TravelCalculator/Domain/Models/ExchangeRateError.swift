@@ -7,7 +7,6 @@ enum ExchangeRateError: Error, LocalizedError, Sendable, Equatable {
     case parsingError
     case invalidRate
     case noCacheAvailable
-    case missingAPIKey
 
     nonisolated var errorDescription: String? {
         switch self {
@@ -17,7 +16,6 @@ enum ExchangeRateError: Error, LocalizedError, Sendable, Equatable {
         case .parsingError: "환율 데이터를 처리할 수 없습니다"
         case .invalidRate: "유효하지 않은 환율입니다"
         case .noCacheAvailable: "저장된 환율 데이터가 없습니다"
-        case .missingAPIKey: "환율 API 키가 설정되지 않았습니다"
         }
     }
 }

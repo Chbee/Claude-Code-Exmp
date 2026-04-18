@@ -10,7 +10,7 @@ struct ExchangeRateCacheActorTests {
             .appendingPathExtension("json")
     }
 
-    private func makeResponse(fetchedAt: Date = .now, searchDate: String = "2026-04-11") -> ExchangeRateResponse {
+    private func makeResponse(fetchedAt: Date = .now, searchDate: String) -> ExchangeRateResponse {
         ExchangeRateResponse(
             rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1350)],
             fetchedAt: fetchedAt,
@@ -23,7 +23,7 @@ struct ExchangeRateCacheActorTests {
     @Test func saveAndLoad_roundTrips() async throws {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        let response = makeResponse()
+        let response = makeResponse(searchDate: Date.now.yyyyMMddKST())
 
         try await actor.save(response)
         let loaded = await actor.load()
@@ -41,22 +41,23 @@ struct ExchangeRateCacheActorTests {
         #expect(loaded == nil)
     }
 
-    // MARK: - isValid
+    // MARK: - isValid (searchDate == todayKST)
 
-    @Test func isValid_within24h_returnsTrue() async {
+    @Test func isValid_searchDateEqualsTodayKST_returnsTrue() async {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        let response = makeResponse(fetchedAt: Date(timeIntervalSinceNow: -3600)) // 1시간 전
+        let response = makeResponse(searchDate: Date.now.yyyyMMddKST())
 
         let valid = await actor.isValid(response)
 
         #expect(valid == true)
     }
 
-    @Test func isValid_over24h_returnsFalse() async {
+    @Test func isValid_searchDateNotToday_returnsFalse() async {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        let response = makeResponse(fetchedAt: Date(timeIntervalSinceNow: -86401)) // 24시간 1초 전
+        let yesterday = Date.now.addingTimeInterval(-86_400).yyyyMMddKST()
+        let response = makeResponse(searchDate: yesterday)
 
         let valid = await actor.isValid(response)
 
@@ -68,7 +69,7 @@ struct ExchangeRateCacheActorTests {
     @Test func deleteCache_removesFile() async throws {
         let url = makeTempFileURL()
         let actor = ExchangeRateCacheActor(fileURL: url)
-        try await actor.save(makeResponse())
+        try await actor.save(makeResponse(searchDate: Date.now.yyyyMMddKST()))
 
         try await actor.delete()
 

@@ -26,8 +26,4 @@ struct ExchangeRateErrorTests {
     @Test func noCacheAvailableDescription() {
         #expect(ExchangeRateError.noCacheAvailable.errorDescription == "저장된 환율 데이터가 없습니다")
     }
-
-    @Test func missingAPIKeyDescription() {
-        #expect(ExchangeRateError.missingAPIKey.errorDescription == "환율 API 키가 설정되지 않았습니다")
-    }
 }

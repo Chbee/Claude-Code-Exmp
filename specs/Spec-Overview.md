@@ -144,32 +144,24 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 ### 2.4 환율 API 연동
 
 #### 2.4.1 데이터 소스
-- 한국수출입은행 환율 API
-- endpoint: `https://www.koreaexim.go.kr/site/program/financial/exchangeJSON`
-- 요청 파라미터: `authkey`, `searchdate` (YYYY-MM-DD), `data=AP01`
-- API Key 필요 (APIKeys.swift, .gitignore 처리)
-- Rate Limit: 일 1,000회
-- 응답 코드: `result` 필드 — `1`=성공, `2`=데이터없음, `4`=인증오류
-- 주요 응답 필드: `cur_unit`(통화코드), `cur_nm`(통화명), `deal_bas_r`(매매기준율)
-- **환율 업데이트 주기**: 영업일 오전 11시경 당일 환율 게시. 하루 1회만 갱신
+- open.er-api.com (USD 기준)
+- endpoint: `https://open.er-api.com/v6/latest/USD`
+- 인증 불필요, 호출 한도 없음
+- **업데이트 주기**: 24시간마다 갱신 (`time_next_update_unix` 제공)
+- 응답: `{ "result": "success", "base_code": "USD", "time_last_update_unix": ..., "rates": {"KRW": ..., "TWD": ..., ...} }`
+- KRW 환산: `X→KRW = rates["KRW"] / rates["X"]` (API 레이어에서 사전 계산, 은행 반올림 scale 8)
 
-#### 2.4.2 deal_bas_r 파싱
-- API 응답의 `deal_bas_r` 필드는 쉼표 포함 문자열 (예: `"1,350.50"`)
-- ExchangeRateAPI 구현체 내부에서 쉼표 제거 후 `Decimal` 변환
-- Protocol은 이미 `Decimal`을 반환하므로 외부에 파싱 세부사항 노출 안 됨
+#### 2.4.2 (삭제됨) deal_bas_r 파싱
+- open.er-api는 JSON 숫자로 환율을 반환하므로 별도 문자열 파싱 없음
 
-#### 2.4.3 주말/공휴일 fallback
-- API는 영업일에만 데이터 존재 (주말/공휴일 당일 데이터 없음)
-- `searchdate`를 **순차 역탐색** (데이터 찾는 즉시 중단):
-  1. 오늘 → API 호출. `result=1`이면 사용. 끝.
-  2. `result=2` → 어제로 재시도
-  3. 반복, 최대 **6일 전**까지 (오늘 포함 총 7번 호출)
-- 7번 모두 데이터 없으면 캐시 사용, 캐시도 없으면 전체 화면 에러
+#### 2.4.3 (삭제됨) 주말/공휴일 fallback
+- open.er-api는 24h 주기로 매일 갱신 — fallback 불필요
+- API 실패 시 stale 캐시 반환, 캐시도 없으면 전체 화면 에러
 
 #### 2.4.4 캐싱 전략
 - 캐시 파일: `exchange_rates_cache.json` (Documents 디렉토리)
-- 유효기간: 24시간
-- API 실패 시: 만료된 캐시라도 fallback으로 사용
+- 유효성 판단: `searchDate == 오늘 KST` (24h TTL 아님)
+- API 실패 시: searchDate가 오늘이 아닌 stale 캐시라도 fallback으로 사용
 - JSON 파싱 실패 시: 캐시 파일 삭제 후 재요청
 - 동시 읽기/쓰기: actor 기반 직렬화 보호
 
@@ -182,7 +174,7 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 | 조건 | 새로고침 버튼 | 동작 |
 |------|-------------|------|
 | 캐시의 searchdate = 오늘 | **비활성화** | "최신" 표시 |
-| 캐시의 searchdate < 오늘 | 활성화 | "N일 전" 표시 + 탭 시 API 호출 (2.4.3 fallback 적용) |
+| 캐시의 searchdate < 오늘 | 활성화 | "N일 전" 표시 + 탭 시 API 호출 |
 | 캐시 없음 | — | 앱 시작 시 자동 호출 |
 
 - 별도 throttle 불필요: 같은 날 데이터는 변하지 않으므로 searchdate 기반으로 자연스럽게 제한
