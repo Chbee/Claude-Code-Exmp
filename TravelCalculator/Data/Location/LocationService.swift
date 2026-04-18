@@ -14,23 +14,35 @@ final class LocationService: NSObject, CurrentCountryCodeProvider, CLLocationMan
         manager.desiredAccuracy = kCLLocationAccuracyKilometer
     }
 
+    deinit {
+        timeoutTask?.cancel()
+        continuation?.resume(throwing: LocationError.unavailable)
+        continuation = nil
+    }
+
     func requestCurrentCountryCode() async throws -> String {
         if continuation != nil { throw LocationError.unavailable }
 
-        return try await withCheckedThrowingContinuation { cont in
-            self.continuation = cont
+        return try await withTaskCancellationHandler {
+            try await withCheckedThrowingContinuation { cont in
+                self.continuation = cont
 
-            switch manager.authorizationStatus {
-            case .denied, .restricted:
-                resume(with: .failure(LocationError.permissionDenied))
-            case .notDetermined:
-                manager.requestWhenInUseAuthorization()
-                scheduleTimeout()
-            case .authorizedWhenInUse, .authorizedAlways:
-                manager.requestLocation()
-                scheduleTimeout()
-            @unknown default:
-                resume(with: .failure(LocationError.unavailable))
+                switch manager.authorizationStatus {
+                case .denied, .restricted:
+                    resume(with: .failure(LocationError.permissionDenied))
+                case .notDetermined:
+                    manager.requestWhenInUseAuthorization()
+                    scheduleTimeout()
+                case .authorizedWhenInUse, .authorizedAlways:
+                    manager.requestLocation()
+                    scheduleTimeout()
+                @unknown default:
+                    resume(with: .failure(LocationError.unavailable))
+                }
+            }
+        } onCancel: { [weak self] in
+            Task { @MainActor [weak self] in
+                self?.resume(with: .failure(CancellationError()))
             }
         }
     }
