@@ -18,19 +18,19 @@ enum ToastStyle: Sendable, CaseIterable {
 
     var tintColor: Color {
         switch self {
-        case .success: .appSuccess
-        case .info:    .appInfo
-        case .warning: .appWarning
-        case .error:   .appError
+        case .success: .toastSuccessTint
+        case .info:    .toastInfoTint
+        case .warning: .toastWarningTint
+        case .error:   .toastErrorTint
         }
     }
 
-    var iconName: String {
+    var iconAssetName: String {
         switch self {
-        case .success: "checkmark.circle.fill"
-        case .info:    "info.circle.fill"
-        case .warning: "exclamationmark.triangle.fill"
-        case .error:   "xmark.octagon.fill"
+        case .success: "ToastSuccess"
+        case .info:    "ToastInfo"
+        case .warning: "ToastWarning"
+        case .error:   "ToastError"
         }
     }
 }

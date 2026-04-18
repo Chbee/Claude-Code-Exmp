@@ -46,6 +46,15 @@ extension Color {
         static let check      = ColorPair(light: 0x10B981, dark: 0x34D399)
     }
 
+    enum Toast {
+        static let successTint = ColorPair(light: 0x10B981, dark: 0x34D399)
+        static let errorTint   = ColorPair(light: 0xEF4444, dark: 0xF87171)
+        static let warningTint = ColorPair(light: 0xF59E0B, dark: 0xFBBF24)
+        static let infoTint    = ColorPair(light: 0x475569, dark: 0x475569)
+        static let background  = ColorPair(light: 0xF2F2F7, dark: 0x1C1C1E)
+        static let messageText = ColorPair(light: 0x1E293B, dark: 0xFFFFFF)
+    }
+
     enum Gray {
         static let c050 = ColorPair(light: 0xF5F5F5, dark: 0x1A1A1A)
         static let c100 = ColorPair(light: 0xDDDDDD, dark: 0x202020)
