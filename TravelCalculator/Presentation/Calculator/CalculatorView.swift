@@ -55,6 +55,7 @@ struct CalculatorView: View {
                     locationService: LocationService()
                 )
             )
+            .toast(manager: toastManager)
         }
     }
 }

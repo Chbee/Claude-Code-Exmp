@@ -5,92 +5,105 @@ struct CurrencySelectView: View {
     @State var store: CurrencySelectStore
 
     var body: some View {
-        ZStack(alignment: .top) {
-            Color.appBackground.ignoresSafeArea()
-
-            VStack(spacing: 0) {
-                // Top bar
-                ZStack {
-                    Text(store.state.isOnboarding ? "여행지 통화를 선택해주세요" : "여행 통화 설정")
-                        .font(.headline)
-                        .foregroundStyle(Color.appTextPrimary)
-                        .frame(maxWidth: .infinity)
-
-                    if !store.state.isOnboarding {
-                        HStack {
-                            Spacer()
-                            Button {
-                                store.send(.dismiss)
-                            } label: {
-                                Image(systemName: "xmark")
-                                    .font(.body.weight(.semibold))
-                                    .foregroundStyle(Color.appTextPrimary)
-                                    .padding(8)
-                            }
-                        }
-                    }
-                }
+        VStack(spacing: 0) {
+            header
                 .padding(.horizontal, 16)
                 .padding(.top, 20)
-                .padding(.bottom, 8)
+                .padding(.bottom, 20)
 
-                // Subtitle
-                Text("통화 설정을 위해 국가 선택")
-                    .font(.subheadline)
-                    .foregroundStyle(Color.appTextSub)
-                    .frame(maxWidth: .infinity, alignment: .leading)
-                    .padding(.horizontal, 20)
-                    .padding(.bottom, 12)
+            locationButton
+                .padding(.bottom, 24)
 
-                // Location button
-                Button {
-                    store.send(.requestLocation)
-                } label: {
-                    HStack(spacing: 6) {
-                        if store.state.isRequestingLocation {
-                            ProgressView()
-                                .controlSize(.small)
-                        }
-                        Text(store.state.isRequestingLocation ? "위치 확인 중…" : "📍 현재 위치로 자동 설정")
-                            .font(.subheadline)
-                    }
-                    .foregroundStyle(Color.appTextSub)
-                    .frame(maxWidth: .infinity)
-                    .padding(.vertical, 12)
-                    .background(Color.appCard)
-                    .clipShape(RoundedRectangle(cornerRadius: 10))
-                    .padding(.horizontal, 16)
-                }
-                .disabled(store.state.isRequestingLocation)
-                .padding(.bottom, 16)
+            currencyList
+                .padding(.horizontal, 16)
 
-                // Currency list
-                ScrollView {
-                    LazyVStack(spacing: 0) {
-                        ForEach(store.state.currencies, id: \.self) { currency in
-                            CurrencyRowView(
-                                currency: currency,
-                                isSelected: currency == store.state.selectedCurrency
-                            ) {
-                                store.send(.selectCurrency(currency))
-                            }
-
-                            if currency != store.state.currencies.last {
-                                Divider()
-                                    .padding(.leading, 56)
-                            }
-                        }
-                    }
-                    .background(Color.appCard)
-                    .clipShape(RoundedRectangle(cornerRadius: 12))
-                    .padding(.horizontal, 16)
-                }
-            }
+            Spacer(minLength: 0)
         }
+        .background(Color.appBackground.ignoresSafeArea())
         .interactiveDismissDisabled(store.state.isOnboarding)
         .onChange(of: store.state.shouldDismiss) { _, newValue in
             if newValue {
                 dismiss()
+            }
+        }
+    }
+
+    private var header: some View {
+        ZStack {
+            VStack(spacing: 8) {
+                Text(store.state.isOnboarding ? "여행지 통화를 선택해주세요" : "여행 통화 설정")
+                    .font(.system(size: 24, weight: .bold))
+                    .foregroundStyle(Color.appTextPrimary)
+                Text("통화 설정을 위해 국가 선택")
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.appTextSub)
+            }
+            .frame(maxWidth: .infinity)
+
+            if !store.state.isOnboarding {
+                HStack {
+                    Spacer()
+                    Button {
+                        store.send(.dismiss)
+                    } label: {
+                        Image(systemName: "xmark")
+                            .font(.system(size: 14, weight: .semibold))
+                            .foregroundStyle(Color.appTextPrimary)
+                            .frame(width: 34, height: 34)
+                            .background(Color.appBackground.opacity(0.9))
+                            .clipShape(Circle())
+                    }
+                }
+            }
+        }
+    }
+
+    private var locationButton: some View {
+        Button {
+            store.send(.requestLocation)
+        } label: {
+            HStack(spacing: 8) {
+                if store.state.isRequestingLocation {
+                    ProgressView()
+                        .controlSize(.small)
+                    Text("위치 확인 중…")
+                        .font(.system(size: 15, weight: .semibold))
+                } else {
+                    Image("MapPin")
+                        .renderingMode(.template)
+                        .resizable()
+                        .frame(width: 20, height: 20)
+                    Text("현재 위치로 자동 설정")
+                        .font(.system(size: 15, weight: .semibold))
+                }
+            }
+            .foregroundStyle(Color.appTextSub)
+            .padding(.horizontal, 20)
+            .padding(.vertical, 12)
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.appTextSub, lineWidth: 1.5)
+            )
+        }
+        .disabled(store.state.isRequestingLocation)
+    }
+
+    private var currencyList: some View {
+        ScrollView {
+            LazyVStack(spacing: 0) {
+                ForEach(store.state.currencies, id: \.self) { currency in
+                    CurrencyRowView(
+                        currency: currency,
+                        isSelected: currency == store.state.selectedCurrency
+                    ) {
+                        store.send(.selectCurrency(currency))
+                    }
+
+                    if currency != store.state.currencies.last {
+                        Divider()
+                            .padding(.leading, 60)
+                    }
+                }
             }
         }
     }
@@ -103,25 +116,25 @@ private struct CurrencyRowView: View {
 
     var body: some View {
         Button(action: onTap) {
-            HStack(spacing: 12) {
+            HStack(spacing: 16) {
                 Text(currency.flag)
-                    .font(.title2)
-                    .frame(width: 36)
+                    .font(.system(size: 28))
 
-                Text(currency.countryName)
-                    .font(.body)
-                    .foregroundStyle(isSelected ? Color.appPrimary : Color.appTextPrimary)
+                VStack(alignment: .leading, spacing: 2) {
+                    Text(currency.countryName)
+                        .font(.system(size: 16, weight: .medium))
+                        .foregroundStyle(Color.appTextPrimary)
+                    Text(currency.currencyUnit)
+                        .font(.system(size: 12))
+                        .foregroundStyle(Color.appTextSub)
+                }
 
-                Spacer()
-
-                Text(currency.currencyUnit)
-                    .font(.subheadline)
-                    .foregroundStyle(Color.appTextSub)
+                Spacer(minLength: 8)
 
                 if isSelected {
                     Image(systemName: "checkmark")
-                        .font(.body.weight(.semibold))
-                        .foregroundStyle(Color.appPrimary)
+                        .font(.system(size: 16, weight: .semibold))
+                        .foregroundStyle(Color.appCheck)
                 }
             }
             .padding(.horizontal, 16)
