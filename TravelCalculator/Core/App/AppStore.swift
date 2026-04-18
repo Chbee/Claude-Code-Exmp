@@ -24,4 +24,14 @@ final class AppStore {
             exchangeRateAPI: ExchangeRateAPI()
         )
     }
+
+    func makeOnboardingCurrencySelectStore(toastManager: ToastManager) -> CurrencySelectStore {
+        CurrencySelectStore(
+            toastManager: toastManager,
+            currencyStore: currencyStore,
+            isOnboarding: true,
+            onOnboardingComplete: { [weak self] in self?.hasCompletedOnboarding = true },
+            locationService: LocationService()
+        )
+    }
 }

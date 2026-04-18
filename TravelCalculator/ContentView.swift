@@ -10,20 +10,38 @@ struct ContentView: View {
     let toastManager: ToastManager
 
     var body: some View {
-        CalculatorView(
-            toastManager: toastManager,
-            currencyStore: appStore.currencyStore
-        )
-        .task {
-            await appStore.currencyStore.loadExchangeRates()
-        }
-        .overlay {
-            if let error = appStore.currencyStore.unavailableRateError {
-                ExchangeRateErrorView(error: error) {
-                    Task { await appStore.currencyStore.loadExchangeRates() }
+        Group {
+            if !appStore.hasCompletedOnboarding {
+                OnboardingCurrencySelectContainer(appStore: appStore, toastManager: toastManager)
+            } else {
+                CalculatorView(
+                    toastManager: toastManager,
+                    currencyStore: appStore.currencyStore
+                )
+                .safeAreaInset(edge: .top, spacing: 0) {
+                    if let error = appStore.currencyStore.unavailableRateError {
+                        ExchangeRateErrorBanner(error: error) {
+                            Task { await appStore.currencyStore.loadExchangeRates() }
+                        }
+                    }
                 }
             }
         }
+        .task {
+            await appStore.currencyStore.loadExchangeRates()
+        }
+    }
+}
+
+private struct OnboardingCurrencySelectContainer: View {
+    @State private var store: CurrencySelectStore
+
+    init(appStore: AppStore, toastManager: ToastManager) {
+        _store = State(initialValue: appStore.makeOnboardingCurrencySelectStore(toastManager: toastManager))
+    }
+
+    var body: some View {
+        CurrencySelectView(store: store)
     }
 }
 

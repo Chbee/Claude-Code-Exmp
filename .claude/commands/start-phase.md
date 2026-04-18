@@ -84,7 +84,7 @@ git checkout -b phase/X-name
 **판정 기준:**
 - Step 간 교집합이 있거나 순차 의존성이 있으면 → **직렬 실행 권장**
   - "직렬 실행 권장 — 단일 Task 에이전트로 Step을 순차 수행합니다. Step 4-B를 건너뜁니다."
-  - 여기서 멈추고 사용자에게 결론을 보고합니다.
+  - 판정 결과를 사용자에게 보고한 뒤 **Step 5 (자동 `/start-task` 호출)로 진행**합니다.
 - Step 간 교집합이 없고 독립적이면 → **병렬 실행 가능**
   - "병렬 실행 가능 — Step별 Worker 에이전트를 동시 실행합니다. Step 4-B로 진행합니다."
 
@@ -110,6 +110,15 @@ Agent 도구를 사용하여 에이전트를 병렬 호출합니다:
    xcodebuild -project TravelCalculator.xcodeproj -scheme TravelCalculator \
      -destination 'platform=iOS Simulator,name=iPhone 16' build
    ```
+
+### Step 5: 자동 `/start-task` 호출 (직렬 판정일 때만)
+
+Step 4-A에서 **직렬 실행 권장**으로 판정된 경우, 별도 사용자 승인 없이 `Skill` 툴로 `start-task` 를 즉시 호출합니다.
+
+- `args`: 방금 작성한 `docs/phase-X.md`의 **Step 1** 범위 (Step 제목 + 담당 파일 목록 요약) — Plan Mode 인터뷰 입력이 되도록 간결히 전달
+- 호출 예: `Skill(skill="start-task", args="phase-X.md Step 1 — [Step 제목]: [파일1, 파일2, …]")`
+
+병렬 판정(Step 4-B 경로)인 경우에는 Worker 에이전트들이 TDD를 자체 수행하므로 이 단계를 건너뜁니다.
 
 ## 주의사항
 

@@ -39,6 +39,17 @@ enum Currency: String, CaseIterable, Sendable {
     }
 }
 
+extension Currency {
+    nonisolated static func from(countryCode: String) -> Currency? {
+        switch countryCode.uppercased() {
+        case "KR": .KRW
+        case "US": .USD
+        case "TW": .TWD
+        default: nil
+        }
+    }
+}
+
 extension Currency: Codable {
     nonisolated func encode(to encoder: any Encoder) throws {
         var container = encoder.singleValueContainer()

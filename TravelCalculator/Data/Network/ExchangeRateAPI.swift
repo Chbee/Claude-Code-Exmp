@@ -59,6 +59,8 @@ private struct RawExchangeRate: Codable {
 // MARK: - ExchangeRateAPI
 
 struct ExchangeRateAPI: ExchangeRateAPIProtocol {
+    private static let placeholderAPIKey = "YOUR_API_KEY_HERE"
+
     private let session: any URLSessionProtocol
     private let cache: ExchangeRateCacheActor
     private let apiKey: String
@@ -77,6 +79,12 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         let cachedResponse = await cache.load()
         if let cached = cachedResponse, await cache.isValid(cached) {
             return cached
+        }
+
+        let trimmedKey = apiKey.trimmingCharacters(in: .whitespacesAndNewlines)
+        guard !trimmedKey.isEmpty, trimmedKey != Self.placeholderAPIKey else {
+            if let stale = cachedResponse { return stale }
+            throw ExchangeRateError.missingAPIKey
         }
 
         // 오늘부터 최대 6일 전까지 순차 fallback (주말/공휴일 대응)

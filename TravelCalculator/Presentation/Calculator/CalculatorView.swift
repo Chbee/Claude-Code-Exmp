@@ -51,9 +51,11 @@ struct CalculatorView: View {
             CurrencySelectView(
                 store: CurrencySelectStore(
                     toastManager: toastManager,
-                    currencyStore: currencyStore
+                    currencyStore: currencyStore,
+                    locationService: LocationService()
                 )
             )
+            .toast(manager: toastManager)
         }
     }
 }

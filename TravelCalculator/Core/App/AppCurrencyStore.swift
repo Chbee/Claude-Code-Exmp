@@ -102,6 +102,7 @@ final class AppCurrencyStore {
     // MARK: - Exchange Rate Loading
 
     func loadExchangeRates() async {
+        if case .loaded = exchangeRateStatus { return }
         guard let api = exchangeRateAPI else {
             exchangeRateStatus = .error(.noCacheAvailable)
             return

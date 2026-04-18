@@ -139,6 +139,67 @@ struct ExchangeRateAPINetworkTests {
         }
     }
 
+    // API 키 빈 문자열 + 캐시 없음 → .missingAPIKey throw, 네트워크 호출 없음
+    @Test func fetchRates_emptyAPIKey_noCache_throwsMissingAPIKey() async throws {
+        let counter = CallCounter()
+        let session = MockURLSession { [counter] _ in
+            await counter.increment()
+            return (makeAPIJSON(), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+
+        let api = ExchangeRateAPI(session: session, cache: cache, apiKey: "")
+
+        await #expect(throws: ExchangeRateError.missingAPIKey) {
+            try await api.fetchRates(for: [.USD])
+        }
+        let callCount = await counter.count
+        #expect(callCount == 0)
+    }
+
+    // API 키 placeholder + 캐시 없음 → .missingAPIKey throw, 네트워크 호출 없음
+    @Test func fetchRates_placeholderAPIKey_noCache_throwsMissingAPIKey() async throws {
+        let counter = CallCounter()
+        let session = MockURLSession { [counter] _ in
+            await counter.increment()
+            return (makeAPIJSON(), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+
+        let api = ExchangeRateAPI(session: session, cache: cache, apiKey: "YOUR_API_KEY_HERE")
+
+        await #expect(throws: ExchangeRateError.missingAPIKey) {
+            try await api.fetchRates(for: [.USD])
+        }
+        let callCount = await counter.count
+        #expect(callCount == 0)
+    }
+
+    // API 키 placeholder + TTL 만료 캐시 → stale 캐시 반환, 네트워크 호출 없음
+    // (TTL 유효 캐시는 상단 gate에서 반환되어 placeholder 가드에 도달하지 않으므로
+    //  placeholder 경로의 stale fallback을 검증하려면 fetchedAt이 24h 이전이어야 함)
+    @Test func fetchRates_placeholderAPIKey_staleCache_returnsStale() async throws {
+        let counter = CallCounter()
+        let session = MockURLSession { [counter] _ in
+            await counter.increment()
+            return (makeAPIJSON(), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let cached = ExchangeRateResponse(
+            rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1300)],
+            fetchedAt: Date.now.addingTimeInterval(-90_000), // 25h 전 (TTL 24h 초과)
+            searchDate: "2026-04-11"
+        )
+        try await cache.save(cached)
+
+        let api = ExchangeRateAPI(session: session, cache: cache, apiKey: "YOUR_API_KEY_HERE")
+        let response = try await api.fetchRates(for: [.USD])
+
+        let callCount = await counter.count
+        #expect(callCount == 0)
+        #expect(response.rates.first?.rate == 1300)
+    }
+
     // 주말/공휴일: 첫 날 result != 1 → 다음 날 시도
     @Test func fetchRates_weekendFallback_triesNextDate() async throws {
         let counter = CallCounter()
