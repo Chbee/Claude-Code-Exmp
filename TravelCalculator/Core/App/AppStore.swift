@@ -30,7 +30,7 @@ final class AppStore {
             toastManager: toastManager,
             currencyStore: currencyStore,
             isOnboarding: true,
-            onOnboardingComplete: { self.hasCompletedOnboarding = true },
+            onOnboardingComplete: { [weak self] in self?.hasCompletedOnboarding = true },
             locationService: LocationService()
         )
     }

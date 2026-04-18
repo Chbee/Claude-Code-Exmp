@@ -1,7 +1,7 @@
 import Foundation
 
 @MainActor
-protocol CurrentCountryCodeProvider: Sendable {
+protocol CurrentCountryCodeProvider {
     func requestCurrentCountryCode() async throws -> String
 }
 

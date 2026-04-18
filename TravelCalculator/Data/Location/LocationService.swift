@@ -97,8 +97,10 @@ final class LocationService: NSObject, CurrentCountryCodeProvider, CLLocationMan
             return
         }
         Task { @MainActor in
+            guard continuation != nil else { return }
             do {
                 let placemarks = try await geocoder.reverseGeocodeLocation(location)
+                guard continuation != nil else { return }
                 if let code = placemarks.first?.isoCountryCode {
                     resume(with: .success(code))
                 } else {
