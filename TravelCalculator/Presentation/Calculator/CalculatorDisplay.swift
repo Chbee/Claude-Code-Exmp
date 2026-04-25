@@ -38,11 +38,9 @@ struct CalculatorDisplay: View {
                 Text("·")
                     .font(.footnote)
                     .foregroundStyle(Color.appTextSub)
-                Text("\(cachedAt.yyyyMMddHHmmKST()) 기준")
+                Text(Self.relativeLabel(from: cachedAt))
                     .font(.footnote)
                     .foregroundStyle(Color.appWarning)
-                    .lineLimit(1)
-                    .minimumScaleFactor(0.8)
             } else if let days = daysSinceSearchDate {
                 Text("·")
                     .font(.footnote)
@@ -64,6 +62,16 @@ struct CalculatorDisplay: View {
 
     private static func dateLabel(for days: Int) -> String {
         days == 0 ? "최신" : "\(days)일 전"
+    }
+
+    // 오프라인 전용 — 캐시 freshness 가 의사결정에 영향을 주는 시나리오라
+    // 분/시간/일 단위 finer grain 으로 표시 (online 의 day-grain 보다 정밀).
+    static func relativeLabel(from date: Date, now: Date = .now) -> String {
+        let interval = max(0, now.timeIntervalSince(date))
+        if interval < 60 { return "방금" }
+        if interval < 3600 { return "\(Int(interval / 60))분 전" }
+        if interval < 86400 { return "\(Int(interval / 3600))시간 전" }
+        return "\(Int(interval / 86400))일 전"
     }
 
     // MARK: - Input Row
