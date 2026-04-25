@@ -49,20 +49,20 @@
 - **`unknown` 상태 UI**: 배너/인디케이터 비표시, 새로고침 disabled (안전)
 - **"N일 전" grain**: 단일 (V2 백로그 분리)
 
-### Step 3: 에러 핸들링 + 재시도
+### Step 3: 에러 핸들링 + 재시도 ✅ 완료
 
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
 | 3.1 | `Domain/Models/ExchangeRateError.swift` | 분류 확인 (network/server/parsing) — 친화적 메시지 컴퓨티드 추가 | Spec-Overview §2.5.5, Spec-Tasks 3.4.1/3.4.2 |
 | 3.2 | `Data/Network/ExchangeRateAPI.swift` | `fetchFromAPI` 재시도 로직: 최대 2회, 간격 2초 (timeout 10s) | Spec-Tasks 3.4.3 |
 
-### Step 4: Reducer 단위 테스트
+### Step 4: Reducer 단위 테스트 ✅ 완료
 
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
 | 4.1 | `TravelCalculatorTests/CalculatorReducerTests.swift` (신규) | 숫자 입력, 사칙연산, 소수점, AC/C/백스페이스, 엣지 케이스(0 나누기, 연산자 교체, =반복, 음수), 10자리 제한 — Spec-Tasks 4.1.1~4.1.6 전부 | Spec-Overview §2.1 |
 
-### Step 5: 환율 변환 테스트
+### Step 5: 환율 변환 테스트 ✅ 완료
 
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
@@ -72,16 +72,16 @@
 
 ## 완료 기준
 
-- [ ] `xcodebuild build` 성공 (warning 0, error 0)
-- [ ] `xcodebuild test` 성공 (4.1, 4.2 신규 테스트 통과)
-- [ ] 시뮬레이터 Wi-Fi off → 오프라인 배너 1초 후 등장 + Toolbar 인디케이터 색+아이콘 전환 + 새로고침 disabled
-- [ ] **온→오프 Toast 없음** (배너만)
-- [ ] 오프→온 복귀 시 환율 영역 pulse 애니메이션 + 배너 사라짐
-- [ ] 비행기 모드 ON 상태로 첫 실행 시 배너/인디케이터 즉시 unknown→offline (절대 ON 잠깐 보이지 않음)
-- [ ] 새로고침 disabled tap → Toast(info, "오프라인 시 갱신할 수 없어요")
-- [ ] VoiceOver: 인디케이터에 "오프라인" / "온라인" 레이블
-- [ ] API 일시 실패 시 2초 간격 2회 재시도 후 캐시 fallback 또는 에러 노출 (Step 3)
-- [ ] 오프라인 배너에 절대 시간(`yyyy-MM-dd HH:mm`) 병기
+- [x] `xcodebuild build` 성공 (warning 0, error 0)
+- [x] `xcodebuild test` 성공 (4.1, 4.2 신규 테스트 통과)
+- [x] 시뮬레이터 Wi-Fi off → 오프라인 배너 1초 후 등장 + Toolbar 인디케이터 색+아이콘 전환 + 새로고침 disabled
+- [x] **온→오프 Toast 없음** (배너만)
+- [x] 오프→온 복귀 시 환율 영역 pulse 애니메이션 + 배너 사라짐
+- [x] 비행기 모드 ON 상태로 첫 실행 시 배너/인디케이터 즉시 unknown→offline (절대 ON 잠깐 보이지 않음)
+- [x] 새로고침 disabled tap → Toast(info, "오프라인 시 갱신할 수 없어요")
+- [x] VoiceOver: 인디케이터에 "오프라인" / "온라인" 레이블
+- [x] API 일시 실패 시 2초 간격 2회 재시도 후 캐시 fallback 또는 에러 노출 (Step 3)
+- [x] 오프라인 배너에 절대 시간(`yyyy-MM-dd HH:mm`) 병기
 
 ---
 
