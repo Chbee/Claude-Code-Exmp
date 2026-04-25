@@ -8,7 +8,7 @@ import Observation
 @MainActor
 @Observable
 private final class MockNetworkMonitor: NetworkMonitorProtocol {
-    var isOffline: Bool = false
+    var state: NetworkState = .unknown
     func start() {}
 }
 
@@ -26,22 +26,40 @@ private func makeResponse(fetchedAt: Date = .now) -> ExchangeRateResponse {
 @MainActor
 struct AppCurrencyStoreOfflineTests {
 
-    @Test func isOffline_reflectsNetworkMonitor() {
+    @Test func networkState_reflectsMonitor() {
         let monitor = MockNetworkMonitor()
         let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
         let store = AppCurrencyStore(userDefaults: ud, networkMonitor: monitor)
 
-        #expect(store.isOffline == false)
+        #expect(store.networkState == .unknown)
 
-        monitor.isOffline = true
-        #expect(store.isOffline == true)
+        monitor.state = .online
+        #expect(store.networkState == .online)
+
+        monitor.state = .offline
+        #expect(store.networkState == .offline)
     }
 
-    @Test func isOffline_defaultsFalse_whenNoMonitor() {
+    @Test func networkState_defaultsUnknown_whenNoMonitor() {
         let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
         let store = AppCurrencyStore(userDefaults: ud)
 
+        #expect(store.networkState == .unknown)
+    }
+
+    @Test func isOffline_isTrueOnlyWhenStateIsOffline() {
+        let monitor = MockNetworkMonitor()
+        let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
+        let store = AppCurrencyStore(userDefaults: ud, networkMonitor: monitor)
+
+        monitor.state = .unknown
         #expect(store.isOffline == false)
+
+        monitor.state = .online
+        #expect(store.isOffline == false)
+
+        monitor.state = .offline
+        #expect(store.isOffline == true)
     }
 
     @Test func cachedAt_isNilWhenNoResponse() {

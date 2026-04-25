@@ -92,8 +92,12 @@ final class AppCurrencyStore {
         currentResponse?.fetchedAt
     }
 
+    var networkState: NetworkState {
+        networkMonitor?.state ?? .unknown
+    }
+
     var isOffline: Bool {
-        networkMonitor?.isOffline ?? false
+        networkState == .offline
     }
 
     // MARK: - Init
