@@ -1,16 +1,6 @@
 import Testing
 import Foundation
-import Observation
 @testable import TravelCalculator
-
-// MARK: - Mock
-
-@MainActor
-@Observable
-private final class MockNetworkMonitor: NetworkMonitorProtocol {
-    var state: NetworkState = .unknown
-    func start() {}
-}
 
 private func makeResponse(fetchedAt: Date = .now, validUntil: Date = .distantFuture) -> ExchangeRateResponse {
     ExchangeRateResponse(

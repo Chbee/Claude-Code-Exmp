@@ -1,17 +1,8 @@
 import Testing
 import Foundation
-import Observation
 @testable import TravelCalculator
 
 // MARK: - Mocks
-
-@MainActor
-@Observable
-private final class MockNetworkMonitor: NetworkMonitorProtocol {
-    var state: NetworkState
-    init(state: NetworkState = .online) { self.state = state }
-    func start() {}
-}
 
 private struct MockExchangeRateAPI: ExchangeRateAPIProtocol {
     enum Behavior: Sendable {

@@ -53,15 +53,7 @@ struct OfflineBanner: View {
         guard let cachedAt else {
             return "오프라인 — 캐시 없음"
         }
-        return "오프라인 — \(Self.formatKST(cachedAt)) 기준 데이터"
-    }
-
-    private static func formatKST(_ date: Date) -> String {
-        let c = Calendar.kst.dateComponents([.year, .month, .day, .hour, .minute], from: date)
-        return String(
-            format: "%04d-%02d-%02d %02d:%02d KST",
-            c.year ?? 0, c.month ?? 0, c.day ?? 0, c.hour ?? 0, c.minute ?? 0
-        )
+        return "오프라인 — \(cachedAt.yyyyMMddHHmmKST()) 기준 데이터"
     }
 }
 
