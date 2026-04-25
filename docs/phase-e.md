@@ -8,8 +8,8 @@
 ## 구현 목표
 
 1. 네트워크 상태 감지 (NWPathMonitor, @Sendable)
-2. 오프라인 State + 온→오프 전환 알림 (배너 + Toast)
-3. 오프라인 UI 피드백 (Toolbar 인디케이터, 환율 영역 위 배너, 새로고침 비활성화)
+2. 오프라인 State + 온→오프 전환 처리 (인라인 캐시 시각 표시)
+3. 오프라인 UI 피드백 (Toolbar 인디케이터, 환율 영역 인라인 캐시 시각, 새로고침 비활성화)
 4. API 에러 핸들링 강화 (재시도 2회, 간격 2초)
 5. Reducer 단위 테스트 (Spec-Tasks 4.1)
 6. 환율 변환 테스트 (Spec-Tasks 4.2)
@@ -35,19 +35,19 @@
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
 | 2.1 | `Presentation/Calculator/CalculatorToolbar.swift` | 인디케이터: 색 + 아이콘 모양 변경(● ↔ wifi-off) + `accessibilityLabel` | Spec-UI §1, Spec-Tasks 3.3.1 |
-| 2.2 | `Presentation/Common/OfflineBanner.swift` (신규) | `state == .offline` 시만 표시 (unknown 비표시), `"오프라인 — yyyy-MM-dd HH:mm 기준 데이터"`, **등장 1초 grace period** (flapping 흡수) | Spec-Overview §2.5.2, Spec-Tasks 3.3.2 |
-| 2.3 | `Presentation/Calculator/CalculatorView.swift` | OfflineBanner 통합 + 새로고침 disabled binding (`state != .online`) + 복귀 시 환율 영역 **pulse 애니** (scale 1.0→1.02→1.0 한 번) | Spec-Tasks 3.3.3 |
+| 2.2 | `Presentation/Calculator/CalculatorDisplay.swift` | 오프라인일 때 환율 영역 rate row 에 캐시 시각을 인라인 표시 (`isOffline + cachedAt` 분기). 라벨은 `relativeLabel` 헬퍼로 finer-grain 상대 시각(`방금` / `N분 전` / `N시간 전` / `N일 전`), `Color.appWarning` 톤 | Spec-Overview §2.5.2, Spec-Tasks 3.3.2 |
+| 2.3 | `Presentation/Calculator/CalculatorView.swift` | `isOffline`/`cachedAt`을 CalculatorDisplay 로 전달 + 새로고침 disabled binding (`state != .online`) + 복귀 시 환율 영역 **pulse 애니** (scale 1.0→1.02→1.0 한 번) | Spec-Tasks 3.3.3 |
 | 2.4 | `Presentation/Calculator/CalculatorView.swift` | 새로고침 disabled 상태에서도 tap 받아 `Toast(info, "오프라인 시 갱신할 수 없어요")` 발화 | UX A-7 |
 | 2.5 | `Core/App/AppStore.swift` | `networkMonitor.start()` 호출을 `AppStore.init`으로 이동 (TravelCalculatorApp 단순화 — 컨벤션 M3) | — |
 
 #### Step 2 결정사항 (인터뷰 확정)
-- **온→오프 Toast**: 없음 (배너만)
+- **온→오프 알림**: 별도 Toast/배너 없음 — 환율 영역 rate row 에 캐시 시각을 인라인 표기로 대체
 - **오프→온 복귀 신호**: 환율 영역 pulse 애니메이션 (Toast/햅틱 X)
 - **새로고침 disabled affordance**: tap → Toast(info, "오프라인 시 갱신할 수 없어요")
 - **Toolbar 인디케이터**: 색 + 아이콘 모양 + VoiceOver
-- **배너 grace period**: 1초 지연 (`Task.sleep` + cancellation), 짧은 flapping 시 깜빡임 흡수
-- **`unknown` 상태 UI**: 배너/인디케이터 비표시, 새로고침 disabled (안전)
-- **"N일 전" grain**: 단일 (V2 백로그 분리)
+- **OfflineBanner**: 도입했다가 제거 — 인라인 캐시 시각 표시로 대체 (별도 grace period 없음)
+- **`unknown` 상태 UI**: 인디케이터/인라인 표기 비표시, 새로고침 disabled (안전)
+- **상대 시각 grain**: 오프라인 인라인 표기는 finer grain (`방금` / `N분 전` / `N시간 전` / `N일 전`), 온라인 day-grain (`최신` / `N일 전`) 과 분리
 
 ### Step 3: 에러 핸들링 + 재시도 ✅ 완료
 
@@ -74,14 +74,14 @@
 
 - [x] `xcodebuild build` 성공 (warning 0, error 0)
 - [x] `xcodebuild test` 성공 (4.1, 4.2 신규 테스트 통과)
-- [x] 시뮬레이터 Wi-Fi off → 오프라인 배너 1초 후 등장 + Toolbar 인디케이터 색+아이콘 전환 + 새로고침 disabled
-- [x] **온→오프 Toast 없음** (배너만)
-- [x] 오프→온 복귀 시 환율 영역 pulse 애니메이션 + 배너 사라짐
-- [x] 비행기 모드 ON 상태로 첫 실행 시 배너/인디케이터 즉시 unknown→offline (절대 ON 잠깐 보이지 않음)
+- [x] 시뮬레이터 Wi-Fi off → 환율 영역 rate row 에 캐시 시각이 즉시 인라인 표시(`방금` / `N분 전` / `N시간 전` / `N일 전`) + Toolbar 인디케이터 색+아이콘 전환 + 새로고침 disabled
+- [x] **온→오프 Toast/배너 없음** (인라인 캐시 시각 표기로 대체)
+- [x] 오프→온 복귀 시 환율 영역 pulse 애니메이션 + 인라인 캐시 시각 표기 사라짐(원래 `최신` / `N일 전` 라벨로 복귀)
+- [x] 비행기 모드 ON 상태로 첫 실행 시 인디케이터/인라인 표기 즉시 unknown→offline (절대 ON 잠깐 보이지 않음)
 - [x] 새로고침 disabled tap → Toast(info, "오프라인 시 갱신할 수 없어요")
 - [x] VoiceOver: 인디케이터에 "오프라인" / "온라인" 레이블
 - [x] API 일시 실패 시 2초 간격 2회 재시도 후 캐시 fallback 또는 에러 노출 (Step 3)
-- [x] 오프라인 배너에 절대 시간(`yyyy-MM-dd HH:mm`) 병기
+- [x] 오프라인 인라인 캐시 시각은 상대 시각(`방금` / `N분 전` / `N시간 전` / `N일 전`) 으로 표시 — 절대 시간 표기는 사용하지 않음
 
 ---
 
@@ -104,11 +104,10 @@ TravelCalculator/
 │       └── ExchangeRateError.swift                  ← MOD (메시지, Step 3)
 ├── TravelCalculatorApp.swift                        ← MOD (Step 1)
 └── Presentation/
-    ├── Calculator/
-    │   ├── CalculatorView.swift                     ← MOD (Step 2)
-    │   └── CalculatorToolbar.swift                  ← MOD (Step 2)
-    └── Common/
-        └── OfflineBanner.swift                      ← NEW (Step 2)
+    └── Calculator/
+        ├── CalculatorView.swift                     ← MOD (Step 2)
+        ├── CalculatorDisplay.swift                  ← MOD (Step 2 — 인라인 캐시 시각)
+        └── CalculatorToolbar.swift                  ← MOD (Step 2)
 
 TravelCalculatorTests/
 ├── Core/
@@ -123,9 +122,8 @@ TravelCalculatorTests/
 
 - **AppCurrencyStore 옵셔널 의존성 제거** (`exchangeRateAPI`, `networkMonitor`) — non-optional + 명시적 mock 주입으로 정리. Preview 동작 검토 필요.
 - **색맹 인디케이터** — online dot에 아이콘 추가(현재 색만 의존), Toolbar 인디케이터 일관성.
-- **Dynamic Type** — Toolbar/배너의 `.system(size: 11/12/13)` 고정 폰트 → `.caption2`/`.caption` relative 폰트로 전환.
-- **상대시간 표기** — `cachedAt` "N분 전" 표기 (Toss/카뱅 환율 위젯 패턴). 현재는 절대 시간만.
-- **캐시 없음 + 오프라인** 별도 톤 — 배너 `style: .danger`(빨강) 차별화.
+- **Dynamic Type** — Toolbar 의 `.system(size: 11/12/13)` 고정 폰트 → `.caption2`/`.caption` relative 폰트로 전환.
+- **캐시 없음 + 오프라인** 별도 톤 — 인라인 표기를 `appDanger`(빨강) 톤으로 차별화.
 - **MockNetworkMonitor 정책 문서화** — 재사용 mock은 `Helpers/`로 분리한다는 정책을 docs/harness.md에 1줄.
 
 ## 다음 Phase
