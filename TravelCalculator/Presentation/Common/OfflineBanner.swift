@@ -4,11 +4,9 @@ struct OfflineBanner: View {
     let isOffline: Bool
     let cachedAt: Date?
 
-    @State private var isVisible = false
-
     var body: some View {
         Group {
-            if isVisible {
+            if isOffline {
                 HStack(spacing: 8) {
                     Image(systemName: "wifi.slash")
                         .font(.system(size: 13, weight: .semibold))
@@ -33,23 +31,13 @@ struct OfflineBanner: View {
                 .padding(.horizontal, 16)
                 .transition(.opacity.combined(with: .move(edge: .top)))
                 .accessibilityElement(children: .combine)
+                .accessibilityLabel(message)
             }
         }
-        .animation(.spring(response: 0.45, dampingFraction: 0.86), value: isVisible)
-        .task(id: isOffline) {
-            // 비대칭 grace: offline 진입은 1s 흡수(짧은 단절은 무시),
-            // online 복귀는 1.5s sticky-hide(flapping 시 깜빡임 방지).
-            do {
-                try await Task.sleep(for: isOffline ? .seconds(1) : .milliseconds(1500))
-            } catch {
-                return
-            }
-            guard isVisible != isOffline else { return }
-            isVisible = isOffline
+        .animation(.spring(response: 0.45, dampingFraction: 0.86), value: isOffline)
+        .onChange(of: isOffline) { _, new in
             AccessibilityNotification.Announcement(
-                isOffline
-                    ? "오프라인 모드, 캐시 데이터 사용 중"
-                    : "온라인 복귀"
+                new ? "오프라인 모드, 캐시 데이터 사용 중" : "온라인 복귀"
             ).post()
         }
     }
