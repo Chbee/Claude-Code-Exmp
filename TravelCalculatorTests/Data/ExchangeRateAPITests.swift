@@ -301,3 +301,85 @@ struct ExchangeRateAPINetworkTests {
         }
     }
 }
+
+// MARK: - Retry Tests
+
+private actor SequencedHandler {
+    private var index = 0
+    private let steps: [@Sendable () throws -> (Data, URLResponse)]
+    private(set) var callCount = 0
+
+    init(steps: [@Sendable () throws -> (Data, URLResponse)]) {
+        self.steps = steps
+    }
+
+    func next() throws -> (Data, URLResponse) {
+        callCount += 1
+        let i = min(index, steps.count - 1)
+        index += 1
+        return try steps[i]()
+    }
+}
+
+struct ExchangeRateAPIRetryTests {
+
+    @Test func retry_networkError_then_success_returnsResponse() async throws {
+        let handler = SequencedHandler(steps: [
+            { throw URLError(.notConnectedToInternet) },
+            { throw URLError(.timedOut) },
+            { (makeOpenERJSON(), makeHTTPResponse()) },
+        ])
+        let session = MockURLSession { [handler] _ in try await handler.next() }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache, retryDelay: .zero)
+
+        let response = try await api.fetchRates(for: [.USD])
+
+        #expect(await handler.callCount == 3)
+        #expect(response.rates.first?.rate == Decimal(string: "1350.5"))
+    }
+
+    @Test func retry_5xx_then_success_returnsResponse() async throws {
+        let handler = SequencedHandler(steps: [
+            { (makeOpenERJSON(), makeHTTPResponse(statusCode: 503)) },
+            { (makeOpenERJSON(), makeHTTPResponse(statusCode: 502)) },
+            { (makeOpenERJSON(), makeHTTPResponse(statusCode: 200)) },
+        ])
+        let session = MockURLSession { [handler] _ in try await handler.next() }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache, retryDelay: .zero)
+
+        let response = try await api.fetchRates(for: [.USD])
+
+        #expect(await handler.callCount == 3)
+        #expect(response.rates.first?.rate == Decimal(string: "1350.5"))
+    }
+
+    @Test func retry_4xx_failsImmediately_noRetry() async throws {
+        let handler = SequencedHandler(steps: [
+            { (makeOpenERJSON(), makeHTTPResponse(statusCode: 400)) },
+        ])
+        let session = MockURLSession { [handler] _ in try await handler.next() }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache, retryDelay: .zero)
+
+        await #expect(throws: ExchangeRateError.noCacheAvailable) {
+            try await api.fetchRates(for: [.USD])
+        }
+        #expect(await handler.callCount == 1)
+    }
+
+    @Test func retry_allThreeAttemptsFail_throwsNoCacheAvailable() async throws {
+        let handler = SequencedHandler(steps: [
+            { throw URLError(.notConnectedToInternet) },
+        ])
+        let session = MockURLSession { [handler] _ in try await handler.next() }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache, retryDelay: .zero)
+
+        await #expect(throws: ExchangeRateError.noCacheAvailable) {
+            try await api.fetchRates(for: [.USD])
+        }
+        #expect(await handler.callCount == 3)
+    }
+}

@@ -9,7 +9,8 @@ struct AppStoreTests {
         let ud = UserDefaults(suiteName: "test-\(UUID().uuidString)")!
         let store = AppStore(
             userDefaults: ud,
-            currencyStore: AppCurrencyStore(userDefaults: ud)
+            currencyStore: AppCurrencyStore(userDefaults: ud),
+            networkMonitor: MockNetworkMonitor()
         )
         return (store, ud)
     }

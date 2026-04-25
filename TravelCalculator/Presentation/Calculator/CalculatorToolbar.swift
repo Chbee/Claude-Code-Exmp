@@ -4,6 +4,7 @@ import SwiftUI
 
 struct CalculatorToolbar: View {
     let currency: Currency
+    let networkState: NetworkState
     let onCurrencyTap: () -> Void
 
     var body: some View {
@@ -27,16 +28,9 @@ struct CalculatorToolbar: View {
             }
             .buttonStyle(.plain)
 
-            // 중간: 온라인 상태
-            HStack(spacing: 4) {
-                Circle()
-                    .fill(Color.appSuccess)
-                    .frame(width: 6, height: 6)
-                Text("온라인")
-                    .font(.system(size: 11))
-                    .foregroundStyle(Color.appTextSub)
-            }
-            .padding(.leading, 10)
+            // 중간: 네트워크 상태 인디케이터
+            networkIndicator
+                .padding(.leading, 10)
 
             Spacer()
 
@@ -64,17 +58,50 @@ struct CalculatorToolbar: View {
         }
         .padding(.horizontal, 16)
     }
+
+    @ViewBuilder
+    private var networkIndicator: some View {
+        switch networkState {
+        case .online:
+            HStack(spacing: 4) {
+                Circle()
+                    .fill(Color.appSuccess)
+                    .frame(width: 6, height: 6)
+                Text("온라인")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.appTextSub)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("온라인")
+        case .offline:
+            HStack(spacing: 4) {
+                Image(systemName: "wifi.slash")
+                    .font(.system(size: 11, weight: .semibold))
+                    .foregroundStyle(Color.appWarning)
+                Text("오프라인")
+                    .font(.system(size: 11))
+                    .foregroundStyle(Color.appWarning)
+            }
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("오프라인")
+        case .unknown:
+            // 레이아웃 자리 유지를 위한 placeholder (동일 높이)
+            Color.clear
+                .frame(height: 12)
+                .accessibilityHidden(true)
+        }
+    }
 }
 
 // MARK: - Preview
 
 #Preview("Light") {
-    CalculatorToolbar(currency: .USD, onCurrencyTap: {})
+    CalculatorToolbar(currency: .USD, networkState: .online, onCurrencyTap: {})
         .background(Color.appBackground)
 }
 
 #Preview("Dark") {
-    CalculatorToolbar(currency: .TWD, onCurrencyTap: {})
+    CalculatorToolbar(currency: .TWD, networkState: .offline, onCurrencyTap: {})
         .background(Color.appBackground)
         .preferredColorScheme(.dark)
 }

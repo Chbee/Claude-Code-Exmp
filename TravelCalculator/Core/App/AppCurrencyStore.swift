@@ -19,6 +19,9 @@ final class AppCurrencyStore {
     @ObservationIgnored private static let selectedCurrencyKey = "selectedCurrency"
     @ObservationIgnored private static let conversionDirectionKey = "conversionDirection"
     @ObservationIgnored private let exchangeRateAPI: (any ExchangeRateAPIProtocol)?
+    @ObservationIgnored private let networkMonitor: (any NetworkMonitorProtocol)?
+    // single-flight 가드. exchangeRateStatus의 초기값이 .loading이라 status로는 구분 불가.
+    @ObservationIgnored private var isInFlight = false
 
     var selectedCurrency: Currency {
         didSet {
@@ -61,7 +64,7 @@ final class AppCurrencyStore {
 
     var isRefreshEnabled: Bool {
         guard let r = currentResponse else { return false }
-        return Date.now >= r.validUntil
+        return Date.now >= r.validUntil && networkState == .online
     }
 
     var daysSinceSearchDate: Int? {
@@ -87,14 +90,28 @@ final class AppCurrencyStore {
         currentRate == nil ? currentError : nil
     }
 
+    var cachedAt: Date? {
+        currentResponse?.fetchedAt
+    }
+
+    var networkState: NetworkState {
+        networkMonitor?.state ?? .unknown
+    }
+
+    var isOffline: Bool {
+        networkState == .offline
+    }
+
     // MARK: - Init
 
     init(
         userDefaults: UserDefaults = .standard,
-        exchangeRateAPI: (any ExchangeRateAPIProtocol)? = nil
+        exchangeRateAPI: (any ExchangeRateAPIProtocol)? = nil,
+        networkMonitor: (any NetworkMonitorProtocol)? = nil
     ) {
         self.userDefaults = userDefaults
         self.exchangeRateAPI = exchangeRateAPI
+        self.networkMonitor = networkMonitor
         self.selectedCurrency = Self.loadSelectedCurrency(from: userDefaults)
         self.conversionDirection = Self.loadConversionDirection(from: userDefaults)
     }
@@ -103,10 +120,15 @@ final class AppCurrencyStore {
 
     func loadExchangeRates(force: Bool = false) async {
         if !force, case .loaded = exchangeRateStatus { return }
+        // single-flight 가드: onAppear + NWPathMonitor unknown→online 자동 트리거가
+        // 첫 호출 진행 중에 겹치는 콜드 스타트 race 방어.
+        if isInFlight { return }
         guard let api = exchangeRateAPI else {
             exchangeRateStatus = .error(.noCacheAvailable)
             return
         }
+        isInFlight = true
+        defer { isInFlight = false }
         exchangeRateStatus = .loading
         do {
             let response = try await api.fetchRates(for: Currency.allCases.filter { $0 != .KRW })
@@ -119,7 +141,9 @@ final class AppCurrencyStore {
     }
 
     func refreshExchangeRates() async {
-        guard isRefreshEnabled else { return }
+        // force=true는 store의 .loaded 가드만 우회. API 레이어는 validUntil 이전엔
+        // 캐시 반환 (open.er-api.com 24h 주기와 정합) — fresh window 안에선 no-op.
+        guard networkState == .online else { return }
         await loadExchangeRates(force: true)
     }
 
