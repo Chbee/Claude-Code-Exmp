@@ -25,7 +25,7 @@ args에서 Phase 문자를 읽습니다 (예: `B`, `C`, `D`, `E`).
 
 Phase별 브랜치명 및 설명:
 - B → `phase/b-calculator-ui` — 계산기 UI (CalculatorView, Keypad, Display, Toolbar) + 통화 선택 UI
-- C → `phase/c-exchange-rate` — 환율 API 연동 (한국수출입은행 API)
+- C → `phase/c-exchange-rate` — 환율 API 연동 (open.er-api.com, USD 기준)
 - D → `phase/d-onboarding` — 온보딩 화면
 - E → `phase/e-offline-tests` — 오프라인 대응 + 테스트
 

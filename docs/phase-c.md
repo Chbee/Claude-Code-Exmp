@@ -1,7 +1,7 @@
 # Phase C — Exchange Rate API (환율 API 연동)
 
 > 브랜치: `phase/c-exchange-rate`
-> 목표: mock 환율을 한국수출입은행 실제 API로 교체. searchdate 기반 캐싱 + 새로고침 + 에러 핸들링.
+> 목표: mock 환율을 open.er-api.com (USD 기준) 실제 API로 교체. searchdate 기반 캐싱 + 새로고침 + 에러 핸들링.
 
 ---
 

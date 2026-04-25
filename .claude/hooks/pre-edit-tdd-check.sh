@@ -1,6 +1,5 @@
 #!/usr/bin/env bash
-# PreToolUse(Edit|Write) hook: TDD 가드 — 대응 테스트 파일 없으면 stderr 경고
-# 차단하지 않음 — exit 0 유지
+# PreToolUse(Edit|Write) hook: TDD 가드 — Store/Reducer/Models 레이어에 테스트 없으면 차단
 
 INPUT=$(cat)
 
@@ -9,7 +8,6 @@ FILE_PATH=$(echo "$INPUT" | python3 -c "
 import sys, json
 try:
     data = json.load(sys.stdin)
-    # tool_input 또는 직접 file_path
     path = data.get('tool_input', data).get('file_path', '')
     print(path)
 except:
@@ -30,16 +28,21 @@ if echo "$FILE_PATH" | grep -qE '/Tests/'; then
   exit 0
 fi
 
+# Store/Reducer/Models 레이어만 차단 (View 등 다른 레이어는 패스)
+if ! echo "$FILE_PATH" | grep -qE '/(Store|Reducer|Models)/'; then
+  exit 0
+fi
+
 # 파일 베이스명 추출
 BASENAME=$(basename "$FILE_PATH" .swift)
 PROJECT_ROOT=$(echo "$FILE_PATH" | sed 's|/TravelCalculator/.*||')
 
 # 대응 테스트 파일 탐색: {Name}Tests.swift
-TEST_FILE_EXACT="${PROJECT_ROOT}/TravelCalculator/${BASENAME}Tests.swift"
 TEST_FILE_FOUND=$(find "${PROJECT_ROOT}" -name "${BASENAME}Tests.swift" 2>/dev/null | head -1)
 
 if [ -z "$TEST_FILE_FOUND" ]; then
-  echo "⚠️ TDD 경고: $(basename "$FILE_PATH") 에 대응하는 테스트 파일(${BASENAME}Tests.swift)이 없습니다. Red → Yellow → Green 사이클을 따르세요." >&2
+  echo "⛔ TDD 차단: $(basename "$FILE_PATH") 에 대응하는 테스트 파일(${BASENAME}Tests.swift)이 없습니다. Red 단계 테스트 먼저 작성하세요."
+  exit 2
 fi
 
 exit 0
