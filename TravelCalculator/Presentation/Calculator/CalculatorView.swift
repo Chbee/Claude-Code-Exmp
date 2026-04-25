@@ -1,6 +1,11 @@
 import SwiftUI
 
 struct CalculatorView: View {
+    // 오프→온 복귀 pulse 발화 간 최소 간격(초). flapping 시 애니 스팸 방지.
+    private static let pulseThrottle: TimeInterval = 10
+    // 새로고침 탭 throttle(초). 동일 안내 Toast 연타 중복 발화 방지.
+    private static let refreshTapThrottle: TimeInterval = 0.8
+
     @State private var calculatorStore: CalculatorStore
     @State private var showCurrencySelect = false
     @State private var pulseScale: CGFloat = 1.0
@@ -61,10 +66,10 @@ struct CalculatorView: View {
             if currencyStore.currentResponse == nil {
                 Task { await currencyStore.loadExchangeRates() }
             }
-            // pulse는 offline → online 복귀 신호. flapping 스팸 방지로 10초 throttle.
+            // pulse는 offline → online 복귀 신호. flapping 스팸 방지 throttle.
             guard old == .offline else { return }
             let now = Date.now
-            guard now.timeIntervalSince(lastPulseAt) >= 10 else { return }
+            guard now.timeIntervalSince(lastPulseAt) >= Self.pulseThrottle else { return }
             lastPulseAt = now
             withAnimation(.easeOut(duration: 0.3)) { pulseScale = 1.02 }
             withAnimation(.easeIn(duration: 0.3).delay(0.3)) { pulseScale = 1.0 }
@@ -82,9 +87,8 @@ struct CalculatorView: View {
     }
 
     private func handleRefreshTap() {
-        // 0.8s throttle — 같은 안내 Toast가 연타로 중복 발화되는 것을 막는다.
         let now = Date.now
-        guard now.timeIntervalSince(lastRefreshTapAt) >= 0.8 else { return }
+        guard now.timeIntervalSince(lastRefreshTapAt) >= Self.refreshTapThrottle else { return }
         lastRefreshTapAt = now
 
         switch currencyStore.networkState {
