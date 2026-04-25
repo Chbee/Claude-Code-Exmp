@@ -59,8 +59,14 @@ struct CalculatorView: View {
             calculatorStore.send(.resetForCurrencyChange)
         }
         .onChange(of: currencyStore.networkState) { old, new in
-            // flapping 시 pulse 스팸 방지: 마지막 pulse로부터 10초 이내면 skip.
-            guard old == .offline, new == .online else { return }
+            guard new == .online else { return }
+            // 캐시가 없으면(앱이 오프라인으로 시작했거나 fetch가 실패해서 .error 상태) 자동 재시도.
+            // 캐시가 있으면 사용자가 명시적으로 새로고침을 누를 때까지 기존 데이터 유지.
+            if currencyStore.currentResponse == nil {
+                Task { await currencyStore.loadExchangeRates() }
+            }
+            // pulse는 offline → online 복귀 신호. flapping 스팸 방지로 10초 throttle.
+            guard old == .offline else { return }
             let now = Date.now
             guard now.timeIntervalSince(lastPulseAt) >= 10 else { return }
             lastPulseAt = now
