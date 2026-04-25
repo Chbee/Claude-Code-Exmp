@@ -17,6 +17,7 @@ struct OfflineBanner: View {
                         .font(.system(size: 12, weight: .medium))
                         .foregroundStyle(Color.appTextPrimary)
                         .lineLimit(1)
+                        .minimumScaleFactor(0.8)
                     Spacer(minLength: 0)
                 }
                 .padding(.horizontal, 14)

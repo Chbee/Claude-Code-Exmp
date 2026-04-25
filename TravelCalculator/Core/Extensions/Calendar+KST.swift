@@ -21,7 +21,7 @@ extension Date {
     nonisolated func yyyyMMddHHmmKST() -> String {
         let c = Calendar.kst.dateComponents([.year, .month, .day, .hour, .minute], from: self)
         return String(
-            format: "%04d-%02d-%02d %02d:%02d KST",
+            format: "%04d-%02d-%02d %02d:%02d",
             c.year ?? 0, c.month ?? 0, c.day ?? 0, c.hour ?? 0, c.minute ?? 0
         )
     }
