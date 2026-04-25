@@ -46,7 +46,7 @@ struct CalculatorDisplay: View {
                     .font(.footnote.weight(.medium))
                     .foregroundStyle(isRefreshEnabled ? Color.appPrimary : Color.appTextSub)
             }
-            .disabled(!isRefreshEnabled || isLoading)
+            .disabled(isLoading)
             .buttonStyle(.plain)
         }
     }

@@ -61,16 +61,28 @@ private struct OpenERAPIResponse: Decodable {
 
 struct ExchangeRateAPI: ExchangeRateAPIProtocol {
     private static let endpoint = URL(string: "https://open.er-api.com/v6/latest/USD")!
+    private static let maxAttempts = 3  // 초기 1회 + 재시도 2회
+
+    // spec §2.5.5: timeout 10s. URLSession.shared(60s)와 분리하기 위한 별도 인스턴스.
+    nonisolated(unsafe) private static let defaultSession: URLSession = {
+        let cfg = URLSessionConfiguration.default
+        cfg.timeoutIntervalForRequest = 10
+        cfg.timeoutIntervalForResource = 30
+        return URLSession(configuration: cfg)
+    }()
 
     private let session: any URLSessionProtocol
     private let cache: ExchangeRateCacheActor
+    private let retryDelay: Duration
 
     nonisolated init(
-        session: any URLSessionProtocol = URLSession.shared,
-        cache: ExchangeRateCacheActor = ExchangeRateCacheActor()
+        session: any URLSessionProtocol = ExchangeRateAPI.defaultSession,
+        cache: ExchangeRateCacheActor = ExchangeRateCacheActor(),
+        retryDelay: Duration = .seconds(2)
     ) {
         self.session = session
         self.cache = cache
+        self.retryDelay = retryDelay
     }
 
     func fetchRates(for currencies: [Currency]) async throws -> ExchangeRateResponse {
@@ -92,6 +104,29 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
     // MARK: - Internal
 
     private func fetchFromAPI(currencies: [Currency]) async throws -> ExchangeRateResponse {
+        var lastError: Error = ExchangeRateError.networkError
+        for attempt in 0..<Self.maxAttempts {
+            do {
+                return try await fetchAttempt(currencies: currencies)
+            } catch let error as ExchangeRateError where Self.shouldRetry(error) {
+                lastError = error
+                if attempt < Self.maxAttempts - 1 {
+                    try await Task.sleep(for: retryDelay)
+                }
+            }
+        }
+        throw lastError
+    }
+
+    private static func shouldRetry(_ error: ExchangeRateError) -> Bool {
+        switch error {
+        case .networkError: true
+        case .serverError(let code): (500...599).contains(code)
+        default: false
+        }
+    }
+
+    private func fetchAttempt(currencies: [Currency]) async throws -> ExchangeRateResponse {
         let (data, response): (Data, URLResponse)
         do {
             (data, response) = try await session.data(from: Self.endpoint)

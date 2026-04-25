@@ -12,12 +12,12 @@ private final class MockNetworkMonitor: NetworkMonitorProtocol {
     func start() {}
 }
 
-private func makeResponse(fetchedAt: Date = .now) -> ExchangeRateResponse {
+private func makeResponse(fetchedAt: Date = .now, validUntil: Date = .distantFuture) -> ExchangeRateResponse {
     ExchangeRateResponse(
         rates: [ExchangeRate(currency: .USD, currencyName: "미국 달러", rate: 1350)],
         fetchedAt: fetchedAt,
         searchDate: "20260425",
-        validUntil: .distantFuture
+        validUntil: validUntil
     )
 }
 
@@ -76,5 +76,45 @@ struct AppCurrencyStoreOfflineTests {
         store.exchangeRateStatus = .loaded(makeResponse(fetchedAt: now))
 
         #expect(store.cachedAt == now)
+    }
+
+    @Test func isRefreshEnabled_trueWhenOnlineAndExpired() {
+        let monitor = MockNetworkMonitor()
+        monitor.state = .online
+        let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
+        let store = AppCurrencyStore(userDefaults: ud, networkMonitor: monitor)
+        store.exchangeRateStatus = .loaded(makeResponse(validUntil: .distantPast))
+
+        #expect(store.isRefreshEnabled == true)
+    }
+
+    @Test func isRefreshEnabled_falseWhenOfflineEvenIfExpired() {
+        let monitor = MockNetworkMonitor()
+        monitor.state = .offline
+        let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
+        let store = AppCurrencyStore(userDefaults: ud, networkMonitor: monitor)
+        store.exchangeRateStatus = .loaded(makeResponse(validUntil: .distantPast))
+
+        #expect(store.isRefreshEnabled == false)
+    }
+
+    @Test func isRefreshEnabled_falseWhenUnknown() {
+        let monitor = MockNetworkMonitor()
+        monitor.state = .unknown
+        let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
+        let store = AppCurrencyStore(userDefaults: ud, networkMonitor: monitor)
+        store.exchangeRateStatus = .loaded(makeResponse(validUntil: .distantPast))
+
+        #expect(store.isRefreshEnabled == false)
+    }
+
+    @Test func isRefreshEnabled_falseWhenOnlineButNotExpired() {
+        let monitor = MockNetworkMonitor()
+        monitor.state = .online
+        let ud = UserDefaults(suiteName: "test.offline.\(UUID().uuidString)")!
+        let store = AppCurrencyStore(userDefaults: ud, networkMonitor: monitor)
+        store.exchangeRateStatus = .loaded(makeResponse(validUntil: .distantFuture))
+
+        #expect(store.isRefreshEnabled == false)
     }
 }

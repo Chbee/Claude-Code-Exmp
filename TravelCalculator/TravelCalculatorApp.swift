@@ -11,9 +11,7 @@ struct TravelCalculatorApp: App {
     @State private var toastManager = ToastManager()
 
     init() {
-        let store = AppStore()
-        store.networkMonitor.start()
-        _appStore = State(initialValue: store)
+        _appStore = State(initialValue: AppStore())
     }
 
     var body: some Scene {

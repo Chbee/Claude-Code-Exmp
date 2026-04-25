@@ -15,7 +15,6 @@ final class AppStore {
     }
 
     let currencyStore: AppCurrencyStore
-    let networkMonitor: any NetworkMonitorProtocol
 
     init(
         userDefaults: UserDefaults = .standard,
@@ -24,12 +23,12 @@ final class AppStore {
     ) {
         self.userDefaults = userDefaults
         self.hasCompletedOnboarding = userDefaults.bool(forKey: Self.hasCompletedOnboardingKey)
-        self.networkMonitor = networkMonitor
         self.currencyStore = currencyStore ?? AppCurrencyStore(
             userDefaults: userDefaults,
             exchangeRateAPI: ExchangeRateAPI(),
             networkMonitor: networkMonitor
         )
+        networkMonitor.start()
     }
 
     func makeOnboardingCurrencySelectStore(toastManager: ToastManager) -> CurrencySelectStore {

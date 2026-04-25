@@ -3,6 +3,8 @@ import SwiftUI
 struct CalculatorView: View {
     @State private var calculatorStore: CalculatorStore
     @State private var showCurrencySelect = false
+    @State private var pulseScale: CGFloat = 1.0
+    @State private var lastRefreshTapAt: Date = .distantPast
 
     private let toastManager: ToastManager
     private let currencyStore: AppCurrencyStore
@@ -20,7 +22,14 @@ struct CalculatorView: View {
         VStack(spacing: 0) {
             CalculatorToolbar(
                 currency: currencyStore.selectedCurrency,
+                networkState: currencyStore.networkState,
                 onCurrencyTap: { showCurrencySelect = true }
+            )
+            .padding(.top, 8)
+
+            OfflineBanner(
+                isOffline: currencyStore.isOffline,
+                cachedAt: currencyStore.cachedAt
             )
             .padding(.top, 8)
 
@@ -29,12 +38,13 @@ struct CalculatorView: View {
             CalculatorDisplay(
                 displayModel: calculatorStore.displayModel,
                 onToggleDirection: { calculatorStore.toggleDirection() },
-                onRefresh: { Task { await calculatorStore.refreshRates() } },
+                onRefresh: handleRefreshTap,
                 daysSinceSearchDate: currencyStore.daysSinceSearchDate,
                 isRefreshEnabled: currencyStore.isRefreshEnabled,
                 isLoading: currencyStore.isLoading
             )
             .opacity(!currencyStore.isLoading && currencyStore.currentRate == nil ? 0.4 : 1.0)
+            .scaleEffect(pulseScale)
 
             CalculatorKeypad(
                 onIntent: { calculatorStore.send($0) }
@@ -47,6 +57,14 @@ struct CalculatorView: View {
         .onChange(of: currencyStore.selectedCurrency) {
             calculatorStore.send(.resetForCurrencyChange)
         }
+        .onChange(of: currencyStore.networkState) { old, new in
+            guard old == .offline, new == .online else { return }
+            Task { @MainActor in
+                withAnimation(.easeOut(duration: 0.3)) { pulseScale = 1.02 }
+                try? await Task.sleep(for: .milliseconds(300))
+                withAnimation(.easeIn(duration: 0.3)) { pulseScale = 1.0 }
+            }
+        }
         .fullScreenCover(isPresented: $showCurrencySelect) {
             CurrencySelectView(
                 store: CurrencySelectStore(
@@ -56,6 +74,30 @@ struct CalculatorView: View {
                 )
             )
             .toast(manager: toastManager)
+        }
+    }
+
+    private func handleRefreshTap() {
+        // 0.8s throttle — 같은 안내 Toast가 연타로 중복 발화되는 것을 막는다.
+        let now = Date.now
+        guard now.timeIntervalSince(lastRefreshTapAt) >= 0.8 else { return }
+        lastRefreshTapAt = now
+
+        switch currencyStore.networkState {
+        case .offline:
+            toastManager.show(ToastPayload(
+                style: .info,
+                title: "오프라인",
+                message: "네트워크 연결 후 갱신할 수 있어요"
+            ))
+        case .unknown:
+            toastManager.show(ToastPayload(
+                style: .info,
+                title: "네트워크 확인 중",
+                message: "잠시 후 다시 시도해 주세요"
+            ))
+        case .online:
+            Task { await calculatorStore.refreshRates() }
         }
     }
 }

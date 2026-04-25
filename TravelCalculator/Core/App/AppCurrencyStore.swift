@@ -62,7 +62,7 @@ final class AppCurrencyStore {
 
     var isRefreshEnabled: Bool {
         guard let r = currentResponse else { return false }
-        return Date.now >= r.validUntil
+        return Date.now >= r.validUntil && networkState == .online
     }
 
     var daysSinceSearchDate: Int? {

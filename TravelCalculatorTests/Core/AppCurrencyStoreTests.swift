@@ -1,8 +1,17 @@
 import Testing
 import Foundation
+import Observation
 @testable import TravelCalculator
 
-// MARK: - Mock
+// MARK: - Mocks
+
+@MainActor
+@Observable
+private final class MockNetworkMonitor: NetworkMonitorProtocol {
+    var state: NetworkState
+    init(state: NetworkState = .online) { self.state = state }
+    func start() {}
+}
 
 private struct MockExchangeRateAPI: ExchangeRateAPIProtocol {
     enum Behavior: Sendable {
@@ -119,7 +128,7 @@ struct AppCurrencyStoreComputedTests {
     @Test func isRefreshEnabled_whenCacheAfterValidUntil_returnsTrue() async {
         let response = makeResponse(validUntil: Date(timeIntervalSinceNow: -3600))
         let api = MockExchangeRateAPI(behavior: .success(response))
-        let store = AppCurrencyStore(exchangeRateAPI: api)
+        let store = AppCurrencyStore(exchangeRateAPI: api, networkMonitor: MockNetworkMonitor(state: .online))
 
         await store.loadExchangeRates()
 
@@ -156,7 +165,7 @@ struct AppCurrencyStoreRefreshTests {
         let expiredResponse = makeResponse(validUntil: Date(timeIntervalSinceNow: -3600))
         let counter = MockExchangeRateAPI.Counter()
         let api = MockExchangeRateAPI(behavior: .success(expiredResponse), counter: counter)
-        let store = AppCurrencyStore(exchangeRateAPI: api)
+        let store = AppCurrencyStore(exchangeRateAPI: api, networkMonitor: MockNetworkMonitor(state: .online))
         await store.loadExchangeRates()
         let firstCount = await counter.count
         #expect(firstCount == 1)
