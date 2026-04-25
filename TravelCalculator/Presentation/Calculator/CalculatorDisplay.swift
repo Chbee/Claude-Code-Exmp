@@ -9,6 +9,8 @@ struct CalculatorDisplay: View {
     let daysSinceSearchDate: Int?
     let isRefreshEnabled: Bool
     let isLoading: Bool
+    let isOffline: Bool
+    let cachedAt: Date?
 
     var body: some View {
         VStack(spacing: 0) {
@@ -32,6 +34,18 @@ struct CalculatorDisplay: View {
                 ProgressView()
                     .scaleEffect(0.6)
                     .tint(Color.appTextSub)
+            } else if isOffline, let cachedAt {
+                Text("·")
+                    .font(.footnote)
+                    .foregroundStyle(Color.appTextSub)
+                Image(systemName: "wifi.slash")
+                    .font(.footnote.weight(.medium))
+                    .foregroundStyle(Color.appWarning)
+                Text("\(cachedAt.yyyyMMddHHmmKST()) 기준")
+                    .font(.footnote)
+                    .foregroundStyle(Color.appWarning)
+                    .lineLimit(1)
+                    .minimumScaleFactor(0.8)
             } else if let days = daysSinceSearchDate {
                 Text("·")
                     .font(.footnote)
@@ -131,7 +145,9 @@ struct CalculatorDisplay: View {
         onRefresh: {},
         daysSinceSearchDate: 0,
         isRefreshEnabled: false,
-        isLoading: false
+        isLoading: false,
+        isOffline: false,
+        cachedAt: nil
     )
     .background(Color.appBackground)
 }
@@ -152,7 +168,9 @@ struct CalculatorDisplay: View {
         onRefresh: {},
         daysSinceSearchDate: 2,
         isRefreshEnabled: true,
-        isLoading: false
+        isLoading: false,
+        isOffline: false,
+        cachedAt: nil
     )
     .background(Color.appBackground)
 }
@@ -173,7 +191,32 @@ struct CalculatorDisplay: View {
         onRefresh: {},
         daysSinceSearchDate: nil,
         isRefreshEnabled: false,
-        isLoading: true
+        isLoading: true,
+        isOffline: false,
+        cachedAt: nil
+    )
+    .background(Color.appBackground)
+}
+
+#Preview("오프라인 (캐시 시각 표시)") {
+    let state = CalculatorState()
+    let model = CalculatorDisplayModel.make(
+        state: state,
+        inputCurrency: .USD,
+        outputCurrency: .KRW,
+        selectedCurrency: .USD,
+        exchangeRate: 1350,
+        isInputKRW: false
+    )
+    CalculatorDisplay(
+        displayModel: model,
+        onToggleDirection: {},
+        onRefresh: {},
+        daysSinceSearchDate: 0,
+        isRefreshEnabled: false,
+        isLoading: false,
+        isOffline: true,
+        cachedAt: Date(timeIntervalSince1970: 1_745_572_800)
     )
     .background(Color.appBackground)
 }
@@ -194,7 +237,9 @@ struct CalculatorDisplay: View {
         onRefresh: {},
         daysSinceSearchDate: 2,
         isRefreshEnabled: true,
-        isLoading: false
+        isLoading: false,
+        isOffline: false,
+        cachedAt: nil
     )
     .background(Color.appBackground)
     .preferredColorScheme(.dark)

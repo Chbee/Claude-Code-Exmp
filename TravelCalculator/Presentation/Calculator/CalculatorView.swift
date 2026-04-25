@@ -28,12 +28,6 @@ struct CalculatorView: View {
             )
             .padding(.top, 8)
 
-            OfflineBanner(
-                isOffline: currencyStore.isOffline,
-                cachedAt: currencyStore.cachedAt
-            )
-            .padding(.top, 8)
-
             Spacer()
 
             CalculatorDisplay(
@@ -42,7 +36,9 @@ struct CalculatorView: View {
                 onRefresh: handleRefreshTap,
                 daysSinceSearchDate: currencyStore.daysSinceSearchDate,
                 isRefreshEnabled: currencyStore.isRefreshEnabled,
-                isLoading: currencyStore.isLoading
+                isLoading: currencyStore.isLoading,
+                isOffline: currencyStore.isOffline,
+                cachedAt: currencyStore.cachedAt
             )
             .opacity(!currencyStore.isLoading && currencyStore.currentRate == nil ? 0.4 : 1.0)
             .scaleEffect(pulseScale)
