@@ -137,11 +137,14 @@ struct AppCurrencyStoreComputedTests {
 @MainActor
 struct AppCurrencyStoreRefreshTests {
 
-    @Test func refreshExchangeRates_whenNotEnabled_noAPICall() async {
+    @Test func refreshExchangeRates_whenOffline_noAPICall() async {
         let validResponse = makeResponse(validUntil: .distantFuture)
         let counter = MockExchangeRateAPI.Counter()
         let api = MockExchangeRateAPI(behavior: .success(validResponse), counter: counter)
-        let store = AppCurrencyStore(exchangeRateAPI: api)
+        let store = AppCurrencyStore(
+            exchangeRateAPI: api,
+            networkMonitor: MockNetworkMonitor(state: .offline)
+        )
         await store.loadExchangeRates()
         let initial = await counter.count
 
@@ -149,6 +152,24 @@ struct AppCurrencyStoreRefreshTests {
 
         let after = await counter.count
         #expect(after == initial)
+    }
+
+    @Test func refreshExchangeRates_whenOnlineAndCacheFresh_forceFetches() async {
+        // 사용자 명시적 새로고침은 캐시가 fresh 해도 강제 fetch — '탭 = 강제 갱신' 멘탈 모델.
+        let freshResponse = makeResponse(validUntil: .distantFuture)
+        let counter = MockExchangeRateAPI.Counter()
+        let api = MockExchangeRateAPI(behavior: .success(freshResponse), counter: counter)
+        let store = AppCurrencyStore(
+            exchangeRateAPI: api,
+            networkMonitor: MockNetworkMonitor(state: .online)
+        )
+        await store.loadExchangeRates()
+        let initial = await counter.count
+
+        await store.refreshExchangeRates()
+
+        let after = await counter.count
+        #expect(after == initial + 1)
     }
 
     @Test func refreshExchangeRates_whenEnabled_bypassesLoadedGate() async {

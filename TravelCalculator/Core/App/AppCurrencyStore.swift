@@ -134,7 +134,9 @@ final class AppCurrencyStore {
     }
 
     func refreshExchangeRates() async {
-        guard isRefreshEnabled else { return }
+        // 사용자가 명시적으로 탭한 경우 — 캐시 freshness 와 무관하게 force fetch.
+        // 오프라인이면 호출부(handleRefreshTap)에서 이미 차단되므로 여기선 별도 가드 X.
+        guard networkState == .online else { return }
         await loadExchangeRates(force: true)
     }
 
