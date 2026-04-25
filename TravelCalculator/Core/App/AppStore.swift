@@ -15,13 +15,20 @@ final class AppStore {
     }
 
     let currencyStore: AppCurrencyStore
+    let networkMonitor: any NetworkMonitorProtocol
 
-    init(userDefaults: UserDefaults = .standard, currencyStore: AppCurrencyStore? = nil) {
+    init(
+        userDefaults: UserDefaults = .standard,
+        currencyStore: AppCurrencyStore? = nil,
+        networkMonitor: any NetworkMonitorProtocol = NetworkMonitor()
+    ) {
         self.userDefaults = userDefaults
         self.hasCompletedOnboarding = userDefaults.bool(forKey: Self.hasCompletedOnboardingKey)
+        self.networkMonitor = networkMonitor
         self.currencyStore = currencyStore ?? AppCurrencyStore(
             userDefaults: userDefaults,
-            exchangeRateAPI: ExchangeRateAPI()
+            exchangeRateAPI: ExchangeRateAPI(),
+            networkMonitor: networkMonitor
         )
     }
 

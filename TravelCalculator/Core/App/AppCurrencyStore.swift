@@ -19,6 +19,7 @@ final class AppCurrencyStore {
     @ObservationIgnored private static let selectedCurrencyKey = "selectedCurrency"
     @ObservationIgnored private static let conversionDirectionKey = "conversionDirection"
     @ObservationIgnored private let exchangeRateAPI: (any ExchangeRateAPIProtocol)?
+    @ObservationIgnored private let networkMonitor: (any NetworkMonitorProtocol)?
 
     var selectedCurrency: Currency {
         didSet {
@@ -87,14 +88,24 @@ final class AppCurrencyStore {
         currentRate == nil ? currentError : nil
     }
 
+    var cachedAt: Date? {
+        currentResponse?.fetchedAt
+    }
+
+    var isOffline: Bool {
+        networkMonitor?.isOffline ?? false
+    }
+
     // MARK: - Init
 
     init(
         userDefaults: UserDefaults = .standard,
-        exchangeRateAPI: (any ExchangeRateAPIProtocol)? = nil
+        exchangeRateAPI: (any ExchangeRateAPIProtocol)? = nil,
+        networkMonitor: (any NetworkMonitorProtocol)? = nil
     ) {
         self.userDefaults = userDefaults
         self.exchangeRateAPI = exchangeRateAPI
+        self.networkMonitor = networkMonitor
         self.selectedCurrency = Self.loadSelectedCurrency(from: userDefaults)
         self.conversionDirection = Self.loadConversionDirection(from: userDefaults)
     }
