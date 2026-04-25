@@ -119,6 +119,15 @@ TravelCalculatorTests/
 
 ---
 
+## V2 백로그 (팀 검증에서 분리된 항목)
+
+- **AppCurrencyStore 옵셔널 의존성 제거** (`exchangeRateAPI`, `networkMonitor`) — non-optional + 명시적 mock 주입으로 정리. Preview 동작 검토 필요.
+- **색맹 인디케이터** — online dot에 아이콘 추가(현재 색만 의존), Toolbar 인디케이터 일관성.
+- **Dynamic Type** — Toolbar/배너의 `.system(size: 11/12/13)` 고정 폰트 → `.caption2`/`.caption` relative 폰트로 전환.
+- **상대시간 표기** — `cachedAt` "N분 전" 표기 (Toss/카뱅 환율 위젯 패턴). 현재는 절대 시간만.
+- **캐시 없음 + 오프라인** 별도 톤 — 배너 `style: .danger`(빨강) 차별화.
+- **MockNetworkMonitor 정책 문서화** — 재사용 mock은 `Helpers/`로 분리한다는 정책을 docs/harness.md에 1줄.
+
 ## 다음 Phase
 
 V1 완료 → 앱스토어 배포 준비 + 통화 확장(JPY, EUR 등) 백로그 처리.

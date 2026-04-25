@@ -4,7 +4,7 @@ struct CalculatorView: View {
     @State private var calculatorStore: CalculatorStore
     @State private var showCurrencySelect = false
     @State private var pulseScale: CGFloat = 1.0
-    @State private var pulseTask: Task<Void, Never>?
+    @State private var lastPulseAt: Date = .distantPast
     @State private var lastRefreshTapAt: Date = .distantPast
 
     private let toastManager: ToastManager
@@ -59,16 +59,14 @@ struct CalculatorView: View {
             calculatorStore.send(.resetForCurrencyChange)
         }
         .onChange(of: currencyStore.networkState) { old, new in
+            // flapping 시 pulse 스팸 방지: 마지막 pulse로부터 10초 이내면 skip.
             guard old == .offline, new == .online else { return }
-            pulseTask?.cancel()
-            pulseTask = Task { @MainActor in
-                withAnimation(.easeOut(duration: 0.3)) { pulseScale = 1.02 }
-                try? await Task.sleep(for: .milliseconds(300))
-                guard !Task.isCancelled else { return }
-                withAnimation(.easeIn(duration: 0.3)) { pulseScale = 1.0 }
-            }
+            let now = Date.now
+            guard now.timeIntervalSince(lastPulseAt) >= 10 else { return }
+            lastPulseAt = now
+            withAnimation(.easeOut(duration: 0.3)) { pulseScale = 1.02 }
+            withAnimation(.easeIn(duration: 0.3).delay(0.3)) { pulseScale = 1.0 }
         }
-        .onDisappear { pulseTask?.cancel() }
         .fullScreenCover(isPresented: $showCurrencySelect) {
             CurrencySelectView(
                 store: CurrencySelectStore(

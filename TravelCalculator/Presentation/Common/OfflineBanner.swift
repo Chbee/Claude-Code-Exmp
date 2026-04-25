@@ -36,16 +36,20 @@ struct OfflineBanner: View {
         }
         .animation(.spring(response: 0.45, dampingFraction: 0.86), value: isVisible)
         .task(id: isOffline) {
-            guard isOffline else {
-                isVisible = false
+            // 비대칭 grace: offline 진입은 1s 흡수(짧은 단절은 무시),
+            // online 복귀는 1.5s sticky-hide(flapping 시 깜빡임 방지).
+            do {
+                try await Task.sleep(for: isOffline ? .seconds(1) : .milliseconds(1500))
+            } catch {
                 return
             }
-            do {
-                try await Task.sleep(nanoseconds: 1_000_000_000)
-            } catch {
-                return  // cancelled — do not flip visibility
-            }
-            isVisible = true
+            guard isVisible != isOffline else { return }
+            isVisible = isOffline
+            AccessibilityNotification.Announcement(
+                isOffline
+                    ? "오프라인 모드, 캐시 데이터 사용 중"
+                    : "온라인 복귀"
+            ).post()
         }
     }
 

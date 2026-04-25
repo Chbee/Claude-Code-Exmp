@@ -61,10 +61,10 @@ private struct OpenERAPIResponse: Decodable {
 
 struct ExchangeRateAPI: ExchangeRateAPIProtocol {
     private static let endpoint = URL(string: "https://open.er-api.com/v6/latest/USD")!
-    private static let maxAttempts = 3  // 초기 1회 + 재시도 2회
+    private static let maxAttempts = 3
 
     // spec §2.5.5: timeout 10s. URLSession.shared(60s)와 분리하기 위한 별도 인스턴스.
-    nonisolated(unsafe) private static let defaultSession: URLSession = {
+    nonisolated private static let defaultSession: URLSession = {
         let cfg = URLSessionConfiguration.default
         cfg.timeoutIntervalForRequest = 10
         cfg.timeoutIntervalForResource = 30
