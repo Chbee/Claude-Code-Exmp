@@ -154,8 +154,10 @@ struct AppCurrencyStoreRefreshTests {
         #expect(after == initial)
     }
 
-    @Test func refreshExchangeRates_whenOnlineAndCacheFresh_forceFetches() async {
-        // 사용자 명시적 새로고침은 캐시가 fresh 해도 강제 fetch — '탭 = 강제 갱신' 멘탈 모델.
+    @Test func refreshExchangeRates_whenOnlineAndStoreLoaded_bypassesLoadedGate() async {
+        // store의 .loaded 가드를 force=true로 우회 → api.fetchRates 호출이 일어나는 것까지만 검증.
+        // 실 ExchangeRateAPI는 자체 캐시(validUntil 이전이면 즉시 반환)가 있어 네트워크는 호출되지 않으나,
+        // 그 캐시 우선 동작은 ExchangeRateAPITests에서 별도 검증한다 (MockAPI는 캐시 layer 없음).
         let freshResponse = makeResponse(validUntil: .distantFuture)
         let counter = MockExchangeRateAPI.Counter()
         let api = MockExchangeRateAPI(behavior: .success(freshResponse), counter: counter)
