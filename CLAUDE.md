@@ -35,24 +35,7 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 
 - **Reducer는 순수 함수** — 사이드 이펙트 없음. 사이드 이펙트는 Store에서 처리
 - **Store는 @Observable** — 상태 보유 + API 호출, 위치 조회 등 비동기 처리
-
-### 전역 상태 흐름
-
-```
-AppStore (전역)
-├── AppCurrencyStore (selectedCurrency, conversionDirection, exchangeRateStatus)
-│   └── UserDefaults 저장: selectedCurrency, conversionDirection
-├── hasCompletedOnboarding (UserDefaults)
-└── ToastManager (전역 Toast)
-
-↓ @EnvironmentObject 주입
-
-ContentView → CalculatorView
-├── CalculatorStore(toastManager, currencyStore)
-└── CurrencySelectStore(toastManager, currencyStore)
-```
-
-통화 변경 시: `CurrencySelectStore` → `AppCurrencyStore` 업데이트 → `CalculatorStore`가 감지 → `.resetForCurrencyChange` Intent → Reducer 리셋
+- 전역 상태 흐름(AppStore/AppCurrencyStore/ToastManager 주입 구조)은 `specs/Spec-Architecture.md` §4.3 참조
 
 ## Key Specs
 
@@ -69,7 +52,7 @@ ContentView → CalculatorView
 |---|-----------|--------|
 | 0 | 온보딩 | 완료 (Phase D) |
 | 1 | Calculator UI | 완료 (Phase A+B) |
-| 2 | Exchange Rate (한국수출입은행 API) | 완료 (Phase C) |
+| 2 | Exchange Rate (open.er-api.com) | 완료 (Phase C) |
 | 3 | Offline Support | 미착수 |
 | 4 | Testing | 일부 완료 (4.3 API 테스트, 나머지 미착수) |
 
@@ -78,20 +61,12 @@ ContentView → CalculatorView
 이 프로젝트는 Multi-AI 오케스트레이션을 사용 (자세한 내용은 `Plan.md` 참조):
 - **Gemini CLI** (`gemini -p "질문"`): 딥 리서치, API 문서 검색
 - **Codex CLI** (`codex exec "작업"`): 세컨드 오피니언 코드 생성
-- **Figma MCP** (공식 Figma MCP 서버): 디자인 토큰 추출, 화면 디자인 → SwiftUI 변환
-  - 디자인 파일: https://www.figma.com/design/RHAP7WVgoX220lRhWseaWE/여행가계부
-  - 계산기 화면: node-id=298-230
-  - Asset (컬러): node-id=99-875
-  - Component: node-id=397-230
-  - Icon: node-id=397-231
+- **Figma MCP**: 디자인 토큰/화면 → SwiftUI 변환 — node-id 등 상세는 `docs/figma.md`
 - 모델 스위칭: Opus(설계) / Sonnet(구현) / Haiku(단순)
 
 ## Harness Workflow
 
-모든 작업은 `/start-task`로 시작:
-1. **Plan Mode 진입** → 인터뷰 → Codex 검증 → 승인 (편집 차단)
-2. **승인 후 TDD**: Red(실패 테스트) → Yellow(최소 구현) → Green(리팩터링)
-3. **Anti Over-Engineering**: 요청된 것만 구현, 1회성 추상화 금지, 헬퍼는 3회 반복 시만
+모든 작업은 `/start-task`로 시작 — Plan Mode 인터뷰 → Codex 검증 → TDD(Red→Yellow→Green). 자세한 구성(훅/슬래시 커맨드/메모리 구조)은 `docs/harness.md` 참조.
 
 ## Important Notes
 
