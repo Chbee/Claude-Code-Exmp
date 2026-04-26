@@ -198,18 +198,21 @@ ExchangeRateResponse
 
 #### 2.5.1 네트워크 모니터링
 - NWPathMonitor를 사용한 실시간 네트워크 상태 감지
-- `isOffline` 상태 관리
+- `NetworkState` enum: `unknown` / `online` / `offline` (초기값 `unknown` — 첫 콜백 도달 전 "거짓 온라인" 창 제거)
 - 콜백 → MainActor 전달 시 `@Sendable` 처리
 
 #### 2.5.2 오프라인 UI
-- Toolbar: 소형 인디케이터 (● 색상 변경)
-- **환율 정보 영역 바로 위**: 오프라인 배너 표시
-  - `"오프라인 — 2026-04-04 14:00 기준 데이터"` (절대 시간 병기)
-- 새로고침 버튼: 오프라인 시 비활성화
+- **Toolbar 인디케이터**: 색 + 아이콘 모양 변경 (● ↔ wifi-off) + VoiceOver `accessibilityLabel`
+- **환율 영역 rate row 인라인 캐시 시각 표기** (별도 배너 없음): `Color.appWarning` 톤
+  - 상대 시각: `방금` / `N분 전` / `N시간 전` / `N일 전`
+  - 절대 시간(`14:00 기준`)은 사용하지 않음 — 오프라인 인라인 표기는 finer-grain 상대 시각 전용
+- 새로고침 버튼: 오프라인 시 비활성화 (tap 시 `Toast(info, "오프라인 시 갱신할 수 없어요")`)
+- `unknown` 상태: 인디케이터/인라인 표기 비표시, 새로고침 disabled (안전 기본값)
 
-#### 2.5.3 온라인→오프라인 전환
-- 오프라인 배너가 애니메이션으로 등장 (1초 grace period로 flapping 흡수)
-- ~~Toast(info, "오프라인으로 전환되었습니다")~~ → **구현 결정: Toast 미사용, 배너만 (`docs/phase-e.md` Step 2 결정사항)**
+#### 2.5.3 온라인↔오프라인 전환
+- **온→오프**: 별도 Toast/배너 없음 — 환율 영역 인라인 캐시 시각 표기로 대체 (grace period 없음)
+- **오프→온 복귀**: 환율 영역 pulse 애니메이션 (scale 1.0→1.02→1.0 1회), Toast/햅틱 없음, 인라인 표기는 원래 라벨(`최신` / `N일 전`)로 복귀
+- `unknown → offline` 전이는 무시(첫 진입 시 깜빡임 방지), `online → offline` 전이만 인라인 표기 발화
 
 #### 2.5.4 API 실패 + 캐시 없음 (최악의 상태)
 - 계산기 임시 비활성화 (키패드 disable)
