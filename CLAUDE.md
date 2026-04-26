@@ -53,8 +53,8 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 | 0 | 온보딩 | 완료 (Phase D) |
 | 1 | Calculator UI | 완료 (Phase A+B) |
 | 2 | Exchange Rate (open.er-api.com) | 완료 (Phase C) |
-| 3 | Offline Support | 미착수 |
-| 4 | Testing | 일부 완료 (4.3 API 테스트, 나머지 미착수) |
+| 3 | Offline Support | 완료 (Phase E) |
+| 4 | Testing | 4.1 Reducer / 4.2 환율 변환 / 4.3 API 완료 (Phase E) |
 
 ## Multi-AI Workflow
 
