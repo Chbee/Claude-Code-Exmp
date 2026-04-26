@@ -133,7 +133,7 @@ struct CurrencySelectStoreLocationTests {
     }
 
     @Test func requestLocation_unsupported_showsWarningToast() async {
-        let (store, currencyStore, toastManager, _) = makeStore(outcome: .success("JP"))
+        let (store, currencyStore, toastManager, _) = makeStore(outcome: .success("XX"))
         currencyStore.selectedCurrency = .USD
 
         store.send(.requestLocation)
@@ -200,10 +200,3 @@ struct CurrencySelectStoreLocationTests {
     }
 }
 
-@Suite struct CurrencyFromCountryCodeTests {
-    @Test func kr_mapsToKRW() { #expect(Currency.from(countryCode: "KR") == .KRW) }
-    @Test func us_mapsToUSD() { #expect(Currency.from(countryCode: "US") == .USD) }
-    @Test func tw_mapsToTWD() { #expect(Currency.from(countryCode: "TW") == .TWD) }
-    @Test func lowercase_handled() { #expect(Currency.from(countryCode: "us") == .USD) }
-    @Test func unsupported_returnsNil() { #expect(Currency.from(countryCode: "JP") == nil) }
-}

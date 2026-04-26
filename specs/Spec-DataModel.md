@@ -20,16 +20,43 @@ State와 Intent가 공유하는 독립 타입. `Domain/Models/Operator.swift`에
 ### 5.2 Currency
 
 ```swift
-enum Currency: String, CaseIterable, Codable {
-    case KRW, USD, TWD
+enum Currency: String, CaseIterable, Sendable {
+    case KRW, USD, JPY, CNY, EUR, TWD, THB, VND, PHP
 
-    var symbol: String         // ₩, $, NT$
-    var flag: String           // 🇰🇷, 🇺🇸, 🇹🇼
-    var countryName: String    // 대한민국, 미국, 대만
+    var symbol: String         // ₩ $ ¥ ¥ € NT$ ฿ ₫ ₱
+    var flag: String           // 🇰🇷 🇺🇸 🇯🇵 🇨🇳 🇪🇺 🇹🇼 🇹🇭 🇻🇳 🇵🇭
+    var countryName: String    // 대한민국 / 미국 / 일본 / 중국 / 유럽연합 / 대만 / 태국 / 베트남 / 필리핀
+    var currencyName: String   // 대한민국 원 / 미국 달러 / 일본 엔 / 중국 위안 / 유로 / 대만 달러 / 태국 바트 / 베트남 동 / 필리핀 페소
     var currencyUnit: String   // rawValue
-    var fractionDigits: Int    // KRW=0, USD=2, TWD=2
+    var fractionDigits: Int    // 0자리: KRW/JPY/VND, 2자리: USD/CNY/EUR/TWD/THB/PHP
+    var countryCodes: [String] // ISO 3166-1 alpha-2 — EUR만 다중(EU + eurozone 19개국)
 }
+
+extension Currency: Codable { ... }   // singleValueContainer rawValue
 ```
+
+`CaseIterable` 순서가 통화 선택 화면 표시 순서에 직결 (한국 여행객 인기/지역순).
+
+`fractionDigits` 매핑:
+
+| 자릿수 | 통화 |
+|--------|------|
+| 0 | KRW, JPY, VND |
+| 2 | USD, CNY, EUR, TWD, THB, PHP |
+
+`countryCodes` 매핑(`from(countryCode:)` reverse-lookup 데이터):
+
+| Currency | countryCodes |
+|----------|--------------|
+| KRW | KR |
+| USD | US |
+| JPY | JP |
+| CNY | CN |
+| EUR | EU, DE, FR, IT, ES, NL, BE, AT, PT, IE, FI, GR, LU, SK, SI, EE, LV, LT, MT, CY |
+| TWD | TW |
+| THB | TH |
+| VND | VN |
+| PHP | PH |
 
 ### 5.3 CalculatorIntent
 

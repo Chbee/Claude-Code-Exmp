@@ -110,10 +110,18 @@
 | 통화 | 소수점 자릿수 | 표시 예시 |
 |------|-------------|----------|
 | KRW | 0자리 | ₩1,350,000 |
+| JPY | 0자리 | ¥10,000 |
+| VND | 0자리 | ₫25,000,000 |
 | USD | 2자리 | $1,000.00 |
+| CNY | 2자리 | ¥7,250.00 |
+| EUR | 2자리 | €920.00 |
 | TWD | 2자리 | NT$31,500.00 |
+| THB | 2자리 | ฿35,400.00 |
+| PHP | 2자리 | ₱56,800.00 |
 
 Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
+
+> 저액면 통화(VND 등) — KRW→VND 변환 결과가 정수부 10자리에 근접할 수 있다(예: 1억 KRW ≈ 18억 VND). Display 폰트 자동 축소(`minimumScaleFactor`)와 변환 결과값의 10자리 초과 허용 정책(§2.2.3 참조)으로 대응.
 
 ### 2.3 통화 선택
 
@@ -122,7 +130,13 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 |-----------|------|------|--------|
 | KRW | ₩ | 🇰🇷 | 대한민국 |
 | USD | $ | 🇺🇸 | 미국 |
+| JPY | ¥ | 🇯🇵 | 일본 |
+| CNY | ¥ | 🇨🇳 | 중국 |
+| EUR | € | 🇪🇺 | 유럽연합 |
 | TWD | NT$ | 🇹🇼 | 대만 |
+| THB | ฿ | 🇹🇭 | 태국 |
+| VND | ₫ | 🇻🇳 | 베트남 |
+| PHP | ₱ | 🇵🇭 | 필리핀 |
 
 #### 2.3.2 통화 선택 화면
 - 전체 화면 모달 (fullScreenCover)
@@ -137,7 +151,10 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 #### 2.3.4 위치 기반 자동 선택
 - "현재 위치로 자동 설정" 버튼
 - 위치 권한 요청 → GPS 좌표 획득 → 역지오코딩 → 국가 코드 매핑
-- 국가 코드 매핑: `KR → KRW`, `US → USD`, `TW → TWD`
+- 국가 코드 매핑(ISO 3166-1 alpha-2):
+  - 단일 매핑: `KR→KRW`, `US→USD`, `JP→JPY`, `CN→CNY`, `TW→TWD`, `TH→THB`, `VN→VND`, `PH→PHP`
+  - EUR(eurozone 19개국 + EU 자체): `EU/DE/FR/IT/ES/NL/BE/AT/PT/IE/FI/GR/LU/SK/SI/EE/LV/LT/MT/CY → EUR`
+  - 데이터 소스: `Currency.countryCodes` (Spec-DataModel §5.2)
 - 미지원 지역일 경우 Toast(warning) 알림
 - `PermissionStatus.denied` 시: iOS 설정 앱으로 안내하는 Toast(info) + 딥링크
 
