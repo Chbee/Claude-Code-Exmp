@@ -28,7 +28,7 @@
 
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
-| 2.1 | `Presentation/CurrencySelect/CurrencySelectState.swift` | `searchQuery: String = ""` 필드 추가. `filteredCurrencies: [Currency]` computed — `searchQuery` 빈 문자열이면 `currencies` 전체, 아니면 `countryName` / `currencyName` / `currencyUnit` / `symbol` 부분 일치(공백 trim, 대소문자 무시). `currencyName` 포함 이유: "엔" 검색이 "일본 엔"에 매칭되도록 (countryName "일본"만 보면 "엔" 매칭 누락). | Spec-Tasks §9 리뷰 4.2 |
+| 2.1 | `Presentation/CurrencySelect/CurrencySelectState.swift` | `searchQuery: String = ""` 필드 추가. `filteredCurrencies: [Currency]` computed — `searchQuery` 빈 문자열이면 `currencies` 전체, 아니면 `countryName` / `currencyUnit` 부분 일치(공백 trim, 대소문자 무시). `currencyName`/`symbol`은 매칭 범위 제외 (사용자 결정 2026-04-28 — "엔"·"¥" 같은 token-only 검색은 의도적 비매칭으로 통화 식별성 명확하게 유지). | Spec-Tasks §9 리뷰 4.2 |
 | 2.2 | `Presentation/CurrencySelect/CurrencySelectIntent.swift` | `case setSearchQuery(String)` 추가. | — |
 | 2.3 | `Presentation/CurrencySelect/CurrencySelectReducer.swift` | `setSearchQuery` 처리 — `state.searchQuery = query` 만 갱신. | — |
 | 2.4 | `Presentation/CurrencySelect/CurrencySelectView.swift` | 헤더 아래·`locationButton` 위에 SearchBar (`TextField` + 돋보기 아이콘 + 입력 시 우측 `xmark.circle.fill` clear 버튼). `currencyList`는 `state.filteredCurrencies` 사용. 결과 0건일 때 "검색 결과가 없습니다" empty state. | Spec-UI 디자인 시스템 (appBackground/appTextSub 톤 유지) |
@@ -38,17 +38,24 @@
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
 | 3.1 | `TravelCalculatorTests/ExchangeRateConversionTests.swift` | 신규 통화 변환 회귀 케이스 추가 — JPY(fractionDigits=0), EUR(2), VND(0) 각각 USD↔통화↔KRW 라운드트립 (Decimal 정밀도, 은행 반올림). | Spec-Overview §2.2 |
-| 3.2 | `TravelCalculatorTests/CurrencySelectFilterTests.swift` (신규) | `CurrencySelectReducer` + `CurrencySelectState.filteredCurrencies` 단위 테스트: (a) 빈 쿼리 → 전체, (b) "일본"/"JPY"/"¥" 각각 매칭, (c) 대소문자/공백 무시, (d) 무매칭 → 빈 배열. | — |
+| 3.2 | `TravelCalculatorTests/CurrencySelectFilterTests.swift` (신규) | `CurrencySelectReducer` + `CurrencySelectState.filteredCurrencies` 단위 테스트: (a) 빈 쿼리 → 전체, (b) "일본"/"JPY"/"jpy" 매칭, (c) 대소문자/공백 무시, (d) 무매칭 → 빈 배열, (e) scope-guard "엔"/"¥" 비매칭. | — |
 
 ---
 
 ## 완료 기준
 
-- [ ] `xcodebuild build` 성공 (warning 0, error 0)
-- [ ] `xcodebuild test` 성공 (Step 3 신규 테스트 포함 전 케이스 통과)
-- [ ] CurrencySelectView 시뮬레이터 확인: 9개 통화(KRW 제외 8개 표시) 노출, 검색어 입력 시 실시간 필터, clear 버튼 동작, 결과 0건 empty state
-- [ ] 신규 통화(예: JPY, EUR) 선택 → 계산기 화면에서 실시간 KRW 변환 정상 표시 (fractionDigits 차등 반영)
-- [ ] 위치 기반 자동 설정으로 JP/TH/VN/PH/CN 국가 시 해당 통화 매핑 (EU는 fallback Toast 정상)
+- [x] `xcodebuild build` 성공 (warning 0, error 0)
+- [x] `xcodebuild test` 성공 (Step 3.2 신규 검색 테스트 포함 전 케이스 통과)
+- [ ] CurrencySelectView 시뮬레이터 확인: 9개 통화(KRW 제외 8개 표시) 노출, 검색어 입력 시 실시간 필터, clear 버튼 동작, 결과 0건 empty state ← 사용자 손 검증 대기
+- [ ] 신규 통화(예: JPY, EUR) 선택 → 계산기 화면에서 실시간 KRW 변환 정상 표시 (fractionDigits 차등 반영) ← 사용자 손 검증 대기
+- [ ] 위치 기반 자동 설정으로 JP/TH/VN/PH/CN 국가 시 해당 통화 매핑 (EU는 fallback Toast 정상) ← 사용자 손 검증 대기
+
+### Step 진행 상황
+
+- ✅ **Step 1** — Currency 확장 (커밋 `459cbf4`)
+- ✅ **Step 2** — 검색·필터 UI (working tree, 미커밋) + Tripy.html 디자인 사양 + 팀 검증 HIGH(spec)/MEDIUM 7건 반영 + /simplify 1건 반영
+- ⬜ **Step 3.1** — `ExchangeRateConversionTests`에 JPY(0)/EUR(2)/VND(0) fractionDigits 회귀 케이스 추가 (현재 USD/KRW만)
+- ✅ **Step 3.2** — `CurrencySelectFilterTests.swift` 신규 (10 케이스)
 
 ---
 

@@ -158,16 +158,18 @@
 
 ## 9. 개선 백로그
 
-| 출처 | 항목 | 우선순위 |
-|------|------|----------|
-| 리뷰 1.2 | 지원 통화 확장 (JPY, EUR, THB, VND, PHP, CNY 등) | High |
-| 리뷰 4.2 | 통화 확장 시 검색/필터 기능 추가 | High |
-| 리뷰 1.3 | 환율 알림 (목표 환율 푸시) | Medium |
-| 리뷰 4.1 | Toast 스와이프 수동 닫기 | Low |
-| 리뷰 5.1 | VoiceOver accessibilityLabel/Hint 추가 | Medium |
-| 리뷰 5.2 | Dynamic Type 대응 | Low |
-| 리뷰 6.5 | API 키 보안 강화 (CI/CD 주입 방식) | Medium |
-| 리뷰 6.7 | 키 입력 debounce (성능 최적화) | Low |
+| 출처 | 항목 | 우선순위 | 상태 |
+|------|------|----------|------|
+| 리뷰 1.2 | 지원 통화 확장 (JPY, EUR, THB, VND, PHP, CNY 등) | High | ✅ Phase F Step 1 |
+| 리뷰 4.2 | 통화 확장 시 검색/필터 기능 추가 | High | ✅ Phase F Step 2 (countryName + currencyUnit 매칭) |
+| 리뷰 1.3 | 환율 알림 (목표 환율 푸시) | Medium | ⬜ |
+| 리뷰 4.1 | Toast 스와이프 수동 닫기 | Low | ⬜ |
+| 리뷰 5.1 | VoiceOver accessibilityLabel/Hint 추가 | Medium | 🟡 부분 (검색바만 적용 — 전체 앱은 미적용) |
+| 리뷰 5.2 | Dynamic Type 대응 | Low | ⬜ |
+| 리뷰 6.5 | API 키 보안 강화 (CI/CD 주입 방식) | Medium | ⬜ |
+| 리뷰 6.7 | 키 입력 debounce (성능 최적화) | Low | ⬜ |
+| Phase F UX | 검색 결과에 선택 통화 가시성(체크 핀 고정) | Low | ⬜ V2 후보 |
+| Phase F UX | 온보딩 모드에서 검색바 숨김 (8개뿐) | Low | ⬜ V2 후보 |
 
 ---
 

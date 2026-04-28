@@ -14,8 +14,15 @@ struct CurrencySelectView: View {
             locationButton
                 .padding(.bottom, 24)
 
-            currencyList
+            searchBar
                 .padding(.horizontal, 16)
+
+            if store.state.filteredCurrencies.isEmpty {
+                emptyState
+            } else {
+                currencyList
+                    .padding(.horizontal, 16)
+            }
 
             Spacer(minLength: 0)
         }
@@ -91,7 +98,8 @@ struct CurrencySelectView: View {
     private var currencyList: some View {
         ScrollView {
             LazyVStack(spacing: 0) {
-                ForEach(store.state.currencies, id: \.self) { currency in
+                let items = store.state.filteredCurrencies
+                ForEach(items, id: \.self) { currency in
                     CurrencyRowView(
                         currency: currency,
                         isSelected: currency == store.state.selectedCurrency
@@ -99,13 +107,64 @@ struct CurrencySelectView: View {
                         store.send(.selectCurrency(currency))
                     }
 
-                    if currency != store.state.currencies.last {
+                    if currency != items.last {
                         Divider()
                             .padding(.leading, 60)
                     }
                 }
             }
         }
+        .scrollDismissesKeyboard(.immediately)
+    }
+
+    private var searchBar: some View {
+        let binding = Binding<String>(
+            get: { store.state.searchQuery },
+            set: { store.send(.setSearchQuery($0)) }
+        )
+        return VStack(spacing: 0) {
+            HStack(spacing: 12) {
+                Image(systemName: "magnifyingglass")
+                    .font(.system(size: 18, weight: .medium))
+                    .foregroundStyle(Color.appTextSub)
+
+                TextField("국가 또는 통화 검색", text: binding)
+                    .font(.system(size: 15))
+                    .foregroundStyle(Color.appTextPrimary)
+                    .textInputAutocapitalization(.never)
+                    .autocorrectionDisabled()
+                    .submitLabel(.search)
+                    .accessibilityLabel("통화 검색")
+
+                if !store.state.searchQuery.isEmpty {
+                    Button {
+                        store.send(.setSearchQuery(""))
+                    } label: {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 16))
+                            .foregroundStyle(Color.appTextSub)
+                            .frame(width: 44, height: 44)
+                            .contentShape(Rectangle())
+                    }
+                    .buttonStyle(.plain)
+                    .accessibilityLabel("검색어 지우기")
+                }
+            }
+            .frame(height: 48)
+
+            Divider()
+        }
+    }
+
+    private var emptyState: some View {
+        VStack {
+            Text("검색 결과가 없습니다")
+                .font(.system(size: 14))
+                .foregroundStyle(Color.appTextSub)
+                .padding(.top, 40)
+            Spacer(minLength: 0)
+        }
+        .frame(maxWidth: .infinity)
     }
 }
 

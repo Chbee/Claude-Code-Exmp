@@ -5,4 +5,5 @@ enum CurrencySelectIntent {
     case dismiss
     case requestLocation
     case locationRequestFinished
+    case setSearchQuery(String)
 }
