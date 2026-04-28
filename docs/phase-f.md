@@ -37,8 +37,39 @@
 
 | # | 파일 | 태스크 | Spec 참조 |
 |---|------|--------|-----------|
-| 3.1 | `TravelCalculatorTests/ExchangeRateConversionTests.swift` | 신규 통화 변환 회귀 케이스 추가 — JPY(fractionDigits=0), EUR(2), VND(0) 각각 USD↔통화↔KRW 라운드트립 (Decimal 정밀도, 은행 반올림). | Spec-Overview §2.2 |
-| 3.2 | `TravelCalculatorTests/CurrencySelectFilterTests.swift` (신규) | `CurrencySelectReducer` + `CurrencySelectState.filteredCurrencies` 단위 테스트: (a) 빈 쿼리 → 전체, (b) "일본"/"JPY"/"jpy" 매칭, (c) 대소문자/공백 무시, (d) 무매칭 → 빈 배열, (e) scope-guard "엔"/"¥" 비매칭. | — |
+| 3.1 | `TravelCalculatorTests/Domain/ExchangeRateConversionTests.swift` | 신규 통화(JPY/EUR/VND) 변환 회귀 케이스 추가. 자세한 케이스 표는 §Step 3.1 상세. | Spec-Overview §2.2.4 |
+| 3.2 | `TravelCalculatorTests/Presentation/CurrencySelectFilterTests.swift` (신규) | `CurrencySelectReducer` + `CurrencySelectState.filteredCurrencies` 단위 테스트: (a) 빈 쿼리 → 전체, (b) "일본"/"JPY"/"jpy" 매칭, (c) 대소문자/공백 무시, (d) 무매칭 → 빈 배열, (e) scope-guard "엔"/"¥" 비매칭. | — |
+
+#### Step 3.1 상세
+
+**목표**: Phase F Step 1에서 추가된 신규 통화(JPY/CNY/EUR/THB/VND/PHP) 중 fractionDigits 분기를 대표하는 3종(JPY=0, EUR=2, VND=0/저액면)의 KRW 양방향 환산을 회귀 안전망에 편입.
+
+**테스트 패턴**: 기존 `conversion_TWD_appliesRate` (line 43–52) 와 동일. `CalculatorDisplayModel.make(...)` 호출, `inputCurrency`/`outputCurrency`/`exchangeRate` 직접 지정, `resultDisplay.rawAmount` + `formattedAmount` 검증.
+
+**rate 선택 원칙**: 정확한 정수/2자리 결과가 나오도록 의도적으로 라운드 친화 값 사용. 부동 정밀도 검증은 별도 케이스(50 EUR × 1467.93)로만.
+
+| # | 케이스명 | input | rate | output | rawAmount | formattedAmount |
+|---|---|---|---|---|---|---|
+| 3.1.1 | `conversion_JPYtoKRW_appliesRate` | 1000 JPY | 9 | KRW | `9000` | `9,000` |
+| 3.1.2 | `conversion_KRWtoJPY_dropsFractionDigits` | 9000 KRW | 9 | JPY | `1000` | `1,000` |
+| 3.1.3 | `conversion_EURtoKRW_appliesRate` | 100 EUR | 1500 | KRW | `150000` | `150,000` |
+| 3.1.4 | `conversion_KRWtoEUR_keepsTwoFractionDigits` | 150000 KRW | 1500 | EUR | `100` | `100.00` |
+| 3.1.5 | `conversion_EUR_decimalRate_bankerRoundsHalfEven` | 50 EUR | 1467.93 | KRW | `73396.5` | `73,396` |
+| 3.1.6 | `conversion_VNDtoKRW_smallRate` | 100000 VND | 0.05 | KRW | `5000` | `5,000` |
+| 3.1.7 | `conversion_KRWtoVND_largeResult` | 100000 KRW | 0.05 | VND | `2000000` | `2,000,000` |
+
+**산식 검증**:
+- 3.1.5 — `Decimal(50) * Decimal("1467.93") = 73396.5`. `Decimal+Format.swift`는 `NumberFormatter` 기본 모드(`.halfEven` = banker's rounding) 사용. 73396.5 → 73396(짝수)로 내림. 기대값 `73,396` 확정. 이 케이스가 라운딩 모드 회귀를 동시에 잡아주는 효과 있음.
+- 3.1.7 — `Decimal(100000) / Decimal("0.05") = 2,000,000`. 정수부 7자리, 천단위 콤마. Decimal은 38 significant digits까지 안전 → VND 저액면 overflow 우려 없음.
+
+**놓치면 위험한 회귀**:
+- JPY/VND가 `fractionDigits=0`인데 formatter가 0자리 라운딩 미적용 시 소수점 노출 (3.1.2, 3.1.7로 잡힘)
+- EUR이 `fractionDigits=2`인데 0자리 또는 부동정밀도로 절단 (3.1.4, 3.1.5로 잡힘)
+- VND가 너무 작은 rate로 큰 결과를 만들 때 표시 폭 (3.1.7) — Display View 측 minimumScaleFactor 회귀와 별개
+
+**파일 구조**: 기존 `ExchangeRateConversionTests` struct 안에 `@Test` 7개 추가. 별도 struct 분리 불필요 (모두 동일 도메인).
+
+**의존성/사전 조건**: 추가 코드 없음. Currency enum의 fractionDigits는 Phase F Step 1에서 이미 케이스별 분기 완료 (Currency.swift:72–77).
 
 ---
 
@@ -77,8 +108,10 @@ TravelCalculator/
         └── CurrencySelectView.swift                    ← MOD (Step 2, SearchBar + empty state)
 
 TravelCalculatorTests/
-├── ExchangeRateConversionTests.swift                   ← MOD (Step 3.1, 신규 통화 케이스)
-└── CurrencySelectFilterTests.swift                     ← NEW (Step 3.2)
+├── Domain/
+│   └── ExchangeRateConversionTests.swift               ← MOD (Step 3.1, 신규 통화 케이스)
+└── Presentation/
+    └── CurrencySelectFilterTests.swift                 ← NEW (Step 3.2)
 ```
 
 ---
