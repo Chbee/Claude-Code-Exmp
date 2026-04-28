@@ -79,7 +79,7 @@
 - [x] `xcodebuild test` 성공 (Step 3.2 신규 검색 테스트 포함 전 케이스 통과)
 - [x] CurrencySelectView 시뮬레이터 확인: 9개 통화(KRW 제외 8개 표시) 노출, 검색어 입력 시 실시간 필터, clear 버튼 동작, 결과 0건 empty state
 - [x] 신규 통화(예: JPY, EUR) 선택 → 계산기 화면에서 실시간 KRW 변환 정상 표시 (fractionDigits 차등 반영)
-- [x] 위치 기반 자동 설정으로 JP/TH/VN/PH/CN 국가 시 해당 통화 매핑 (EU는 fallback Toast 정상)
+- [ ] 위치 기반 자동 설정으로 JP/TH/VN/PH/CN 국가 시 해당 통화 매핑 (EU는 fallback Toast 정상) ← 사용자 손 검증 대기
 
 ### Step 진행 상황
 
