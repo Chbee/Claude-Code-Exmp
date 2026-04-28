@@ -85,8 +85,14 @@
 
 - ✅ **Step 1** — Currency 확장 (커밋 `459cbf4`)
 - ✅ **Step 2** — 검색·필터 UI (working tree, 미커밋) + Tripy.html 디자인 사양 + 팀 검증 HIGH(spec)/MEDIUM 7건 반영 + /simplify 1건 반영
-- ⬜ **Step 3.1** — `ExchangeRateConversionTests`에 JPY(0)/EUR(2)/VND(0) fractionDigits 회귀 케이스 추가 (현재 USD/KRW만)
+- ✅ **Step 3.1** — `ExchangeRateConversionTests`에 JPY(0)/EUR(2)/VND(0) fractionDigits 회귀 케이스 7개 추가 + `makeConversion` 헬퍼 추출
 - ✅ **Step 3.2** — `CurrencySelectFilterTests.swift` 신규 (10 케이스)
+
+### V2 백로그 (Step 3.1 팀 검증에서 분리)
+
+- **정수 통화 소수점 입력 거부 가드** — JPY/VND/KRW(fractionDigits=0)에서 키패드로 `.` 입력 시 거부 동작이 unspec. Spec-Overview §2.2.4 정수 통화 입력 규칙과 정합 케이스 필요. (Calculator/keypad 도메인)
+- **VND 7자리 표시 폭 회귀 가드** — `2,000,000` 같은 결과의 Display View `minimumScaleFactor` 회귀는 데이터 검증과 별개. 스냅샷 테스트 또는 폭 가드 필요.
+- **EUR 부동소수 누적 시나리오** — `50 + 50.50 EUR` 같은 연속 입력 후 환산 정확도. Calculator 도메인 + ExchangeRate 통합 시나리오로 분리.
 
 ---
 
