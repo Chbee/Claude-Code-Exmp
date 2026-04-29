@@ -47,10 +47,19 @@ git checkout -b phase/X-name
 
 `specs/` 디렉토리의 관련 Spec 파일을 읽어 해당 Phase의 태스크를 파악:
 - `specs/Spec-Tasks.md` — 마일스톤별 전체 태스크 목록
-- `specs/Spec-Overview.md` — 기능 명세
+- `specs/Spec-Overview.md` — 프로젝트 개요 + Toast + 온보딩
+- `specs/Spec-Calculator.md` — 기본 계산기 + 환율 변환
+- `specs/Spec-ExchangeRate.md` — 통화 선택 + 환율 API + 오프라인
 - `specs/Spec-Architecture.md` — 아키텍처
-- `specs/Spec-DataModel.md` — 데이터 모델
+- `specs/Spec-MVI.md` — Reducer/Store 룰 (검증 가능 항목)
+- `specs/Spec-DataModel.md` — 데이터 모델 (Calculator/Currency/Toast/Permission)
+- `specs/Spec-DataModel-Network.md` — 데이터 모델 (ExchangeRate/AppCurrencyStore/Protocol)
 - `specs/Spec-UI.md` — UI 설계 (Phase B, D)
+
+**영향 문서 추정**: 위 spec 파일 중 이 Phase가 추가/수정하거나 참조만 하는 섹션을 식별.
+- 추가/수정: 해당 Phase가 spec 본문을 바꾸는 경우 (예: 새 통화 추가 → Spec-DataModel §5.2)
+- 참조만: spec 본문은 변경하지 않지만 동작이 그 spec에 의존하는 경우 (예: MVI 룰 준수)
+- 모호하면 사용자에게 `AskUserQuestion`으로 확인.
 
 `docs/phase-a.md` 형식을 참고하여 작성:
 ```markdown
@@ -58,6 +67,17 @@ git checkout -b phase/X-name
 
 > 브랜치: `phase/x-name`
 > 목표: [한 줄 요약]
+
+## 영향 문서 (Impact)
+
+이 Phase가 spec에 미치는 영향. 작업 진행 중 추가/수정 발견 시 누적 갱신.
+
+- **추가/수정한 spec 섹션**:
+  - [Spec-XXX §N.M 제목](../specs/Spec-XXX.md#nm-제목) — 변경 요지 한 줄
+- **참조만 (변경 없음)**:
+  - [Spec-XXX §N.M 제목](../specs/Spec-XXX.md#nm-제목) — 의존 이유 한 줄
+
+> 변경/추가가 없으면 항목을 비우되 섹션 자체는 유지.
 
 ## 구현 목표
 [번호 목록]
@@ -69,6 +89,7 @@ git checkout -b phase/X-name
 ## 완료 기준
 - [ ] xcodebuild 빌드 성공 (warning 0, error 0)
 - [ ] [기능별 확인 항목]
+- [ ] **영향 문서 섹션의 모든 추가/수정 항목이 spec에 실제로 반영됨**
 
 ## 파일 구조 (생성/수정 예정)
 [트리 구조]
@@ -125,3 +146,4 @@ Step 4-A에서 **직렬 실행 권장**으로 판정된 경우, 별도 사용자
 - `docs/phase-X.md` 작성 전 반드시 Spec 파일을 읽어 정확한 태스크 파악
 - 태스크 누락 없이 Spec-Tasks.md 기준으로 작성
 - 완료 기준은 검증 가능한 항목만 포함
+- **영향 문서 섹션 필수**: 빈 항목이라도 섹션 자체는 유지. 작업 진행 중 spec 추가/수정 발견 시 누적 갱신 (`/start-task` 종료 시 또는 사용자 요청 시)
