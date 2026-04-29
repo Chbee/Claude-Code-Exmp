@@ -113,7 +113,7 @@
 | JPY | 0자리 | ¥10,000 |
 | VND | 0자리 | ₫25,000,000 |
 | USD | 2자리 | $1,000.00 |
-| CNY | 2자리 | ¥7,250.00 |
+| CNY | 2자리 | 元7,250.00 |
 | EUR | 2자리 | €920.00 |
 | TWD | 2자리 | NT$31,500.00 |
 | THB | 2자리 | ฿35,400.00 |
@@ -131,7 +131,7 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 | KRW | ₩ | 🇰🇷 | 대한민국 |
 | USD | $ | 🇺🇸 | 미국 |
 | JPY | ¥ | 🇯🇵 | 일본 |
-| CNY | ¥ | 🇨🇳 | 중국 |
+| CNY | 元 | 🇨🇳 | 중국 |
 | EUR | € | 🇪🇺 | 유럽연합 |
 | TWD | NT$ | 🇹🇼 | 대만 |
 | THB | ฿ | 🇹🇭 | 태국 |
@@ -153,7 +153,7 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 - 위치 권한 요청 → GPS 좌표 획득 → 역지오코딩 → 국가 코드 매핑
 - 국가 코드 매핑(ISO 3166-1 alpha-2):
   - 단일 매핑: `KR→KRW`, `US→USD`, `JP→JPY`, `CN→CNY`, `TW→TWD`, `TH→THB`, `VN→VND`, `PH→PHP`
-  - EUR(eurozone 19개국 + EU 자체): `EU/DE/FR/IT/ES/NL/BE/AT/PT/IE/FI/GR/LU/SK/SI/EE/LV/LT/MT/CY → EUR`
+  - EUR(eurozone 19개국): `DE/FR/IT/ES/NL/BE/AT/PT/IE/FI/GR/LU/SK/SI/EE/LV/LT/MT/CY → EUR`
   - 데이터 소스: `Currency.countryCodes` (Spec-DataModel §5.2)
 - 미지원 지역일 경우 Toast(warning) 알림
 - `PermissionStatus.denied` 시: iOS 설정 앱으로 안내하는 Toast(info) + 딥링크

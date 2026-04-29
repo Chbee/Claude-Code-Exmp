@@ -16,7 +16,7 @@ enum Currency: String, CaseIterable, Sendable {
         case .KRW: "₩"
         case .USD: "$"
         case .JPY: "¥"
-        case .CNY: "¥"
+        case .CNY: "元"
         case .EUR: "€"
         case .TWD: "NT$"
         case .THB: "฿"
@@ -85,7 +85,7 @@ extension Currency {
         case .USD: ["US"]
         case .JPY: ["JP"]
         case .CNY: ["CN"]
-        case .EUR: ["EU", "DE", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "IE",
+        case .EUR: ["DE", "FR", "IT", "ES", "NL", "BE", "AT", "PT", "IE",
                     "FI", "GR", "LU", "SK", "SI", "EE", "LV", "LT", "MT", "CY"]
         case .TWD: ["TW"]
         case .THB: ["TH"]
@@ -94,9 +94,13 @@ extension Currency {
         }
     }
 
+    private nonisolated static let codeToCurrency: [String: Currency] =
+        Dictionary(uniqueKeysWithValues: allCases.flatMap { currency in
+            currency.countryCodes.map { ($0, currency) }
+        })
+
     nonisolated static func from(countryCode: String) -> Currency? {
-        let code = countryCode.uppercased()
-        return allCases.first { $0.countryCodes.contains(code) }
+        codeToCurrency[countryCode.uppercased()]
     }
 }
 

@@ -122,6 +122,44 @@ TravelCalculatorTests/
 
 ---
 
+## 의사결정 기록
+
+### 2026-04-28 — 검색 매칭 scope: countryName + currencyUnit only
+
+**결정**: `CurrencySelectState.filteredCurrencies` 매칭 범위를 `countryName`(예: "일본")과 `currencyUnit`(예: "JPY")로 한정. `currencyName`("일본 엔")과 `symbol`("¥")은 의도적으로 제외.
+
+**이유**:
+- "엔"·"¥" 같은 token-only 검색은 통화 식별성 약화 — JPY/CNY가 동일 ¥를 공유하던 시점부터 symbol 매칭은 모호함을 키움
+- "일본 엔"은 "일본" 검색으로 이미 매칭됨 — currencyName 매칭은 중복 노이즈
+- 사용자 결정 (PR #9 리뷰)
+
+**적용 위치**: `CurrencySelectState.swift:filteredCurrencies` computed
+**회귀 가드**: `CurrencySelectFilterTests.swift` — `currencyName_doesNotMatch_scopeGuard`("엔" → []), `symbol_doesNotMatch_scopeGuard`("¥" → [])
+
+### 2026-04-29 — CNY 기호 ¥ → 元
+
+**결정**: CNY 기호를 `¥`에서 `元`로 변경. JPY와의 시각적 충돌 해소.
+
+**대안 검토**:
+- `CN¥` (블룸버그/은행 표기) — ISO 4217 정신에 가까우나 한국 사용자에게 익숙하지 않음
+- `元` 채택 — CJK 사용자에게 식별성 명확, 시스템 폰트 렌더링 안전
+
+**Spec 동기화 필요**: Spec-Overview §2.3.1 / Spec-DataModel §5.2 표 — 후속 PR에서 반영.
+
+### 2026-04-29 — Currency.from(countryCode:) static dict 채택
+
+**결정**: `allCases.first { contains }` 선형 스캔 → `private nonisolated static let codeToCurrency: [String: Currency]` reverse-index 1회 파생.
+
+**이유**:
+- SSoT는 `countryCodes`에 유지 (설계 일관)
+- enum 추가 시 `flatMap` 자동 반영 (수동 동기화 부담 제거)
+- immutable static let — Swift 6 strict concurrency 안전 (`nonisolated` 명시)
+- Codex 자문 2026-04-29
+
+**부수**: `"EU"` 코드는 `CLPlacemark.isoCountryCode`가 반환하지 않는 ISO 3166-1 reserved code → dead code 제거. 회귀 가드 `from_EU_returnsNil`, `countryCodes_haveNoDuplicates` 추가.
+
+---
+
 ## 다음 Phase
 
 V1 백로그 잔여(접근성: VoiceOver/Dynamic Type, Toast 스와이프 닫기) 또는 V1+ 릴리스 준비(앱 아이콘/스토어 메타데이터).

@@ -3,6 +3,7 @@ import SwiftUI
 struct CurrencySelectView: View {
     @Environment(\.dismiss) private var dismiss
     @State var store: CurrencySelectStore
+    @FocusState private var isSearchFocused: Bool
 
     var body: some View {
         VStack(spacing: 0) {
@@ -26,7 +27,18 @@ struct CurrencySelectView: View {
 
             Spacer(minLength: 0)
         }
-        .background(Color.appBackground.ignoresSafeArea())
+        .background(
+            // 검색 결과가 짧아 하단 빈 공간이 큰 케이스에서도 키보드 dismiss를 보장.
+            Color.appBackground
+                .ignoresSafeArea()
+                .onTapGesture { isSearchFocused = false }
+        )
+        .toolbar {
+            ToolbarItemGroup(placement: .keyboard) {
+                Spacer()
+                Button("완료") { isSearchFocused = false }
+            }
+        }
         .interactiveDismissDisabled(store.state.isOnboarding)
         .onChange(of: store.state.shouldDismiss) { _, newValue in
             if newValue {
@@ -134,6 +146,7 @@ struct CurrencySelectView: View {
                     .textInputAutocapitalization(.never)
                     .autocorrectionDisabled()
                     .submitLabel(.search)
+                    .focused($isSearchFocused)
                     .accessibilityLabel("통화 검색")
 
                 if !store.state.searchQuery.isEmpty {
