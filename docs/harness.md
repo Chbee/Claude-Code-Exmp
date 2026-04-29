@@ -1,6 +1,6 @@
 # 하네스 엔지니어링 구성 문서
 
-> 마지막 갱신: 2026-04-23
+> 마지막 갱신: 2026-04-29
 
 ---
 
@@ -10,11 +10,14 @@
 [글로벌]  ~/.claude/settings.json
               └─ 모델 / 환경변수 / 플러그인 / effortLevel
 
-[프로젝트] .claude/settings.local.json   ← git ignored
-              ├─ permissions.allow (자동 승인 목록)
+[프로젝트] .claude/settings.json         ← committed (팀 공유)
               └─ hooks
                    ├─ UserPromptSubmit → pre-prompt-harness-reminder.sh
-                   ├─ PreToolUse(Edit|Write) → pre-edit-tdd-check.sh
+                   └─ PreToolUse(Edit|Write) → pre-edit-tdd-check.sh
+
+[프로젝트] .claude/settings.local.json   ← git ignored (개인 오버라이드)
+              ├─ permissions.allow (자동 승인 목록)
+              └─ hooks
                    └─ Stop → 완료 알림 (osascript + 소리)
 
 [슬래시 커맨드] .claude/commands/
@@ -42,6 +45,19 @@
 | `hooks.PermissionRequest` | `[]` | 커스텀 훅 없음 |
 
 > Stop hook은 이 파일에서 **제거됨** — 프로젝트 레벨 `settings.local.json`으로 이동.
+
+---
+
+### `.claude/settings.json` (프로젝트, committed — 팀 공유)
+
+> 2026-04-29: 팀 공유 가치가 있는 TDD 가드 훅 2종을 `settings.local.json`에서 이동.
+
+#### hooks
+
+| 이벤트 | 매처 | 스크립트 | 동작 |
+|--------|------|----------|------|
+| `UserPromptSubmit` | (없음) | `pre-prompt-harness-reminder.sh` | 구현 키워드 감지 시 경고 (비차단) |
+| `PreToolUse` | `Edit\|Write` | `pre-edit-tdd-check.sh` | Store/Reducer/Models 레이어 편집 시 테스트 없으면 **차단** |
 
 ---
 
@@ -86,13 +102,13 @@
 | `Read(//Users/jiyoung/Library/Developer/CoreSimulator/...)` | 시뮬레이터 앱 데이터 읽기 |
 | `Read(//Applications/**)` | /Applications 읽기 |
 
-#### hooks
+#### hooks (개인 오버라이드)
 
 | 이벤트 | 매처 | 스크립트 | 동작 |
 |--------|------|----------|------|
-| `UserPromptSubmit` | (없음) | `pre-prompt-harness-reminder.sh` | 구현 키워드 감지 시 경고 (비차단) |
-| `PreToolUse` | `Edit\|Write` | `pre-edit-tdd-check.sh` | Store/Reducer/Models 레이어 편집 시 테스트 없으면 **차단** |
 | `Stop` | (없음) | `osascript + afplay` | Claude 응답 완료 시 macOS 알림 + 소리 (async) |
+
+> 팀 공유 훅(UserPromptSubmit, PreToolUse)은 `settings.json`으로 이동 (2026-04-29).
 
 ---
 
@@ -305,4 +321,4 @@ EnterPlanMode
 | `pre-prompt-harness-reminder.sh` | 한국어 오탐 가능성으로 차단 안 함 — 경고에 의존 |
 | TDD 차단 범위 | Store/Reducer/Models 에만 적용. View/Extension 계층은 테스트 강제 없음 |
 | Codex fallback | 3회 재시도 후 사용자가 승인하면 검증 없이 진행 가능 |
-| `settings.local.json` | git ignored — 팀 공유 불가, 개인 오버라이드 전용 |
+| `settings.local.json` | git ignored — 팀 공유 불가, 개인 오버라이드 전용 (팀 공유 훅은 `settings.json`으로 이동: 2026-04-29) |

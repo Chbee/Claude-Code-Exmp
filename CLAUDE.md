@@ -55,6 +55,7 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 | 2 | Exchange Rate (open.er-api.com) | 완료 (Phase C) |
 | 3 | Offline Support | 완료 (Phase E) |
 | 4 | Testing | 4.1 Reducer / 4.2 환율 변환 / 4.3 API 완료 (Phase E) |
+| F | Currency 확장 + 검색 | Step 1 통화 7개 추가 완료 / Step 2 검색·필터 완료 / Step 3.1 JPY·EUR·VND 회귀 케이스만 잔여 |
 
 ## Multi-AI Workflow
 

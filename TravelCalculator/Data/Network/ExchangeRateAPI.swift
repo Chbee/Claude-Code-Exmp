@@ -173,7 +173,7 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
                 let cross = (NSDecimalNumber(decimal: usdToKrw)
                     .dividing(by: NSDecimalNumber(decimal: usdToX), withBehavior: rounding))
                     .decimalValue
-                return ExchangeRate(currency: currency, currencyName: currencyName(for: currency), rate: cross)
+                return ExchangeRate(currency: currency, currencyName: currency.currencyName, rate: cross)
             }
 
         guard !rates.isEmpty else { throw ExchangeRateError.noDataAvailable }
@@ -181,13 +181,5 @@ struct ExchangeRateAPI: ExchangeRateAPIProtocol {
         let searchDate = Date(timeIntervalSince1970: decoded.time_last_update_unix).yyyyMMddKST()
         let validUntil = Date(timeIntervalSince1970: decoded.time_next_update_unix)
         return ExchangeRateResponse(rates: rates, fetchedAt: .now, searchDate: searchDate, validUntil: validUntil)
-    }
-
-    private nonisolated func currencyName(for currency: Currency) -> String {
-        switch currency {
-        case .KRW: "대한민국 원"
-        case .USD: "미국 달러"
-        case .TWD: "대만 달러"
-        }
     }
 }

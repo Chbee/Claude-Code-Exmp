@@ -42,6 +42,8 @@ final class CurrencySelectStore {
             Task { await handleLocationRequest() }
         case .locationRequestFinished:
             break
+        case .setSearchQuery:
+            break
         }
     }
 
@@ -92,6 +94,8 @@ final class CurrencySelectStore {
                 ))
                 return
             }
+            // 활성 검색어가 위치 결과 통화를 가릴 수 있어 같이 초기화.
+            send(.setSearchQuery(""))
             applySelectedCurrency(currency, fromLocation: true)
         } catch LocationError.permissionDenied {
             toastManager.show(ToastPayload(

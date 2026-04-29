@@ -13,6 +13,8 @@ enum CurrencySelectReducer {
             s.isRequestingLocation = true
         case .locationRequestFinished:
             s.isRequestingLocation = false
+        case .setSearchQuery(let q):
+            s.searchQuery = q
         }
         return s
     }
