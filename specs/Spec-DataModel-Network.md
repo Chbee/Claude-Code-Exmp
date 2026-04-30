@@ -8,19 +8,21 @@
 ## 5.8 ExchangeRate
 
 ```swift
-struct ExchangeRate: Codable {
-    let currencyCode: String
+struct ExchangeRate: Codable, Sendable {
+    let currency: Currency       // Currency enum (타입 안전 — String 코드 대신)
     let currencyName: String
     let rate: Decimal
 }
 
-struct ExchangeRateResponse: Codable {
+struct ExchangeRateResponse: Codable, Sendable {
     let rates: [ExchangeRate]
     let fetchedAt: Date
-    let searchDate: String     // "2026-04-04"
-    let validUntil: Date
+    let searchDate: String       // "2026-04-04" — 표시 전용. cache validity 판정에 사용 금지.
+    let validUntil: Date         // API의 `time_next_update_unix` 기반 — isValid/isRefreshEnabled 기준.
 }
 ```
+
+> **필드명 주의**: `currency: Currency`는 `String` 코드가 아닌 `Currency` enum이다. 환율 매핑/필터링 시 `==` 비교가 타입 안전.
 
 ## 5.9 AppCurrencyStore 상태
 
