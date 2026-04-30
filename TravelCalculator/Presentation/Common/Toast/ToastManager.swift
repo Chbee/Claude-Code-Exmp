@@ -5,17 +5,17 @@ import UIKit
 @MainActor
 @Observable
 final class ToastManager {
+    // Toast 진입/퇴장 공통 스프링 애니메이션 (ToastModifier에서도 동일 값 사용 — SSOT)
+    static let springAnimation = Animation.spring(response: 0.45, dampingFraction: 0.86)
+
     var currentToast: ToastPayload?
 
     @ObservationIgnored
     private var dismissTask: Task<Void, Never>?
 
-    @ObservationIgnored
-    private let animation = Animation.spring(response: 0.45, dampingFraction: 0.86)
-
     func show(_ payload: ToastPayload) {
         dismissTask?.cancel()
-        withAnimation(animation) {
+        withAnimation(Self.springAnimation) {
             currentToast = payload
         }
         triggerHaptic(for: payload.style)
@@ -26,7 +26,7 @@ final class ToastManager {
         dismissTask?.cancel()
         dismissTask = nil
         guard currentToast != nil else { return }
-        withAnimation(animation) {
+        withAnimation(Self.springAnimation) {
             currentToast = nil
         }
     }
