@@ -81,7 +81,7 @@ final class CurrencySelectStore {
             guard let currency = Currency.from(countryCode: code) else {
                 toastManager.show(ToastPayload(
                     style: .warning,
-                    title: "지원하지 않는 지역입니다",
+                    title: "지원하지 않는 지역이에요",
                     message: "여행지 통화를 직접 선택해주세요"
                 ))
                 return
@@ -89,7 +89,7 @@ final class CurrencySelectStore {
             if currency == .KRW {
                 toastManager.show(ToastPayload(
                     style: .info,
-                    title: "현재 위치는 한국입니다",
+                    title: "현재 위치는 한국이에요",
                     message: "여행지 통화를 직접 선택해주세요"
                 ))
                 return
@@ -100,13 +100,13 @@ final class CurrencySelectStore {
         } catch LocationError.permissionDenied {
             toastManager.show(ToastPayload(
                 style: .info,
-                title: "위치 권한이 필요합니다",
+                title: "위치 권한이 필요해요",
                 message: "설정 > 개인정보 보호 > 위치 서비스에서 허용해 주세요"
             ))
         } catch {
             toastManager.show(ToastPayload(
                 style: .error,
-                title: "현재 위치를 확인할 수 없습니다",
+                title: "현재 위치를 확인할 수 없어요",
                 message: "잠시 후 다시 시도해 주세요"
             ))
         }

@@ -40,7 +40,9 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 ## Key Specs
 
 기획서는 `specs/` 디렉토리에 분리되어 있고, `Spec.md`가 인덱스:
-- `specs/Spec-Overview.md` — 기능 명세 (계산기 엣지 케이스, 환율 API, 오프라인 대응, Toast)
+- `specs/Spec-Overview.md` — 프로젝트 개요 + Toast + 온보딩
+- `specs/Spec-Calculator.md` — 기본 계산기 + 환율 변환 (엣지 케이스 포함)
+- `specs/Spec-ExchangeRate.md` — 통화 선택 + 환율 API + 오프라인 대응
 - `specs/Spec-UI.md` — 화면 설계, 디자인 시스템
 - `specs/Spec-Architecture.md` — MVI 아키텍처, 폴더 구조
 - `specs/Spec-DataModel.md` — 전체 데이터 모델 정의
@@ -69,9 +71,11 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 
 모든 작업은 `/start-task`로 시작 — Plan Mode 인터뷰 → Codex 검증 → TDD(Red→Yellow→Green). 자세한 구성(훅/슬래시 커맨드/메모리 구조)은 `docs/harness.md` 참조.
 
+PR 직전 또는 큰 spec 변경 후에는 `/audit`로 결재(`spec-auditor` 서브에이전트) 검증. specs의 "검증 가능 항목" 블록을 단일 출처로 grep/test 자동 검증 후 리포트 반환 (read-only).
+
 ## Important Notes
 
 - 환율 API는 `open.er-api.com/v6/latest/USD` (USD 기준, 인증 불필요, 24h 갱신) — API 키 없음
   - KRW 환산은 `USD→KRW / USD→X`를 API 레이어에서 사전 계산 (spec 2.2.3 은행 반올림, scale 8)
   - 캐시 유효성은 `searchDate == 오늘 KST` 기준 (24h TTL 아님)
-- iOS 기본 계산기와 동일한 AC/C 토글, `=` 반복 동작을 정확히 따라야 함 (상세 엣지케이스는 `specs/Spec-Overview.md` §2.1 참조)
+- iOS 기본 계산기와 동일한 AC/C 토글, `=` 반복 동작을 정확히 따라야 함 (상세 엣지케이스는 `specs/Spec-Calculator.md` §2.1 참조)

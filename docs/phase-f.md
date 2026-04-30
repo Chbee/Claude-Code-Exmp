@@ -5,6 +5,21 @@
 
 ---
 
+## 영향 문서 (Impact)
+
+이 Phase가 spec에 미치는 영향. (소급 기록 — Phase 종료 후 audit 결과를 반영)
+
+- **추가/수정한 spec 섹션**:
+  - [Spec-DataModel §5.2 Currency](../specs/Spec-DataModel.md#52-currency) — JPY/CNY/EUR/THB/VND/PHP 6종 추가, `currencyName`/`countryCodes` 신설, eurozone 19개국 다중 매핑
+  - [Spec-Calculator §2.2.4 변환 결과 소수점 (통화별 차등)](../specs/Spec-Calculator.md#224-변환-결과-소수점-통화별-차등) — 9통화로 확장, VND 저액면 결과 자릿수 정합 메모
+  - [Spec-ExchangeRate §2.3.1 지원 통화](../specs/Spec-ExchangeRate.md#231-지원-통화) — 9통화 표 (CNY 기호 `元` 채택, JPY와 시각 충돌 해소)
+  - [Spec-ExchangeRate §2.3.4 위치 기반 자동 선택](../specs/Spec-ExchangeRate.md#234-위치-기반-자동-선택) — `Currency.countryCodes` 기반 reverse-lookup, eurozone 19개국 매핑 명시
+  - [Spec-Tasks §9 개선 백로그](../specs/Spec-Tasks.md#9-개선-백로그) — 리뷰 1.2/4.2 ✅ 처리 + Phase F UX 백로그 2건 추가
+- **참조만 (변경 없음)**:
+  - [Spec-Calculator §2.1.5 엣지 케이스](../specs/Spec-Calculator.md#215-엣지-케이스) — 결과 자릿수 한도 12자리가 VND 큰 변환 결과(~1,800억, 12자리)와 정합
+
+---
+
 ## 구현 목표
 
 1. `Currency` enum 확장 — JPY, EUR, THB, VND, PHP, CNY 추가 (기호/국기/국가명/fractionDigits)

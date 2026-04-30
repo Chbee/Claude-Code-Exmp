@@ -1,7 +1,7 @@
 # TravelCalculator 기획서 — 태스크 & 백로그
 
 > 2차 인터뷰 기반 최종 확정본 | 2026-04-05
-> 관련: [기능 명세](Spec-Overview.md) | [화면 설계](Spec-UI.md) | [아키텍처](Spec-Architecture.md) | [데이터 모델](Spec-DataModel.md)
+> 관련: [개요/Toast/온보딩](Spec-Overview.md) | [계산기/환율 변환](Spec-Calculator.md) | [환율/통화/오프라인](Spec-ExchangeRate.md) | [화면 설계](Spec-UI.md) | [아키텍처](Spec-Architecture.md) | [데이터 모델](Spec-DataModel.md)
 
 ---
 
@@ -106,17 +106,19 @@
 #### 3.2 네트워크 상태 감지
 - [x] 3.2.1 네트워크 모니터 구현 (NWPathMonitor, @Sendable)
 - [x] 3.2.2 오프라인 상태 State
-- [x] 3.2.3 온→오프라인 전환 알림 (환율 영역 인라인 캐시 시각 표기 — Spec-Overview §2.5.2/§2.5.3)
+- [x] 3.2.3 온→오프라인 전환 알림 (환율 영역 인라인 캐시 시각 표기 — Spec-ExchangeRate §2.5.2/§2.5.3)
 
 #### 3.3 오프라인 UI 피드백
 - [x] 3.3.1 Toolbar 소형 인디케이터
-- [x] 3.3.2 환율 영역 인라인 캐시 시각 표기 (상대 시각: `방금`/`N분 전`/`N시간 전`/`N일 전` — Spec-Overview §2.5.2)
+- [x] 3.3.2 환율 영역 인라인 캐시 시각 표기 (상대 시각: `방금`/`N분 전`/`N시간 전`/`N일 전` — Spec-ExchangeRate §2.5.2)
 - [x] 3.3.3 새로고침 버튼 오프라인 시 비활성화
 
 #### 3.4 에러 핸들링
 - [x] 3.4.1 API 에러 분류 (네트워크/서버/파싱)
 - [x] 3.4.2 사용자 친화적 에러 메시지
 - [x] 3.4.3 재시도 로직 (최대 2회, 간격 2초)
+
+> **수정 이력**: [Phase E](../docs/phase-e.md)
 
 ### 마일스톤 4: 테스트 코드
 
@@ -134,6 +136,8 @@
 - [x] 4.2.3 방향 전환 시 값 이전 테스트 (10자리 초과 포함)
 - [x] 4.2.4 통화 변경 시 리셋 테스트
 - [x] 4.2.5 음수 → 변환 0 테스트
+
+> **수정 이력**: [Phase E](../docs/phase-e.md) (4.1 / 4.2)
 
 #### 4.3 API 테스트
 - [x] 4.3.1 MockExchangeRateAPI 구현 (Protocol 기반)
@@ -170,6 +174,8 @@
 | 리뷰 6.7 | 키 입력 debounce (성능 최적화) | Low | ⬜ |
 | Phase F UX | 검색 결과에 선택 통화 가시성(체크 핀 고정) | Low | ⬜ V2 후보 |
 | Phase F UX | 온보딩 모드에서 검색바 숨김 (8개뿐) | Low | ⬜ V2 후보 |
+
+> **수정 이력**: [Phase F](../docs/phase-f.md)
 
 ---
 

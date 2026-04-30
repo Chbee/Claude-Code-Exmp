@@ -171,7 +171,7 @@ struct CurrencySelectView: View {
 
     private var emptyState: some View {
         VStack {
-            Text("검색 결과가 없습니다")
+            Text("검색 결과가 없어요")
                 .font(.system(size: 14))
                 .foregroundStyle(Color.appTextSub)
                 .padding(.top, 40)

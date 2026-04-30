@@ -5,8 +5,6 @@ struct ToastModifier: ViewModifier {
 
     @State private var dragOffset: CGFloat = 0
 
-    private let animation = Animation.spring(response: 0.45, dampingFraction: 0.86)
-
     func body(content: Content) -> some View {
         content
             .overlay(alignment: .top) {
@@ -30,7 +28,7 @@ struct ToastModifier: ViewModifier {
                                         manager.dismiss()
                                         dragOffset = 0
                                     } else {
-                                        withAnimation(animation) {
+                                        withAnimation(ToastManager.springAnimation) {
                                             dragOffset = 0
                                         }
                                     }
@@ -46,7 +44,7 @@ struct ToastModifier: ViewModifier {
                         .zIndex(1)
                 }
             }
-            .animation(animation, value: manager.currentToast?.id)
+            .animation(ToastManager.springAnimation, value: manager.currentToast?.id)
     }
 }
 

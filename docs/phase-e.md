@@ -5,6 +5,22 @@
 
 ---
 
+## 영향 문서 (Impact)
+
+이 Phase가 spec에 미치는 영향. (소급 기록 — Phase 종료 후 audit 결과를 반영)
+
+- **추가/수정한 spec 섹션**:
+  - [Spec-ExchangeRate §2.5.1 네트워크 모니터링](../specs/Spec-ExchangeRate.md#251-네트워크-모니터링) — `NetworkState` enum(unknown/online/offline) 도입, "거짓 온라인" 창 제거
+  - [Spec-ExchangeRate §2.5.2 오프라인 UI](../specs/Spec-ExchangeRate.md#252-오프라인-ui) — 별도 배너 → 환율 영역 인라인 캐시 시각(상대 시각, finer-grain) + Toolbar 인디케이터
+  - [Spec-ExchangeRate §2.5.3 온라인↔오프라인 전환](../specs/Spec-ExchangeRate.md#253-온라인오프라인-전환) — 온→오프 무알림, 오프→온 pulse(throttle 10s), unknown→offline 전이 무시
+  - [Spec-ExchangeRate §2.5.5 에러 핸들링](../specs/Spec-ExchangeRate.md#255-에러-핸들링) — 총 3회 시도(최초 1회 + 재시도 2회, 간격 2초) + 재시도 대상 분류
+  - [Spec-Tasks 마일스톤 3 오프라인 대응](../specs/Spec-Tasks.md#마일스톤-3-오프라인-대응) — 3.1/3.2/3.3/3.4 완료 체크 + Phase E 결정 주석(3.2.3, 3.3.2 인라인 대체)
+  - [Spec-Tasks 마일스톤 4 테스트 코드](../specs/Spec-Tasks.md#마일스톤-4-테스트-코드) — 4.1/4.2 완료 체크
+- **참조만 (변경 없음)**:
+  - [Spec-Calculator §2.2.1 실시간 변환](../specs/Spec-Calculator.md#221-실시간-변환) — `currentRate == nil` fallback("0") 정책에 의존 (환율 미가용 배너 분기와 정합)
+
+---
+
 ## 구현 목표
 
 1. 네트워크 상태 감지 (NWPathMonitor, @Sendable)

@@ -3,14 +3,11 @@ import SwiftUI
 struct CalculatorView: View {
     // 오프→온 복귀 pulse 발화 간 최소 간격(초). flapping 시 애니 스팸 방지.
     private static let pulseThrottle: TimeInterval = 10
-    // 새로고침 탭 throttle(초). 동일 안내 Toast 연타 중복 발화 방지.
-    private static let refreshTapThrottle: TimeInterval = 0.8
 
     @State private var calculatorStore: CalculatorStore
     @State private var showCurrencySelect = false
     @State private var pulseScale: CGFloat = 1.0
     @State private var lastPulseAt: Date = .distantPast
-    @State private var lastRefreshTapAt: Date = .distantPast
 
     private let toastManager: ToastManager
     private let currencyStore: AppCurrencyStore
@@ -38,7 +35,7 @@ struct CalculatorView: View {
             CalculatorDisplay(
                 displayModel: calculatorStore.displayModel,
                 onToggleDirection: { calculatorStore.toggleDirection() },
-                onRefresh: handleRefreshTap,
+                onRefresh: { calculatorStore.requestRefresh() },
                 daysSinceSearchDate: currencyStore.daysSinceSearchDate,
                 isRefreshEnabled: currencyStore.isRefreshEnabled,
                 isLoading: currencyStore.isLoading,
@@ -86,28 +83,6 @@ struct CalculatorView: View {
         }
     }
 
-    private func handleRefreshTap() {
-        let now = Date.now
-        guard now.timeIntervalSince(lastRefreshTapAt) >= Self.refreshTapThrottle else { return }
-        lastRefreshTapAt = now
-
-        switch currencyStore.networkState {
-        case .offline:
-            toastManager.show(ToastPayload(
-                style: .info,
-                title: "오프라인",
-                message: "네트워크 연결 후 갱신할 수 있어요"
-            ))
-        case .unknown:
-            toastManager.show(ToastPayload(
-                style: .info,
-                title: "네트워크 확인 중",
-                message: "잠시 후 다시 시도해 주세요"
-            ))
-        case .online:
-            Task { await calculatorStore.refreshRates() }
-        }
-    }
 }
 
 #Preview {

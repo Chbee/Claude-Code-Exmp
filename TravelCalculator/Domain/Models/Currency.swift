@@ -1,15 +1,17 @@
 import Foundation
 
 enum Currency: String, CaseIterable, Sendable {
+    // 순서: 홈(KRW) → 한국인 인기 여행지(JPY/VND/THB/PHP) → 글로벌 기축(CNY/TWD/USD/EUR).
+    // 출처: KTO/KOSIS 한국인 출국 통계 (2024-2025). 통화 선택 화면 표시 순서가 이 순서를 따름 — Spec-DataModel §5.2.
     case KRW
-    case USD
     case JPY
-    case CNY
-    case EUR
-    case TWD
-    case THB
     case VND
+    case THB
     case PHP
+    case CNY
+    case TWD
+    case USD
+    case EUR
 
     nonisolated var symbol: String {
         switch self {

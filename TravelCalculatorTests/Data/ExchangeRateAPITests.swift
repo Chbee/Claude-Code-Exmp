@@ -193,6 +193,33 @@ struct ExchangeRateAPINetworkTests {
         }
     }
 
+    // Spec-DataModel-Network §계약: 빈 배열 전달 → 결과 통화 0개 → noDataAvailable.
+    // 캐시 없을 시 fetchRates가 noCacheAvailable로 래핑하는 실제 흐름을 검증.
+    @Test func fetchRates_emptyCurrencies_throwsNoCacheAvailable() async throws {
+        let session = MockURLSession { _ in (makeOpenERJSON(), makeHTTPResponse()) }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache)
+
+        await #expect(throws: ExchangeRateError.noCacheAvailable) {
+            try await api.fetchRates(for: [])
+        }
+    }
+
+    // Spec-DataModel-Network §계약: KRW를 포함해 전달해도 결과에 KRW 없음 (base 자동 제외).
+    @Test func fetchRates_withKRWinCurrencies_excludesKRWfromResult() async throws {
+        let session = MockURLSession { _ in
+            (makeOpenERJSON(rates: ["USD": 1.0, "KRW": 1350.5, "TWD": 32.0]), makeHTTPResponse())
+        }
+        let cache = ExchangeRateCacheActor(fileURL: makeTempCacheURL())
+        let api = ExchangeRateAPI(session: session, cache: cache)
+
+        let response = try await api.fetchRates(for: [.KRW, .USD, .TWD])
+
+        #expect(response.rates.contains { $0.currency == .KRW } == false)
+        #expect(response.rates.contains { $0.currency == .USD } == true)
+        #expect(response.rates.contains { $0.currency == .TWD } == true)
+    }
+
     @Test func fetchRates_zeroOrNegativeUSDRate_currencyIsSkipped() async throws {
         let session = MockURLSession { _ in
             (makeOpenERJSON(rates: ["USD": 0.0, "KRW": 1350.0, "TWD": 32.0]), makeHTTPResponse())
