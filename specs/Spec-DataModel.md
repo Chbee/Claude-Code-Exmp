@@ -75,6 +75,8 @@ extension Currency: Codable { ... }   // singleValueContainer rawValue
 | VND | VN |
 | PHP | PH |
 
+> **수정 이력**: [Phase F](../docs/phase-f.md)
+
 ### 5.3 CalculatorIntent
 
 ```swift

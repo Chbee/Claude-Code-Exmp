@@ -20,6 +20,8 @@
 | VND | ₫ | 🇻🇳 | 베트남 |
 | PHP | ₱ | 🇵🇭 | 필리핀 |
 
+> **수정 이력**: [Phase F](../docs/phase-f.md)
+
 ### 2.3.2 통화 선택 화면
 - 전체 화면 모달 (fullScreenCover)
 - 통화 목록에서 선택 시 체크마크 표시
@@ -39,6 +41,8 @@
   - 데이터 소스: `Currency.countryCodes` (Spec-DataModel §5.2)
 - 미지원 지역일 경우 Toast(warning) 알림
 - `PermissionStatus.denied` 시: iOS 설정 앱으로 안내하는 Toast(info) + 딥링크
+
+> **수정 이력**: [Phase F](../docs/phase-f.md)
 
 ---
 
@@ -111,6 +115,8 @@ ExchangeRateResponse
 - `NetworkState` enum: `unknown` / `online` / `offline` (초기값 `unknown` — 첫 콜백 도달 전 "거짓 온라인" 창 제거)
 - 콜백 → MainActor 전달 시 `@Sendable` 처리
 
+> **수정 이력**: [Phase E](../docs/phase-e.md)
+
 ### 2.5.2 오프라인 UI
 - **Toolbar 인디케이터**: Online(`● 온라인`, 초록) ↔ Offline(`wifi.slash 오프라인`, 노랑) ↔ Unknown(빈 placeholder). 상세 스펙은 Spec-UI §3.1 참조
 - **환율 영역 rate row 인라인 캐시 시각 표기** (별도 배너 없음): `Color.appWarning` 톤
@@ -124,11 +130,15 @@ ExchangeRateResponse
 - 새로고침 버튼: 오프라인 시 비활성화 (tap 시 `Toast(info, "오프라인 시 갱신할 수 없어요")`)
 - `unknown` 상태: 인디케이터/인라인 표기 비표시, 새로고침 disabled (안전 기본값)
 
+> **수정 이력**: [Phase E](../docs/phase-e.md)
+
 ### 2.5.3 온라인↔오프라인 전환
 - **온→오프**: 별도 Toast/배너 없음 — 환율 영역 인라인 캐시 시각 표기로 대체 (grace period 없음)
 - **오프→온 복귀**: 환율 영역 pulse 애니메이션 — `scale 1.0→1.02→1.0` 1회 (`easeOut 0.3s` → `easeIn 0.3s`, 총 0.6초). Toast/햅틱 없음. 인라인 표기는 원래 라벨(`최신` / `N일 전`)로 복귀.
   - **Throttle**: 직전 pulse 발화 후 10초 이내에는 재발화하지 않음 (flapping 시 애니 스팸 방지). 정의: `CalculatorView.pulseThrottle = 10s`
 - `unknown → offline` 전이는 무시(첫 진입 시 깜빡임 방지), `online → offline` 전이만 인라인 표기 발화
+
+> **수정 이력**: [Phase E](../docs/phase-e.md)
 
 ### 2.5.4 API 실패 + 캐시 없음 (환율 미가용)
 - **트리거**: `currentRate == nil` (= API 실패 + stale 캐시도 없음). 판정 프로퍼티: `AppCurrencyStore.unavailableRateError`
@@ -157,3 +167,5 @@ ExchangeRateResponse
 
   - 정의 위치: `Domain/Models/ExchangeRateError.swift`
   - 메시지 변경 시 코드 우선, spec 표 동시 갱신
+
+> **수정 이력**: [Phase E](../docs/phase-e.md)

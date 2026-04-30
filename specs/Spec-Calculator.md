@@ -113,3 +113,5 @@ Currency enum에 `fractionDigits: Int` 프로퍼티로 관리.
 > 저액면 통화(VND 등) — KRW→VND 변환 결과가 정수부 10자리에 근접할 수 있다.
 > 예시(2026-04 환율 기준, 약 1 KRW ≈ 18 VND): 1억 KRW ≈ 18억 VND(10자리). 입력 한도 10자리 KRW(99억)는 약 1,800억 VND(12자리)까지 도달 — §2.1.5 결과 자릿수 한도 12자리와 정합.
 > Display 폰트 자동 축소(`minimumScaleFactor`)와 변환 결과값의 10자리 초과 허용 정책(§2.2.3 참조)으로 대응.
+
+> **수정 이력**: [Phase F](../docs/phase-f.md)
