@@ -92,6 +92,27 @@ CLAUDE.md Milestones 테이블 업데이트
 
 ---
 
+### `/audit` — Spec ↔ 코드 정합성 검증 (결재)
+
+```
+/audit          # 전체 감사
+/audit phase-c  # 특정 phase 영향 범위만
+```
+
+`spec-auditor` 서브에이전트(Sonnet, read-only)를 호출. specs/Spec-*.md의
+"검증 가능 항목" 블록을 단일 출처로 삼아 grep/test/Read로 자동 검증 후
+✅/⚠️/❌ 카테고리 리포트 반환. PR 직전 또는 큰 spec 변경 후 호출.
+
+룰 카테고리:
+- A. Grep 자동 (Reducer 사이드 이펙트, Color/Combine 직접 참조 등)
+- B. 단위 테스트 (fetchRates 계약 등)
+- C. 코드 실재 (특정 함수/fallback 존재)
+- D. 수동 (Figma 일치 등 자동 불가 — ⚠️로만 보고)
+
+추가로 Phase ↔ Spec 양방향 링크 누락/stale 점검.
+
+---
+
 ## 전체 워크플로우 흐름도
 
 ```

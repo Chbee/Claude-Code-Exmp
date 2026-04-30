@@ -71,6 +71,8 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 
 모든 작업은 `/start-task`로 시작 — Plan Mode 인터뷰 → Codex 검증 → TDD(Red→Yellow→Green). 자세한 구성(훅/슬래시 커맨드/메모리 구조)은 `docs/harness.md` 참조.
 
+PR 직전 또는 큰 spec 변경 후에는 `/audit`로 결재(`spec-auditor` 서브에이전트) 검증. specs의 "검증 가능 항목" 블록을 단일 출처로 grep/test 자동 검증 후 리포트 반환 (read-only).
+
 ## Important Notes
 
 - 환율 API는 `open.er-api.com/v6/latest/USD` (USD 기준, 인증 불필요, 24h 갱신) — API 키 없음
