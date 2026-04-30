@@ -73,4 +73,12 @@ struct CurrencyTests {
         let duplicates = Dictionary(grouping: all, by: { $0 }).filter { $1.count > 1 }.keys
         #expect(duplicates.isEmpty, "중복 country code: \(Array(duplicates))")
     }
+
+    // MARK: - allCases 순서 (Spec-DataModel §5.2)
+
+    @Test func allCases_followsTravelDomainOrder() {
+        // 홈(KRW) → 한국인 인기 여행지 → 글로벌 기축. 출처: KTO/KOSIS 한국인 출국 통계 (2024-2025).
+        // 통화 선택 화면 표시 순서가 이 순서를 따른다 — 회귀 시 UX 영향.
+        #expect(Currency.allCases == [.KRW, .JPY, .VND, .THB, .PHP, .CNY, .TWD, .USD, .EUR])
+    }
 }

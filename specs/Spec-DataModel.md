@@ -54,8 +54,6 @@ extension Currency: Codable { ... }   // singleValueContainer rawValue
 3. PR 설명에 KTO/KOSIS 데이터 인용 또는 디자이너/PM 합의 흔적 첨부
 4. `Currency.swift` case 순서, `Spec-DataModel §5.2` 표, `Spec-Overview §2.3.1` 표 동시 갱신
 
-⚠️ **현 코드 순서**: `KRW · USD · JPY · CNY · EUR · TWD · THB · VND · PHP` — spec과 불일치, 정합화 작업 대기 중
-
 `fractionDigits` 매핑:
 
 | 자릿수 | 통화 |
