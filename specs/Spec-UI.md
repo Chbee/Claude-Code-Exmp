@@ -212,25 +212,26 @@
 
 **Source of Truth 계층** (위에서 아래로 우선)
 1. **브랜드 자산 팩** (canonical) — `INTEGRATION_GUIDE.md` §2 (sRGB hex), §4 (transparent center PNG)
-2. **`Assets.xcassets/BrandSplashBG.colorset/`** — sRGB Light `#5BA8EC` / Dark `#1E2A38`. **런치 스크린 전용** — Swift `Color.app*` 시맨틱 별칭(§6.1)에 추가하지 않고 `Info.plist`가 colorset 이름으로 직접 참조.
+2. **`Assets.xcassets/BrandSplashBG.colorset/`** — sRGB Light `#5BA8EC` / Dark `#1E2A38`. **런치 스크린 전용** — Swift `Color.app*` 시맨틱 별칭(§6.1)에 추가하지 않고 storyboard가 named color로 직접 참조.
 3. **`Assets.xcassets/SplashCenter.imageset/`** — 1290×1290 transparent PNG, Any + luminosity:dark 변형.
-4. **`Info.plist` `UILaunchScreen` dict** — `UIColorName=BrandSplashBG` / `UIImageName=SplashCenter` / `UIImageRespectsSafeAreaInsets=true`.
+4. **`Info.plist` `UILaunchStoryboardName=LaunchScreen` + `TravelCalculator/LaunchScreen.storyboard`** — root view background=`BrandSplashBG` named color, `UIImageView image=SplashCenter` + Aspect Fit + Auto Layout(centerX/centerY safe area, width ≤ view.width × 0.8, aspect 1:1).
 
-**합성 방식 — Option B (가이드 §4c)**
+**합성 방식 — Option A (가이드 §4b — Apple recommended)**
 
-iOS Springboard가 부팅 시점에 `UILaunchScreen` dict를 직접 읽어 합성. SwiftUI/UIKit 런타임이 켜지기 전 단계라 Swift 코드 진입점 없음 — 모든 자산은 Asset Catalog 등록 이름으로만 참조. 본 프로젝트에 `LaunchScreen.storyboard` 미존재.
+iOS Springboard가 부팅 시점에 `UILaunchStoryboardName` 키로 `LaunchScreen.storyboard`를 찾아 UIKit으로 합성. SwiftUI/앱 런타임이 켜지기 전 단계라 Swift 코드 진입점 없음 — 모든 자산은 Asset Catalog 등록 이름으로만 참조. UIImageView가 device scale을 자동 처리하므로 1290×1290 PNG의 scale 키 누락 문제(Option B 시 좌우/하단 잘림)가 근본 해결됨.
 
 **정책 결정**
-- **`UIImageRespectsSafeAreaInsets=true`** — 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 배치.
+- **Aspect Fit + width ≤ view.width × 0.8 + safe area centerY** — 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 80% 폭으로 정사각형 비례 보존.
 - **`-Full` PNG 미반입** — 가이드 §4d의 `Splash-{Light,Dark}-Full.png`는 디자인 QA 참조용. 앱 번들 포함 금지.
 - **정적 launch** — SwiftUI 애니메이션 splash는 Apple HIG가 권장하지 않으며, system splash → 첫 frame 사이에 visible flash/re-mount seam 발생.
 
 **검증 가능 항목** (결재 에이전트용)
 - `BrandSplashBG.colorset/Contents.json` 존재, Light/Dark sRGB components가 가이드 hex(`#5BA8EC` / `#1E2A38`)와 일치
 - `SplashCenter.imageset/Contents.json` 존재, `appearances: luminosity=dark` entry 명시, 두 PNG 파일 실재
-- `Info.plist` `UILaunchScreen` dict에 `UIColorName=BrandSplashBG` / `UIImageName=SplashCenter` / `UIImageRespectsSafeAreaInsets=true` 키 정확히 3개
+- `TravelCalculator/LaunchScreen.storyboard` 파일 실재, root view `backgroundColor` = named ref `BrandSplashBG`, UIImageView `image` = named ref `SplashCenter`
+- `Info.plist`에 `UILaunchStoryboardName=LaunchScreen` 키 존재, 기존 `UILaunchScreen` dict 미존재
 - `Splash-{Light,Dark}-Full.png`가 앱 번들·Asset Catalog에 포함되지 않음
-- `TravelCalculatorTests/Assets/AssetCatalogRuntimeTests.brandSplashBG_loadsFromHostAppBundle` / `splashCenter_loadsFromHostAppBundle` / `InfoPlistLaunchScreenTests.infoPlist_uiLaunchScreen_hasExpectedKeys` 통과
+- `TravelCalculatorTests/Assets/AssetCatalogRuntimeTests.brandSplashBG_loadsFromHostAppBundle` / `splashCenter_loadsFromHostAppBundle` / `InfoPlistLaunchScreenTests.infoPlist_usesLaunchStoryboard` / `launchScreenStoryboard_existsAtExpectedPath` 통과
 
 > **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
 > **수정 이력**: [Phase G](../docs/phase-g.md)

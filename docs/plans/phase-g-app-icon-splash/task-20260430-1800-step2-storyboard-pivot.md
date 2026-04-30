@@ -204,12 +204,12 @@ struct InfoPlistLaunchScreenTests {
 
 ### 검증 항목
 
-- [ ] `xcodebuild build` warning 0, error 0
-- [ ] `xcodebuild test -only-testing:TravelCalculatorTests/InfoPlistLaunchScreenTests` 2건 pass
-- [ ] `LaunchScreen.storyboard` 빌드 산출물(`Base.lproj` 또는 root)에 컴파일됨 — actool/ibtool 출력 확인
+- [ ] `xcodebuild build` warning 0, error 0  *(Linux 환경 — 사용자 macOS에서 수동 검증 필요)*
+- [ ] `xcodebuild test -only-testing:TravelCalculatorTests/InfoPlistLaunchScreenTests` 2건 pass  *(동일)*
+- [ ] `LaunchScreen.storyboard` 빌드 산출물(`Base.lproj` 또는 root)에 컴파일됨 — actool/ibtool 출력 확인  *(동일)*
 - [ ] 시뮬레이터(Light/Dark) 부팅 시 스크린샷에서 발견된 잘림(워드마크 좌우/태그라인 하단)이 해소됨 — Step 7 시각 검증
 - [ ] 기존 Phase G 테스트 4건(`AssetCatalogRuntimeTests` 2 + `AppIconContentsTests` 1 + 신규 InfoPlistLaunchScreenTests 2) **5건** 모두 pass
-- [ ] `git diff TravelCalculator.xcodeproj/project.pbxproj` 빈 출력 (auto-discovery)
+- [x] `git diff TravelCalculator.xcodeproj/project.pbxproj` 빈 출력 (auto-discovery — `fileSystemSynchronizedGroups` 사용)
 
 ### 범위 외
 
@@ -231,7 +231,15 @@ struct InfoPlistLaunchScreenTests {
 
 ## TDD 사이클 로그
 
-(승인 후 채움)
+- **Red** (2026-04-30): `TravelCalculatorTests/Assets/InfoPlistLaunchScreenTests.swift`를 plan §"테스트 코드"의 2건으로 교체. 기존 `infoPlist_uiLaunchScreen_hasExpectedKeys` 폐기. *Linux 환경이라 `xcodebuild test` 실행 불가 — 사용자 macOS에서 fail 확인 필요(2건 모두 fail 예상: UILaunchStoryboardName 키 부재 + storyboard 파일 부재).*
+- **Yellow** (2026-04-30):
+  - `TravelCalculator/LaunchScreen.storyboard` 신규 생성 — plan §"LaunchScreen.storyboard 내용"의 XML 그대로. UIImageView Aspect Fit + safe area centerY + width ≤ view.width × 0.8 + aspect 1:1 + bg=BrandSplashBG named ref + image=SplashCenter named ref.
+  - `TravelCalculator/Info.plist` `UILaunchScreen` dict 8줄 제거 + `UILaunchStoryboardName=LaunchScreen` 키 추가 (현재 32-33행).
+  - *xcodebuild test 실행은 사용자 macOS에서 검증 필요 — 2건 pass 예상.*
+- **Green** (2026-04-30):
+  - `specs/Spec-UI.md` §6.5 — Source of Truth 4번째 항목 storyboard 기준 재작성, 합성 방식 Option A로 교체, 정책 결정에서 `UIImageRespectsSafeAreaInsets` 항목 제거 + Aspect Fit 정책 추가, 검증 가능 항목 4건 갱신(테스트 메서드 명칭 2건 교체).
+  - `docs/phase-g.md` — 영향 문서 §6.5 항목 갱신, Step 2 표를 2.1 strikethrough + 2.2~2.4 신규로 분할, 완료 기준 3개 갱신, 결정 기록에 Option B → A 전환 사유 추가(B 항목은 이력 보존), 파일 구조에 LaunchScreen.storyboard 추가.
+  - 빌드 warning/error 0 확인은 사용자 macOS에서 수동 검증 필요.
 
 ## 팀 검증 반영
 

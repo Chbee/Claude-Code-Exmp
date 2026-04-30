@@ -12,7 +12,7 @@
 - **추가/수정한 spec 섹션**:
   - [Spec-UI §6.1 컬러 팔레트](../specs/Spec-UI.md#61-컬러-팔레트) — Step 3에서 본문 끝에 `BrandSplashBG` 예외 cross-link 1줄 추가. "뷰는 시맨틱만 참조" 규칙과 §6.5 "Color.app* 미추가"의 충돌이 grep 검증 위반으로 오판되지 않도록 명시.
   - [Spec-UI §6.4 앱 아이콘](../specs/Spec-UI.md#64-앱-아이콘) — 신설. iOS 18 3-variant 정책(Any/Dark/Tinted), 1024×1024 단일 슬롯, 가이드 출처(Tripy brand pack), HIG 준수, 자산 교체 5스텝 절차, V1+ Tinted 게이트.
-  - [Spec-UI §6.5 런치 스크린](../specs/Spec-UI.md#65-런치-스크린) — 신설. `UILaunchScreen` dict 방식(Option B), `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙, `UIImageRespectsSafeAreaInsets=true` lock decision, 정적 launch 채택.
+  - [Spec-UI §6.5 런치 스크린](../specs/Spec-UI.md#65-런치-스크린) — 신설 후 Step 2 재작성에서 Option A(`LaunchScreen.storyboard` + `UILaunchStoryboardName`) 기준으로 재작성. `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙, Aspect Fit + safe area centerY 정책, 정적 launch 채택.
   - [Spec-Tasks §9 개선 백로그](../specs/Spec-Tasks.md#9-개선-백로그) — Phase G UX 백로그 2건 추가: Tinted grayscale 재export (V1+ TestFlight 전 게이트, High) + 런치 스크린 접근성(Reduce Transparency / Increase Contrast).
 - **참조만 (변경 없음)**:
   - [Spec-UI §6.2 아이콘](../specs/Spec-UI.md#62-아이콘) — UI 아이콘(Asset Catalog `MapPin`/`Toast*`, SF Symbols)과 분리. 표 변경 없음.
@@ -56,11 +56,14 @@
 | 1.2 | `TravelCalculator/Assets.xcassets/BrandSplashBG.colorset/Contents.json` (신규) | Color Set 신규. `Any` = sRGB `#5BA8EC` (R 0.357 G 0.659 B 0.925), `Dark` = sRGB `#1E2A38` (R 0.118 G 0.165 B 0.220). 부동소수 8자리 표기로 통일. | INTEGRATION_GUIDE §2 |
 | 1.3 | `TravelCalculator/Assets.xcassets/SplashCenter.imageset/` (신규) | `SplashCenter-Light.png` → Any, `SplashCenter-Dark.png` → Dark. `Contents.json`에 `appearances: luminosity=dark` 키 부여. `properties` 미설정(가이드 §4a "Single Scale, Preserve Vector off"). | INTEGRATION_GUIDE §4a |
 
-### Step 2: Info.plist 런치 스크린
+### Step 2: 런치 스크린 (재작성 — Option B → A pivot)
 
 | # | 파일 | 태스크 | 가이드/Spec 참조 |
 |---|------|--------|------------------|
-| 2.1 | `TravelCalculator/Info.plist` | `UILaunchScreen` dict 내용 교체: `UIColorName=BrandSplashBG`, `UIImageName=SplashCenter`, `UIImageRespectsSafeAreaInsets=true` (true). 기존 빈 `UILaunchScreen` 중첩 dict 제거. | INTEGRATION_GUIDE §4c (Option B) |
+| 2.1 | ~~`TravelCalculator/Info.plist`~~ | ~~`UILaunchScreen` dict 내용 교체: `UIColorName=BrandSplashBG`, `UIImageName=SplashCenter`, `UIImageRespectsSafeAreaInsets=true`.~~ **(commit `ac9bac5` Option B 적용 후 시각 검증 시 SplashCenter PNG scale 처리 실패로 잘림 발견 — 아래 Step 2.2~2.4로 pivot)** | ~~INTEGRATION_GUIDE §4c (Option B)~~ |
+| 2.2 | `TravelCalculator/LaunchScreen.storyboard` (신규) | UIKit launch screen 신설 — root view bg=`BrandSplashBG` named color, `UIImageView image=SplashCenter` + `contentMode=scaleAspectFit` + Auto Layout(centerX/centerY safe area, width ≤ view.width × 0.8, aspect 1:1). `useSafeAreas=YES` + `launchScreen=YES`. | INTEGRATION_GUIDE §4b (Option A) |
+| 2.3 | `TravelCalculator/Info.plist` | `UILaunchScreen` dict 제거 + `UILaunchStoryboardName=LaunchScreen` 키 추가. | INTEGRATION_GUIDE §4b |
+| 2.4 | `TravelCalculatorTests/Assets/InfoPlistLaunchScreenTests.swift` | 테스트 2건으로 교체 — `infoPlist_usesLaunchStoryboard` (UILaunchStoryboardName=LaunchScreen + 기존 dict 미존재 검증), `launchScreenStoryboard_existsAtExpectedPath` (storyboard 파일 실재 검증). storyboard XML 구조 파싱은 fragile하여 스킵. | docs/plans/phase-g-app-icon-splash/task-20260430-1800-step2-storyboard-pivot.md |
 
 ### Step 3: Spec 반영
 
@@ -86,11 +89,13 @@
 - [ ] `AppIcon-Dark-1024.png` / `AppIcon-Light-1024.png` / `AppIcon-Tinted-1024.png` 3개 PNG가 `AppIcon.appiconset/` 안에 존재 (1024×1024)
 - [ ] `Assets.xcassets/BrandSplashBG.colorset/Contents.json` 존재, Any/Dark hex가 가이드와 일치
 - [ ] `Assets.xcassets/SplashCenter.imageset/` 안에 `SplashCenter-Light.png` / `SplashCenter-Dark.png` 존재, `Contents.json`에 luminosity dark appearance 명시
-- [ ] `Info.plist` — `UILaunchScreen` dict에 `UIColorName=BrandSplashBG`, `UIImageName=SplashCenter`, `UIImageRespectsSafeAreaInsets=true` 키 3개 존재, 기존 빈 중첩 dict 제거
+- [ ] `Info.plist` — `UILaunchStoryboardName=LaunchScreen` 키 존재, 기존 `UILaunchScreen` dict 미존재
+- [ ] `TravelCalculator/LaunchScreen.storyboard` 실재, root view backgroundColor=BrandSplashBG named ref, UIImageView image=SplashCenter named ref, scaleAspectFit + safe area centerY + width ≤ view.width × 0.8 + aspect 1:1
+- [ ] `InfoPlistLaunchScreenTests.infoPlist_usesLaunchStoryboard` / `launchScreenStoryboard_existsAtExpectedPath` 통과
 - [ ] 시뮬레이터(Light) 부팅 시 `#5BA8EC` 배경 + 중앙 SplashCenter 마크 가시 — sky blue 배경에서 tagline 가독성 확인 (마진하면 navy tagline 재export 요청)
 - [ ] 시뮬레이터(Dark) 부팅 시 `#1E2A38` 배경 + Dark 변형 SplashCenter 마크 가시
 - [ ] 백그라운드→포어그라운드 복귀 시 splash 미노출 확인 (iOS 스냅샷 사용 — 정상 동작이면 splash 안 보여야 함)
-- [ ] Dynamic Island 디바이스(iPhone 15 Pro 시뮬레이터)에서 마크가 island와 충돌하지 않음 — `UIImageRespectsSafeAreaInsets=true` 검증
+- [ ] Dynamic Island 디바이스(iPhone 15 Pro 시뮬레이터)에서 마크가 island와 충돌하지 않음 — safe area centerY anchor 검증
 - [ ] Springboard 설치 후 tap-and-hold → "Edit appearance" → Light/Dark/Tinted 3 모드 모두에서 아이콘 가독 (Step 1 deferred 시각 검증)
 - [ ] Spec-UI §6.4 / §6.5 신설, "검증 가능 항목" 블록 포함
 - [ ] **영향 문서 섹션의 모든 추가/수정 항목이 spec에 실제로 반영됨**
@@ -114,7 +119,8 @@ TravelCalculator/
 │       ├── Contents.json                  ← 신규 (Any + luminosity:dark)
 │       ├── SplashCenter-Light.png         ← 신규
 │       └── SplashCenter-Dark.png          ← 신규
-└── Info.plist                              ← 수정 (UILaunchScreen dict 키 3종)
+├── Info.plist                              ← 수정 (UILaunchStoryboardName=LaunchScreen)
+└── LaunchScreen.storyboard                 ← 신규 (Option A pivot, UIImageView Aspect Fit + Auto Layout)
 
 specs/
 └── Spec-UI.md                              ← 수정 (§6.4 / §6.5 신설)
@@ -128,8 +134,9 @@ docs/
 ## 결정 기록
 
 - **V1+ TestFlight 전 게이트 — Tinted PNG grayscale 재export**: `AppIcon-Tinted-1024.png`는 8-bit RGB로 iOS 18 monochrome tint의 luminance 추출 시 의도된 색조와 어긋날 수 있음. Step 1에서는 brand pack 그대로 반입(merge gate 아님). V1+ TestFlight 진입 전 시각 검증 후 brand source에서 grayscale L* 채널 재export 필요 — Spec-Tasks §9 백로그(Phase G UX, High)에 등록됨.
-- **Splash 방식 — Option B (Info.plist) 선택**: 가이드 §4b/§4c 둘 다 제시. 본 프로젝트는 SwiftUI `App` 구조이고 `LaunchScreen.storyboard`가 없으며 기존 `Info.plist`에 빈 `UILaunchScreen` dict가 이미 있음. Option B가 자연스럽고 storyboard 빈 파일 추가가 불필요.
-- **`UIImageRespectsSafeAreaInsets=true`**: 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 배치. Step 3 Spec-UI §6.5에 명시.
+- **Splash 방식 — Option B (Info.plist) 선택** *(2026-04-30 commit `ac9bac5`, 후속 pivot)*: 가이드 §4b/§4c 둘 다 제시. 본 프로젝트는 SwiftUI `App` 구조이고 `LaunchScreen.storyboard`가 없으며 기존 `Info.plist`에 빈 `UILaunchScreen` dict가 이미 있음. Option B가 자연스럽고 storyboard 빈 파일 추가가 불필요. **이 결정은 다음 항목으로 번복됨.**
+- **Splash 방식 — Option A로 전환 (2026-04-30 storyboard pivot)**: Option B 적용 후 시뮬레이터 시각 검증에서 SplashCenter PNG 잘림 발견. 근본 원인은 `SplashCenter.imageset/Contents.json`에 `scale` 키 누락 → iOS가 1290×1290 PNG를 `@1x`로 해석 → `@3x` 디바이스에서 약 3배 stretch. Option B의 scale 키만 추가해도 해소 가능하나, 가이드가 "recommended for most apps"로 표시한 Option A(`LaunchScreen.storyboard` + UIImageView Aspect Fit + Auto Layout)로 전환 — UIImageView가 device scale을 자동 처리하므로 디바이스/scale 무관 정렬 보장. 결정 변경 이력 추적 위해 위 Option B 항목은 보존. 상세: `docs/plans/phase-g-app-icon-splash/task-20260430-1800-step2-storyboard-pivot.md`.
+- **Aspect Fit + width ≤ view.width × 0.8 + safe area centerY**: storyboard에서 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 80% 폭으로 정사각형 비례 보존. Step 3 Spec-UI §6.5에 명시.
 - **Mac 슬롯 정리**: `AppIcon.appiconset/Contents.json`에 Mac idiom 13개 슬롯이 있으나 본 프로젝트는 iPhone portrait only(`Spec-Architecture`/Info.plist `UISupportedInterfaceOrientations~iphone`). 빌드 경고 회피 + Single Source of Truth 강화 차원에서 제거.
 - **`BrandNavy` / `BrandSky` 제외**: 가이드 §2 표에는 informational로 등장하나 verification checklist §7과 launch screen 실제 사용처에는 없음. 즉시 사용처 없는 dead asset 회피.
 - **App Store 미리보기 4종 제외**: 가이드 §5의 `previews/Preview-0*.png`는 App Store Connect 웹 콘솔 업로드 단계로 코드 변경 0건. 본 Phase는 앱 번들 통합 범위로 한정.
