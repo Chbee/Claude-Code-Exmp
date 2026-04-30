@@ -203,7 +203,7 @@
 - `Contents.json` 3 entries(Any/Dark/Tinted) 각 `filename`이 디렉토리 실재 PNG(`AppIcon-{Dark,Light,Tinted}-1024.png`)와 매칭
 - Mac idiom 슬롯 0건
 - `[V1+ gate] AppIcon-Tinted-1024.png가 grayscale L* 채널 재export 완료` (TestFlight 빌드 진입 전)
-- `TravelCalculatorTests/Assets/AssetCatalogIntegrationTests.AppIconContentsTests.appIconContents_hasExactlyThreeIOSEntries` 통과
+- `TravelCalculatorTests/AppIconContentsTests/appIconContents_hasExactlyThreeIOSEntries` 통과 (정의: `TravelCalculatorTests/Assets/AssetCatalogIntegrationTests.swift`)
 
 > **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
 > **수정 이력**: [Phase G](../docs/phase-g.md)
@@ -231,7 +231,7 @@ iOS Springboard가 부팅 시점에 `UILaunchStoryboardName` 키로 `LaunchScree
 - `TravelCalculator/LaunchScreen.storyboard` 파일 실재, root view `backgroundColor` = named ref `BrandSplashBG`, UIImageView `image` = named ref `SplashCenter`
 - `Info.plist`에 `UILaunchStoryboardName=LaunchScreen` 키 존재, 기존 `UILaunchScreen` dict 미존재
 - `Splash-{Light,Dark}-Full.png`가 앱 번들·Asset Catalog에 포함되지 않음
-- `TravelCalculatorTests/Assets/AssetCatalogIntegrationTests.AssetCatalogRuntimeTests.brandSplashBG_loadsFromHostAppBundle` / `splashCenter_loadsFromHostAppBundle` / `InfoPlistLaunchScreenTests.infoPlist_usesLaunchStoryboard` / `launchScreenStoryboard_existsAtExpectedPath` 통과
+- `TravelCalculatorTests/AssetCatalogRuntimeTests/brandSplashBG_loadsFromHostAppBundle` / `TravelCalculatorTests/AssetCatalogRuntimeTests/splashCenter_loadsFromHostAppBundle` / `TravelCalculatorTests/InfoPlistLaunchScreenTests/infoPlist_usesLaunchStoryboard` / `TravelCalculatorTests/InfoPlistLaunchScreenTests/launchScreenStoryboard_existsAtExpectedPath` 통과 (`AssetCatalogRuntimeTests` 정의: `TravelCalculatorTests/Assets/AssetCatalogIntegrationTests.swift`)
 
 > **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
 > **수정 이력**: [Phase G](../docs/phase-g.md)
