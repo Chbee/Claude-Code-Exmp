@@ -118,9 +118,13 @@
 
 **뷰 접근 규칙**: 뷰 코드에서 원시 토큰(`Color.Main.c500.adaptive` 등) 직접 참조 금지. **시맨틱 별칭(`Color.app*`)만 사용**. (현재 Presentation 코드에서 원시 참조 0건 — 이 상태 유지)
 
+> **예외**: `BrandSplashBG`는 런치 스크린(Springboard 단계, Swift 진입 전) 전용 colorset이며 `Color.app*` 시맨틱 별칭 대상이 아니다. `Info.plist`가 colorset 이름으로 직접 참조 — §6.5 참조.
+
 **검증 가능 항목** (결재 에이전트용)
 - Figma node-id 99-875의 토큰 그룹·단계 수가 `ColorTokens.swift`와 일치하는지
 - Presentation 디렉토리에서 `Color.Main` / `Color.Gray` / `Color.System` / `Color.Side` / `Color.Toast` 직접 참조 grep 결과 0건
+
+> **수정 이력**: [Phase G](../docs/phase-g.md)
 
 ### 6.2 아이콘
 
@@ -165,3 +169,68 @@
 | 새로고침 버튼 탭 | light (impact) |
 
 > 새로고침 햅틱은 throttle 가드 *위*에서 발화 (탭 인지 우선 정책). 차단된 탭에도 햅틱은 발화되며 Toast/API 호출만 차단됨.
+
+### 6.4 앱 아이콘
+
+**Source of Truth 계층** (위에서 아래로 우선)
+1. **브랜드 자산 팩** (canonical) — Tripy `INTEGRATION_GUIDE.md` §3 (외부 디렉토리 `/Users/SONJIYONG/tripy-appstore/dist/appstore/`). PNG 3종이 canonical.
+2. **`Assets.xcassets/AppIcon.appiconset/`** — 자산 팩 PNG 사본 + `Contents.json`. iOS 18 universal 1024 single-slot.
+3. **`project.pbxproj` build setting** — `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` (변경 시 spec 동시 갱신 필요).
+
+**iOS 18 3-variant 정책 + Swap 규칙**
+
+| 슬롯 | PNG (filename) | 적용 모드 |
+|---|---|---|
+| Any (Default) | `AppIcon-Dark-1024.png` (navy bg) | Light 시스템 모드 홈 |
+| Dark | `AppIcon-Light-1024.png` (sky gradient) | Dark 시스템 모드 홈 |
+| Tinted | `AppIcon-Tinted-1024.png` | iOS 18 Tinted 모드 |
+
+> **Swap 의도**: iOS는 어두운 아이콘이 Light 홈에서, 밝은 아이콘이 Dark 홈에서 가독이 더 높음. 브랜드 default가 navy(어두운 톤)인 본 프로젝트에서는 파일명과 슬롯 이름이 반대로 매핑됨 — 가이드 §3a 정책. 향후 자산 교체 시 같은 swap 규칙 유지 필요.
+
+**HIG 준수**
+- 1024×1024 정사각형, 모서리 마스킹 X(iOS 자동 squircle), 알파 채널 X
+- Mac idiom 슬롯 미사용 (iPhone portrait only — Spec-Architecture)
+- Tinted 원본은 8-bit RGB(grayscale 아님) — V1+ TestFlight 전 grayscale L* 채널 재export 필요 (Spec-Tasks §9 백로그, High)
+
+**자산 교체 절차** (디자이너/개발자가 PNG 3장 갈아끼울 때)
+1. 자산 팩(`/Users/SONJIYONG/tripy-appstore/dist/appstore/`) 신규 PNG 3종 수령 (1024×1024 RGB, 알파 X)
+2. `Assets.xcassets/AppIcon.appiconset/` 사본 갱신 (filename 동일 유지로 Contents.json 변경 0)
+3. Tinted PNG가 grayscale L* 채널인지 확인(`file` 명령) — V1+ TestFlight 게이트
+4. `xcodebuild build` 성공 + `AppIconContentsTests` 통과
+5. 시뮬레이터 Light/Dark/Tinted 3 모드 시각 확인 (Springboard tap-and-hold → Edit appearance)
+
+**검증 가능 항목** (결재 에이전트용)
+- `Contents.json` 3 entries(Any/Dark/Tinted) 각 `filename`이 디렉토리 실재 PNG(`AppIcon-{Dark,Light,Tinted}-1024.png`)와 매칭
+- Mac idiom 슬롯 0건
+- `[V1+ gate] AppIcon-Tinted-1024.png가 grayscale L* 채널 재export 완료` (TestFlight 빌드 진입 전)
+- `TravelCalculatorTests/Assets/AppIconContentsTests.appIconContents_hasExactlyThreeIOSEntries` 통과
+
+> **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
+> **수정 이력**: [Phase G](../docs/phase-g.md)
+
+### 6.5 런치 스크린
+
+**Source of Truth 계층** (위에서 아래로 우선)
+1. **브랜드 자산 팩** (canonical) — `INTEGRATION_GUIDE.md` §2 (sRGB hex), §4 (transparent center PNG)
+2. **`Assets.xcassets/BrandSplashBG.colorset/`** — sRGB Light `#5BA8EC` / Dark `#1E2A38`. **런치 스크린 전용** — Swift `Color.app*` 시맨틱 별칭(§6.1)에 추가하지 않고 `Info.plist`가 colorset 이름으로 직접 참조.
+3. **`Assets.xcassets/SplashCenter.imageset/`** — 1290×1290 transparent PNG, Any + luminosity:dark 변형.
+4. **`Info.plist` `UILaunchScreen` dict** — `UIColorName=BrandSplashBG` / `UIImageName=SplashCenter` / `UIImageRespectsSafeAreaInsets=true`.
+
+**합성 방식 — Option B (가이드 §4c)**
+
+iOS Springboard가 부팅 시점에 `UILaunchScreen` dict를 직접 읽어 합성. SwiftUI/UIKit 런타임이 켜지기 전 단계라 Swift 코드 진입점 없음 — 모든 자산은 Asset Catalog 등록 이름으로만 참조. 본 프로젝트에 `LaunchScreen.storyboard` 미존재.
+
+**정책 결정**
+- **`UIImageRespectsSafeAreaInsets=true`** — 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 배치.
+- **`-Full` PNG 미반입** — 가이드 §4d의 `Splash-{Light,Dark}-Full.png`는 디자인 QA 참조용. 앱 번들 포함 금지.
+- **정적 launch** — SwiftUI 애니메이션 splash는 Apple HIG가 권장하지 않으며, system splash → 첫 frame 사이에 visible flash/re-mount seam 발생.
+
+**검증 가능 항목** (결재 에이전트용)
+- `BrandSplashBG.colorset/Contents.json` 존재, Light/Dark sRGB components가 가이드 hex(`#5BA8EC` / `#1E2A38`)와 일치
+- `SplashCenter.imageset/Contents.json` 존재, `appearances: luminosity=dark` entry 명시, 두 PNG 파일 실재
+- `Info.plist` `UILaunchScreen` dict에 `UIColorName=BrandSplashBG` / `UIImageName=SplashCenter` / `UIImageRespectsSafeAreaInsets=true` 키 정확히 3개
+- `Splash-{Light,Dark}-Full.png`가 앱 번들·Asset Catalog에 포함되지 않음
+- `TravelCalculatorTests/Assets/AssetCatalogRuntimeTests.brandSplashBG_loadsFromHostAppBundle` / `splashCenter_loadsFromHostAppBundle` / `InfoPlistLaunchScreenTests.infoPlist_uiLaunchScreen_hasExpectedKeys` 통과
+
+> **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
+> **수정 이력**: [Phase G](../docs/phase-g.md)

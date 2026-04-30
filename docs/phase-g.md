@@ -10,11 +10,11 @@
 이 Phase가 spec에 미치는 영향. 작업 진행 중 추가/수정 발견 시 누적 갱신.
 
 - **추가/수정한 spec 섹션**:
-  - [Spec-UI §6.4 앱 아이콘](../specs/Spec-UI.md#64-앱-아이콘) — 신설. iOS 18 3-variant 정책(Any/Dark/Tinted), 1024×1024 단일 슬롯, 가이드 출처(Tripy brand pack), HIG 준수 메모(불투명/모서리 없음/알파 없음).
-  - [Spec-UI §6.5 런치 스크린](../specs/Spec-UI.md#65-런치-스크린) — 신설. `UILaunchScreen` dict 방식(Option B), `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙.
-  - [Spec-Tasks §9 개선 백로그](../specs/Spec-Tasks.md#9-개선-백로그) — Phase G UX 백로그 3건 추가 (Tinted grayscale 재export / BrandNavy·BrandSky 조건부 / 런치 스크린 접근성).
+  - [Spec-UI §6.1 컬러 팔레트](../specs/Spec-UI.md#61-컬러-팔레트) — Step 3에서 본문 끝에 `BrandSplashBG` 예외 cross-link 1줄 추가. "뷰는 시맨틱만 참조" 규칙과 §6.5 "Color.app* 미추가"의 충돌이 grep 검증 위반으로 오판되지 않도록 명시.
+  - [Spec-UI §6.4 앱 아이콘](../specs/Spec-UI.md#64-앱-아이콘) — 신설. iOS 18 3-variant 정책(Any/Dark/Tinted), 1024×1024 단일 슬롯, 가이드 출처(Tripy brand pack), HIG 준수, 자산 교체 5스텝 절차, V1+ Tinted 게이트.
+  - [Spec-UI §6.5 런치 스크린](../specs/Spec-UI.md#65-런치-스크린) — 신설. `UILaunchScreen` dict 방식(Option B), `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙, `UIImageRespectsSafeAreaInsets=true` lock decision, 정적 launch 채택.
+  - [Spec-Tasks §9 개선 백로그](../specs/Spec-Tasks.md#9-개선-백로그) — Phase G UX 백로그 2건 추가: Tinted grayscale 재export (V1+ TestFlight 전 게이트, High) + 런치 스크린 접근성(Reduce Transparency / Increase Contrast).
 - **참조만 (변경 없음)**:
-  - [Spec-UI §6.1 컬러 팔레트](../specs/Spec-UI.md#61-컬러-팔레트) — `BrandSplashBG`는 런치 스크린 전용 색이며 시맨틱 별칭(`Color.app*`) 체계 외 별도 토큰. 기존 토큰 그룹은 변경 없음.
   - [Spec-UI §6.2 아이콘](../specs/Spec-UI.md#62-아이콘) — UI 아이콘(Asset Catalog `MapPin`/`Toast*`, SF Symbols)과 분리. 표 변경 없음.
 
 ---
@@ -129,7 +129,7 @@ docs/
 
 - **V1+ TestFlight 전 게이트 — Tinted PNG grayscale 재export**: `AppIcon-Tinted-1024.png`는 8-bit RGB로 iOS 18 monochrome tint의 luminance 추출 시 의도된 색조와 어긋날 수 있음. Step 1에서는 brand pack 그대로 반입(merge gate 아님). V1+ TestFlight 진입 전 시각 검증 후 brand source에서 grayscale L* 채널 재export 필요 — Spec-Tasks §9 백로그(Phase G UX, High)에 등록됨.
 - **Splash 방식 — Option B (Info.plist) 선택**: 가이드 §4b/§4c 둘 다 제시. 본 프로젝트는 SwiftUI `App` 구조이고 `LaunchScreen.storyboard`가 없으며 기존 `Info.plist`에 빈 `UILaunchScreen` dict가 이미 있음. Option B가 자연스럽고 storyboard 빈 파일 추가가 불필요.
-- **`UIImageRespectsSafeAreaInsets=true` lock decision**: 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 배치. 향후 "full-bleed 브랜드 모먼트" 요청은 V2 분류 — Step 3 Spec-UI §6.5에 명시.
+- **`UIImageRespectsSafeAreaInsets=true`**: 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 배치. Step 3 Spec-UI §6.5에 명시.
 - **Mac 슬롯 정리**: `AppIcon.appiconset/Contents.json`에 Mac idiom 13개 슬롯이 있으나 본 프로젝트는 iPhone portrait only(`Spec-Architecture`/Info.plist `UISupportedInterfaceOrientations~iphone`). 빌드 경고 회피 + Single Source of Truth 강화 차원에서 제거.
 - **`BrandNavy` / `BrandSky` 제외**: 가이드 §2 표에는 informational로 등장하나 verification checklist §7과 launch screen 실제 사용처에는 없음. 즉시 사용처 없는 dead asset 회피.
 - **App Store 미리보기 4종 제외**: 가이드 §5의 `previews/Preview-0*.png`는 App Store Connect 웹 콘솔 업로드 단계로 코드 변경 0건. 본 Phase는 앱 번들 통합 범위로 한정.
