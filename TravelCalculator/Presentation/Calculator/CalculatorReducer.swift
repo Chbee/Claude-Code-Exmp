@@ -6,8 +6,8 @@ enum CalculatorReducer {
     private static let maxIntegerDigits = 10
     // 소수점 최대 자릿수
     private static let maxFractionDigits = 2
-    // = 결과 정수부 한계
-    private static let maxResultIntegerDigits = 15
+    // = 결과 정수부 한계 (입력 10자리 ÷ 0.01 = 12자리 — Spec-Calculator §2.1.5)
+    private static let maxResultIntegerDigits = 12
 
     static func reduce(_ state: CalculatorState, intent: CalculatorIntent) -> CalculatorState {
         var s = state
@@ -228,7 +228,7 @@ enum CalculatorReducer {
                 return s
             }
 
-            // 결과 정수부 15자리 초과 체크
+            // 결과 정수부 12자리 초과 체크
             if exceedsResultLimit(result) {
                 s.pendingToast = ToastPayload(
                     style: .error,
