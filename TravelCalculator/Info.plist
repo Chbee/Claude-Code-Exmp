@@ -31,8 +31,12 @@
 	<true/>
 	<key>UILaunchScreen</key>
 	<dict>
-		<key>UILaunchScreen</key>
-		<dict/>
+		<key>UIColorName</key>
+		<string>BrandSplashBG</string>
+		<key>UIImageName</key>
+		<string>SplashCenter</string>
+		<key>UIImageRespectsSafeAreaInsets</key>
+		<true/>
 	</dict>
 	<key>UIStatusBarStyle</key>
 	<string>UIStatusBarStyleDefault</string>

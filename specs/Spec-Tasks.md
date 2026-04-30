@@ -178,6 +178,8 @@
 | Phase G UX | AppIcon Tinted variant — grayscale L* 채널 재export (현재 RGB라 iOS 18 monochrome tint 색조가 의도와 어긋날 수 있음) | High | ⬜ V1+ TestFlight 전 |
 | Phase G UX | `BrandNavy` / `BrandSky` 색 토큰 — in-app UI가 launch screen 외 브랜드 색을 채택 시 활성 (현재 dead asset 회피로 미반입) | Low | ⬜ 조건부 |
 | Phase G UX | 런치 스크린 접근성 — Reduce Transparency / Increase Contrast 설정 시 가독성 검증 (기존 VoiceOver/Dynamic Type 백로그와 묶음) | Low | ⬜ V2 후보 |
+| Phase G UX | Post-launch SwiftUI welcome shimmer (200ms `BrandSplashBG`→ContentView cross-fade) — TestFlight 피드백에서 hard cut이 abrupt하다는 의견 시 검토 | Low | ⬜ V2 후보 |
+| Phase G UX | 로컬라이제이션 `SplashCenter` 변형 — 현재 tagline이 PNG에 굽혀있어 i18n 마일스톤 시 자산 duplication 필요 | Low | ⬜ i18n 마일스톤 시 |
 
 > **수정 이력**: [Phase F](../docs/phase-f.md), [Phase G](../docs/phase-g.md)
 

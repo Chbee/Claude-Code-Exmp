@@ -87,8 +87,11 @@
 - [ ] `Assets.xcassets/BrandSplashBG.colorset/Contents.json` 존재, Any/Dark hex가 가이드와 일치
 - [ ] `Assets.xcassets/SplashCenter.imageset/` 안에 `SplashCenter-Light.png` / `SplashCenter-Dark.png` 존재, `Contents.json`에 luminosity dark appearance 명시
 - [ ] `Info.plist` — `UILaunchScreen` dict에 `UIColorName=BrandSplashBG`, `UIImageName=SplashCenter`, `UIImageRespectsSafeAreaInsets=true` 키 3개 존재, 기존 빈 중첩 dict 제거
-- [ ] 시뮬레이터(Light) 부팅 시 `#5BA8EC` 배경 + 중앙 SplashCenter 마크 가시
+- [ ] 시뮬레이터(Light) 부팅 시 `#5BA8EC` 배경 + 중앙 SplashCenter 마크 가시 — sky blue 배경에서 tagline 가독성 확인 (마진하면 navy tagline 재export 요청)
 - [ ] 시뮬레이터(Dark) 부팅 시 `#1E2A38` 배경 + Dark 변형 SplashCenter 마크 가시
+- [ ] 백그라운드→포어그라운드 복귀 시 splash 미노출 확인 (iOS 스냅샷 사용 — 정상 동작이면 splash 안 보여야 함)
+- [ ] Dynamic Island 디바이스(iPhone 15 Pro 시뮬레이터)에서 마크가 island와 충돌하지 않음 — `UIImageRespectsSafeAreaInsets=true` 검증
+- [ ] Springboard 설치 후 tap-and-hold → "Edit appearance" → Light/Dark/Tinted 3 모드 모두에서 아이콘 가독 (Step 1 deferred 시각 검증)
 - [ ] Spec-UI §6.4 / §6.5 신설, "검증 가능 항목" 블록 포함
 - [ ] **영향 문서 섹션의 모든 추가/수정 항목이 spec에 실제로 반영됨**
 - [ ] `Splash-Light-Full.png` / `Splash-Dark-Full.png` 가 앱 번들·Asset Catalog에 포함되지 않음 (가이드 §4d)
@@ -126,6 +129,7 @@ docs/
 
 - **V1+ TestFlight 전 게이트 — Tinted PNG grayscale 재export**: `AppIcon-Tinted-1024.png`는 8-bit RGB로 iOS 18 monochrome tint의 luminance 추출 시 의도된 색조와 어긋날 수 있음. Step 1에서는 brand pack 그대로 반입(merge gate 아님). V1+ TestFlight 진입 전 시각 검증 후 brand source에서 grayscale L* 채널 재export 필요 — Spec-Tasks §9 백로그(Phase G UX, High)에 등록됨.
 - **Splash 방식 — Option B (Info.plist) 선택**: 가이드 §4b/§4c 둘 다 제시. 본 프로젝트는 SwiftUI `App` 구조이고 `LaunchScreen.storyboard`가 없으며 기존 `Info.plist`에 빈 `UILaunchScreen` dict가 이미 있음. Option B가 자연스럽고 storyboard 빈 파일 추가가 불필요.
+- **`UIImageRespectsSafeAreaInsets=true` lock decision**: 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 배치. 향후 "full-bleed 브랜드 모먼트" 요청은 V2 분류 — Step 3 Spec-UI §6.5에 명시.
 - **Mac 슬롯 정리**: `AppIcon.appiconset/Contents.json`에 Mac idiom 13개 슬롯이 있으나 본 프로젝트는 iPhone portrait only(`Spec-Architecture`/Info.plist `UISupportedInterfaceOrientations~iphone`). 빌드 경고 회피 + Single Source of Truth 강화 차원에서 제거.
 - **`BrandNavy` / `BrandSky` 제외**: 가이드 §2 표에는 informational로 등장하나 verification checklist §7과 launch screen 실제 사용처에는 없음. 즉시 사용처 없는 dead asset 회피.
 - **App Store 미리보기 4종 제외**: 가이드 §5의 `previews/Preview-0*.png`는 App Store Connect 웹 콘솔 업로드 단계로 코드 변경 0건. 본 Phase는 앱 번들 통합 범위로 한정.
