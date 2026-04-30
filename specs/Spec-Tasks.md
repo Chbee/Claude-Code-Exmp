@@ -175,8 +175,11 @@
 | Phase F Step 3.1 검증 | 정수 통화(JPY/VND/KRW) 소수점 입력 거부 가드 — Spec-Overview §2.2.4 정합 | Medium | ⬜ V2 후보 |
 | Phase F Step 3.1 검증 | VND 7자리 결과 표시 폭 회귀 가드 (`minimumScaleFactor` 스냅샷) | Low | ⬜ V2 후보 |
 | Phase F Step 3.1 검증 | EUR 부동소수 누적 시나리오 (Calculator + ExchangeRate 통합) | Low | ⬜ V2 후보 |
+| Phase G UX | AppIcon Tinted variant — grayscale L* 채널 재export (현재 RGB라 iOS 18 monochrome tint 색조가 의도와 어긋날 수 있음) | High | ⬜ V1+ TestFlight 전 |
+| Phase G UX | `BrandNavy` / `BrandSky` 색 토큰 — in-app UI가 launch screen 외 브랜드 색을 채택 시 활성 (현재 dead asset 회피로 미반입) | Low | ⬜ 조건부 |
+| Phase G UX | 런치 스크린 접근성 — Reduce Transparency / Increase Contrast 설정 시 가독성 검증 (기존 VoiceOver/Dynamic Type 백로그와 묶음) | Low | ⬜ V2 후보 |
 
-> **수정 이력**: [Phase F](../docs/phase-f.md)
+> **수정 이력**: [Phase F](../docs/phase-f.md), [Phase G](../docs/phase-g.md)
 
 ---
 
