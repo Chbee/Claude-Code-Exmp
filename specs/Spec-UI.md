@@ -162,3 +162,6 @@
 | 방향 전환 버튼 탭 | medium (impact) |
 | 통화 선택 완료 | success (notification) |
 | 등호(=) 결과 표시 | light (impact) |
+| 새로고침 버튼 탭 | light (impact) |
+
+> 새로고침 햅틱은 throttle 가드 *위*에서 발화 (탭 인지 우선 정책). 차단된 탭에도 햅틱은 발화되며 Toast/API 호출만 차단됨.
