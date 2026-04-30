@@ -58,6 +58,7 @@ View → Intent(enum) → Reducer(순수 함수: State + Intent → State) → S
 | 3 | Offline Support | 완료 (Phase E) |
 | 4 | Testing | 4.1 Reducer / 4.2 환율 변환 / 4.3 API 완료 (Phase E) |
 | F | Currency 확장 + 검색 | 완료 (Step 1 통화 확장 / Step 2 검색·필터 / Step 3.1 회귀 + Step 3.2 필터 테스트) |
+| G | App Icon + Launch Screen | 완료 (Step 1 자산 / Step 2 storyboard pivot / Step 3 Spec-UI §6.4·§6.5 / audit followup) |
 
 ## Multi-AI Workflow
 
