@@ -29,7 +29,7 @@
 - [x] 1.1.10 엣지 케이스 (연산자 교체, 0 나누기 Toast, 소수점 자동완성, 음수→변환 0)
 - [x] 1.1.11 백스페이스 엣지 케이스 ("5"→"0", "0."→"0", "0"→무시, = 후 삭제)
 - [x] 1.1.12 정수부 10자리 제한 + 초과 시 숫자/소수점만 차단
-- [x] 1.1.13 `=` 결과 15자리 초과 시 Toast(error) + display 유지
+- [x] 1.1.13 `=` 결과 12자리 초과 시 Toast(error) + display 유지 (`CalculatorReducer.maxResultIntegerDigits`)
 
 #### 1.2 디스플레이 영역 개선
 - [x] 1.2.1 천단위 콤마 포맷팅 (`Decimal+Format`, 로케일 고정)
@@ -166,14 +166,15 @@
 |------|------|----------|------|
 | 리뷰 1.2 | 지원 통화 확장 (JPY, EUR, THB, VND, PHP, CNY 등) | High | ✅ Phase F Step 1 |
 | 리뷰 4.2 | 통화 확장 시 검색/필터 기능 추가 | High | ✅ Phase F Step 2 (countryName + currencyUnit 매칭) |
-| 리뷰 1.3 | 환율 알림 (목표 환율 푸시) | Medium | ⬜ |
-| 리뷰 4.1 | Toast 스와이프 수동 닫기 | Low | ⬜ |
-| 리뷰 5.1 | VoiceOver accessibilityLabel/Hint 추가 | Medium | 🟡 부분 (검색바만 적용 — 전체 앱은 미적용) |
-| 리뷰 5.2 | Dynamic Type 대응 | Low | ⬜ |
-| 리뷰 6.5 | API 키 보안 강화 (CI/CD 주입 방식) | Medium | ⬜ |
+| 리뷰 4.1 | Toast 스와이프 수동 닫기 | Low | ✅ 슬라이드 업 닫기 (`ToastModifier` DragGesture + `ToastDismissDecision`) |
+| 리뷰 5.1 | VoiceOver accessibilityLabel/Hint 추가 | Medium | 🟡 부분 (검색바 + Toolbar 네트워크 인디케이터 — 계산기 키패드/환율 영역 미적용) |
+| 리뷰 6.5 | API 키 보안 강화 (CI/CD 주입 방식) | Medium | ➖ N/A (open.er-api.com 키리스 API 채택으로 항목 무효화) |
 | 리뷰 6.7 | 키 입력 debounce (성능 최적화) | Low | ⬜ |
 | Phase F UX | 검색 결과에 선택 통화 가시성(체크 핀 고정) | Low | ⬜ V2 후보 |
 | Phase F UX | 온보딩 모드에서 검색바 숨김 (8개뿐) | Low | ⬜ V2 후보 |
+| Phase F Step 3.1 검증 | 정수 통화(JPY/VND/KRW) 소수점 입력 거부 가드 — Spec-Overview §2.2.4 정합 | Medium | ⬜ V2 후보 |
+| Phase F Step 3.1 검증 | VND 7자리 결과 표시 폭 회귀 가드 (`minimumScaleFactor` 스냅샷) | Low | ⬜ V2 후보 |
+| Phase F Step 3.1 검증 | EUR 부동소수 누적 시나리오 (Calculator + ExchangeRate 통합) | Low | ⬜ V2 후보 |
 
 > **수정 이력**: [Phase F](../docs/phase-f.md)
 
