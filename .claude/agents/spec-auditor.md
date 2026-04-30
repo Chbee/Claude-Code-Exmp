@@ -20,11 +20,13 @@ TravelCalculator 프로젝트가 spec대로 구현돼 있는지 검증합니다.
 
 `specs/Spec-*.md` 전체에서 "검증 가능 항목" 블록을 찾아 룰로 추출.
 
+**블록 헤더는 줄 시작에 고정된 정규식으로 매칭** (단순히 `검증 가능 항목` 단어 검색 금지 — 본문 *문장 안에 단어로 등장*하는 cross-reference를 룰 블록으로 오인할 수 있음. 예: `Spec-Architecture.md:19`의 "상세 룰(허용/금지 목록, 리팩터링 예시, 검증 가능 항목)은 [Spec-MVI] 참조" 같은 줄):
+
 ```bash
-grep -n '검증 가능 항목' specs/*.md
+grep -nE '^>?\s*(\*\*검증 가능 항목\*\*|\*\*계약.*검증 가능 항목.*\*\*|### 검증 가능 항목)' specs/*.md
 ```
 
-블록 형식은 4가지:
+블록 형식은 4가지 (모두 위 정규식이 잡음):
 - `**검증 가능 항목** (결재 에이전트용)` 다음에 오는 bullet (Spec-Architecture, Spec-UI)
 - `### 검증 가능 항목 (결재 에이전트용)` 다음 bullet (Spec-MVI)
 - `> **검증 가능 항목**` blockquote (Spec-Calculator)
@@ -51,13 +53,18 @@ grep -n '검증 가능 항목' specs/*.md
 
 #### B. 단위 테스트 (계약 검증)
 키워드: "throw", "반환", "호출 없이". 코드 동작에 대한 계약.
-실행: 관련 테스트 클래스를 식별해 xcodebuild로 실행.
+
+**검증은 2단계로 수행 — 클래스 존재만으로는 부족**:
+1. **계약별 키워드로 테스트 함수명 grep**: spec 본문의 핵심 단어(예: "빈 배열" → `empty|emptyCurrencies`, "KRW 자동 제외" → `excludesKRW|KRWExcluded`, "캐시 유효" → `cacheHit|cacheValid`)를 추출해 `@Test func` 라인에서 매칭. 매칭 0건이면 ⚠️ "테스트 누락" — 클래스 안에 다른 테스트가 있어도 *이 계약을 직접 검증하는 테스트*가 없음을 의미.
+2. **(선택) xcodebuild test 실행**: 호출자가 명시적으로 요청한 경우에만. 시간 비용 큼. 일반 audit에서는 1단계만 수행.
 
 대표 룰:
-- **Spec-DataModel-Network §계약**: `fetchRates` 빈 배열 → `noDataAvailable`, KRW 포함 시 결과 제외, 캐시 유효 시 네트워크 미호출
-  - 검증 명령: `xcodebuild test -only-testing:TravelCalculatorTests/ExchangeRateAPITests` (해당 테스트 존재 확인 필요)
+- **Spec-DataModel-Network §계약**:
+  - `fetchRates` 빈 배열 → `noDataAvailable`: 함수명 grep `fetchRates.*[Ee]mpty|emptyCurrencies`
+  - KRW 포함 시 결과 제외: 함수명 grep `KRW.*[Ee]xclud|[Ee]xclud.*KRW`
+  - 캐시 유효 시 네트워크 미호출: 함수명 grep `cacheHit|cacheValid|doesNotCallAPI`
 
-테스트가 없으면 ⚠️ Warning으로 "테스트 누락" 보고.
+테스트가 없으면 ⚠️ Warning으로 "테스트 누락 — 회귀 위험" 보고 + 권장 테스트명 제시.
 
 #### C. 코드 실재 확인 (Read)
 키워드: "fallback", "변환 결과는 0", 특정 함수/필드 존재.
@@ -83,6 +90,8 @@ grep -n '검증 가능 항목' specs/*.md
 3. 누락 시 ⚠️ "역링크 누락 — `/update-docs` 실행 필요" 보고
 4. 영향 섹션에 `<!-- TODO: ... -->` 마커 잔존 시 ⚠️ "영향 섹션 미정리" 보고
 5. "참조만" 버킷은 검증 대상에서 제외 (변경 없음 의미)
+
+**Legacy phase 처리** — 영향 섹션 자체가 *없는* phase 파일은 회귀가 아니라 *템플릿 도입 이전*에 완료된 phase. fail 아닌 ⚠️로만 보고하되, 같은 종류의 누락을 한 줄로 묶어 노이즈 줄임 (예: "`docs/phase-{a,b,c,d,e,f}.md` — 영향 섹션 부재 (legacy, 신규 phase부터 적용)"). 항목별 누락만 fail 후보가 됨.
 
 ### Step 4: 리포트 작성
 

@@ -23,6 +23,26 @@
 
 ---
 
+## `pre-prompt-audit-trigger.sh`
+
+**이벤트**: `UserPromptSubmit` — 사용자가 프롬프트를 제출할 때마다 실행
+
+```
+입력 텍스트
+  │
+  ├─ /audit /review /security-review 로 시작? → exit 0 (이미 명시, 중복 방지)
+  ├─ 과거형(받았/이미/끝났/완료/마쳤) + 트리거 단어 동시? → exit 0 (단순 보고)
+  └─ 트리거 키워드 매칭?
+       (한글: 리뷰/결재/감사/점검/검증/PR 올/머지 전/배포 전,
+        영문: \breview\b / \baudit\b)
+       → system-reminder 출력 (Claude에게 spec-auditor 호출 요청)
+```
+
+> **의도**: 사용자가 검토를 요청할 때 자동으로 결재 에이전트 발화. PR 직전·spec 변경 후 정합성 검증을 깜빡 누락하는 일 방지.
+> **한계**: 단어 기반 매칭이라 false positive 가능 (예: "audit log 보여줘"). reminder 본문에 "무관 시 호출 생략" 단서가 들어 있어 Claude가 컨텍스트로 판단.
+
+---
+
 ## `pre-edit-tdd-check.sh`
 
 **이벤트**: `PreToolUse(Edit|Write)` — Edit/Write 도구 호출 직전 실행
