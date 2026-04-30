@@ -24,7 +24,7 @@
 1. `AppIcon.appiconset` — iOS 18 3-variant(Any/Dark/Tinted) 1024×1024 PNG 등록 + Mac 슬롯 정리(iPhone-only 프로젝트)
 2. `BrandSplashBG.colorset` — Light `#5BA8EC` / Dark `#1E2A38` 신규 (런치 스크린 전용)
 3. `SplashCenter.imageset` — 1290×1290 transparent PNG Any/Dark 변형 신규
-4. `Info.plist` `UILaunchScreen` dict에 `UIColorName=BrandSplashBG` / `UIImageName=SplashCenter` / `UIImageRespectsSafeAreaInsets=true` 적용
+4. ~~`Info.plist` `UILaunchScreen` dict에 `UIColorName=BrandSplashBG` / `UIImageName=SplashCenter` / `UIImageRespectsSafeAreaInsets=true` 적용~~ → **`UILaunchStoryboardName=LaunchScreen` 키 + `LaunchScreen.storyboard` 신규** (Option B → A pivot, 결정 기록 참조)
 5. Spec-UI에 §6.4(앱 아이콘) / §6.5(런치 스크린) 신설 — 자산 출처·검증 가능 항목 명시
 6. 시뮬레이터 빌드 후 Light/Dark 모드에서 아이콘·런치 스크린 가시 확인
 
@@ -53,7 +53,7 @@
 | # | 파일 | 태스크 | 가이드/Spec 참조 |
 |---|------|--------|------------------|
 | 1.1 | `TravelCalculator/Assets.xcassets/AppIcon.appiconset/` | 가이드 §1의 PNG 3종(`AppIcon-Dark-1024.png` / `AppIcon-Light-1024.png` / `AppIcon-Tinted-1024.png`)을 복사. `Contents.json`을 가이드 §3b 형식으로 교체 — iOS universal 1024 Any/Dark/Tinted 3엔트리, Mac 슬롯 13개 전부 제거(프로젝트는 iPhone portrait only). | INTEGRATION_GUIDE §3 |
-| 1.2 | `TravelCalculator/Assets.xcassets/BrandSplashBG.colorset/Contents.json` (신규) | Color Set 신규. `Any` = sRGB `#5BA8EC` (R 0.357 G 0.659 B 0.925), `Dark` = sRGB `#1E2A38` (R 0.118 G 0.165 B 0.220). 부동소수 8자리 표기로 통일. | INTEGRATION_GUIDE §2 |
+| 1.2 | `TravelCalculator/Assets.xcassets/BrandSplashBG.colorset/Contents.json` (신규) | Color Set 신규. `Any` = sRGB `#5BA8EC` (R 0.357 G 0.659 B 0.925), `Dark` = sRGB `#1E2A38` (R 0.118 G 0.165 B 0.220). 소수점 3자리(hex round-trip 충족 최소 자릿수). | INTEGRATION_GUIDE §2 |
 | 1.3 | `TravelCalculator/Assets.xcassets/SplashCenter.imageset/` (신규) | `SplashCenter-Light.png` → Any, `SplashCenter-Dark.png` → Dark. `Contents.json`에 `appearances: luminosity=dark` 키 부여. `properties` 미설정(가이드 §4a "Single Scale, Preserve Vector off"). | INTEGRATION_GUIDE §4a |
 
 ### Step 2: 런치 스크린 (재작성 — Option B → A pivot)
@@ -70,7 +70,7 @@
 | # | 파일 | 태스크 |
 |---|------|--------|
 | 3.1 | `specs/Spec-UI.md` | §6.3 햅틱 위에 §6.4 "앱 아이콘" 섹션 신설 — iOS 18 3-variant 정책, swap 이유, 1024 단일 슬롯, HIG 준수 항목, 자산 출처(Tripy brand pack), 검증 가능 항목(`AppIcon.appiconset` 슬롯 3개 채워짐 / Mac 슬롯 0건 / PNG 1024×1024 RGB). |
-| 3.2 | `specs/Spec-UI.md` | §6.5 "런치 스크린" 섹션 신설 — `UILaunchScreen` dict 방식, `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙, 검증 가능 항목(Info.plist 키 3개 / ColorSet 존재 / ImageSet 존재 / "-Full" PNG bundle 미포함). |
+| 3.2 | `specs/Spec-UI.md` | §6.5 "런치 스크린" 섹션 신설 — ~~`UILaunchScreen` dict 방식~~ (→ Step 2 pivot 후 Option A `UILaunchStoryboardName` + `LaunchScreen.storyboard` 방식으로 재작성), `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙, 검증 가능 항목(Info.plist 키 + storyboard 파일 / ColorSet 존재 / ImageSet 존재 / "-Full" PNG bundle 미포함). |
 
 ### Step 4: 빌드 검증
 
