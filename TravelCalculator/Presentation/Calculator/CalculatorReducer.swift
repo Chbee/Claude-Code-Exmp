@@ -86,7 +86,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .warning,
                     title: "입력 한도 초과",
-                    message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있습니다"
+                    message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있어요"
                 )
                 return s
             }
@@ -133,7 +133,7 @@ enum CalculatorReducer {
             s.pendingToast = ToastPayload(
                 style: .warning,
                 title: "입력 한도 초과",
-                message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있습니다"
+                message: "최대 \(maxIntegerDigits)자리까지 입력할 수 있어요"
             )
             return s
         }
@@ -186,7 +186,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .warning,
                     title: "계산 오류",
-                    message: "0으로 나눌 수 없습니다"
+                    message: "0으로 나눌 수 없어요"
                 )
                 s.pendingOperator = op
             }
@@ -214,7 +214,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .warning,
                     title: "계산 오류",
-                    message: "0으로 나눌 수 없습니다"
+                    message: "0으로 나눌 수 없어요"
                 )
                 return s
             }
@@ -223,7 +223,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .warning,
                     title: "계산 오류",
-                    message: "0으로 나눌 수 없습니다"
+                    message: "0으로 나눌 수 없어요"
                 )
                 return s
             }
@@ -233,7 +233,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .error,
                     title: "계산 결과 초과",
-                    message: "계산 결과가 너무 큽니다"
+                    message: "계산 결과가 너무 커요"
                 )
                 // display 유지, 상태 유지
                 return s
@@ -256,7 +256,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .warning,
                     title: "계산 오류",
-                    message: "0으로 나눌 수 없습니다"
+                    message: "0으로 나눌 수 없어요"
                 )
                 return s
             }
@@ -265,7 +265,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .warning,
                     title: "계산 오류",
-                    message: "0으로 나눌 수 없습니다"
+                    message: "0으로 나눌 수 없어요"
                 )
                 return s
             }
@@ -274,7 +274,7 @@ enum CalculatorReducer {
                 s.pendingToast = ToastPayload(
                     style: .error,
                     title: "계산 결과 초과",
-                    message: "계산 결과가 너무 큽니다"
+                    message: "계산 결과가 너무 커요"
                 )
                 return s
             }

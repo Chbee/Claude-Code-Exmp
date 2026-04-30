@@ -47,7 +47,7 @@ final class CalculatorStore {
             toastManager.show(ToastPayload(
                 style: .warning,
                 title: "음수 결과",
-                message: "환율 변환 결과는 0으로 표시됩니다"
+                message: "환율 변환 결과는 0으로 표시돼요"
             ))
         }
         wasNegative = isNegativeNow

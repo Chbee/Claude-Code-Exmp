@@ -148,12 +148,12 @@ ExchangeRateResponse
 
   | 케이스 | 메시지 |
   |---|---|
-  | `networkError` | `네트워크 연결에 실패했습니다` |
-  | `serverError` (5xx/4xx 무관 동일) | `서버에서 오류가 발생했습니다` |
-  | `noDataAvailable` | `환율 데이터를 찾을 수 없습니다` |
-  | `parsingError` | `환율 데이터를 처리할 수 없습니다` |
-  | `invalidRate` | `유효하지 않은 환율입니다` |
-  | `noCacheAvailable` | `저장된 환율 데이터가 없습니다` |
+  | `networkError` | `네트워크 연결에 실패했어요` |
+  | `serverError` (5xx/4xx 무관 동일) | `서버에서 오류가 발생했어요` |
+  | `noDataAvailable` | `환율 데이터를 찾을 수 없어요` |
+  | `parsingError` | `환율 데이터를 처리할 수 없어요` |
+  | `invalidRate` | `유효하지 않은 환율이에요` |
+  | `noCacheAvailable` | `저장된 환율 데이터가 없어요` |
 
   - 정의 위치: `Domain/Models/ExchangeRateError.swift`
   - 메시지 변경 시 코드 우선, spec 표 동시 갱신
