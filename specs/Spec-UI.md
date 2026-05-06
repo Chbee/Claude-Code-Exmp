@@ -37,6 +37,7 @@
   - VoiceOver `accessibilityLabel`: 각각 `"온라인"` / `"오프라인"` / 비표시
   - 정의 위치: `CalculatorToolbar.swift networkIndicator`
 - 카메라/설정 버튼: **V1에서 숨김** (레이아웃 자리는 유지, opacity=0)
+- → §6.6 접근성 참조 (통화 pill / 네트워크 인디케이터 a11y 라벨 매핑 단일 출처)
 
 #### Display 영역
 - 환율 정보 + 새로고침: `"1 USD = 1,350.00 KRW"` + 우측 ↻ 버튼. 오프라인 시 rate row 우측에 인라인 캐시 시각(`· N분 전` 등) 추가 표기 — Spec-Overview §2.5.2 참조 (별도 오프라인 배너 없음)
@@ -44,6 +45,7 @@
 - 방향 전환 버튼 `↓`: 탭 시 결과값을 새 입력값으로 이전하며 방향 전환
 - 변환 금액: 통화 기호 + 천단위 콤마 포맷, 통화별 소수점 자릿수 적용
 - 긴 숫자는 폰트 크기 자동 축소 (`minimumScaleFactor: 0.3` — 원본의 30%까지 축소 허용. VND 등 저액면 통화 12자리 결과 대응)
+- → §6.6 접근성 참조 (rateRow / input·result row / refresh / toggle a11y 라벨 매핑)
 
 ### 3.2 통화 선택 화면
 
@@ -237,3 +239,59 @@ iOS Springboard가 부팅 시점에 `UILaunchStoryboardName` 키로 `LaunchScree
 
 > **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
 > **수정 이력**: [Phase G](../docs/phase-g.md)
+
+### 6.6 접근성 (VoiceOver)
+
+V1 출시 범위 한정 VoiceOver `accessibilityLabel`/`accessibilityHint`/element grouping 정책. Dynamic Type / 고대비 / Reduce Transparency 등 시각·모션 접근성은 V2 백로그(Spec-Tasks §9 Phase G UX 백로그) 분리.
+
+**정책 원칙**
+1. **인터랙티브 요소** — 모든 `Button`/`Toggle`은 명시 한국어 `accessibilityLabel`. 시스템 음성 합성 단독 의존 금지.
+2. **`accessibilityHint` 부여 기준** — 1일 1~2회 탭 저빈도 액션(새로고침 / 방향 전환 / 통화 선택)에만. 빈번 입력(키패드)은 부여 금지(노이즈).
+3. **시각 구분자** — `Text("·")` 등 의미 없는 시각 요소는 `.accessibilityHidden(true)`.
+4. **라벨 톤 가이드라인** — iOS 한국어 기본 계산기 관용 우선:
+   - (a) **액션 버튼** — 명사구 결과 (`"통화 선택"`, `"새로고침"`, `"방향 전환"`, `"전체 지우기"`)
+   - (b) **토글/상태 인디케이터** — 명사 또는 명사+상태 (`"온라인"` / `"오프라인"`)
+   - (c) **연산자 키패드** — 동사형 (`"더하기"` / `"빼기"` / `"곱하기"` / `"나누기"` / `"같음"`)
+   - (d) **`accessibilityHint`** — 동사형 결과/상태 전환 ("환율 정보를 다시 불러옵니다", "통화 선택 화면을 엽니다")
+
+#### 6.6.1 자산 매핑 — 계산기 키패드 (`CalculatorKeypad.swift`, 17개 버튼)
+
+| 표시 | accessibilityLabel | 비고 |
+|---|---|---|
+| `0` ~ `9` | `"0"` ~ `"9"` | visible Text와 동일 (Step 4 시뮬레이터 검증에서 자릿값 읽기 발생 시 한글 전환 검토) |
+| `.` | `"소수점"` | |
+| `=` | `"같음"` | iOS 한국어 기본 계산기 관용 |
+| `+` `-` `×` `÷` | `"더하기"` `"빼기"` `"곱하기"` `"나누기"` | 동사형 |
+| `AC` `C` `←` | `"전체 지우기"` `"지우기"` `"삭제"` | iOS 비대칭 정합 |
+
+> 키패드는 빈번 입력 — `accessibilityHint` 미부여.
+
+#### 6.6.2 자산 매핑 — 환율 영역 (`CalculatorDisplay.swift`)
+
+| 요소 | accessibilityLabel | accessibilityHint |
+|---|---|---|
+| Rate row 텍스트 그룹 (combine) | 자식 Text 자동 결합 (Loading 시 `"환율 갱신 중"` 추가) | (없음) |
+| 새로고침 ↻ 버튼 | `"새로고침"` | `"환율 정보를 다시 불러옵니다"` |
+| 방향 전환 ↕ 버튼 | `"방향 전환"` | `"입력 통화와 결과 통화를 바꿉니다"` |
+| Input row (combine) | `"입력 통화 \(currencyCode), 금액 \(formattedAmount)"` | (없음) |
+| Result row (combine) | `"결과 통화 \(currencyCode), 금액 \(formattedAmount)"` | (없음) |
+| `Text("·")` 시각 구분자 ×2 | (`.accessibilityHidden(true)`) | — |
+
+#### 6.6.3 자산 매핑 — Toolbar (`CalculatorToolbar.swift`)
+
+| 요소 | accessibilityLabel | accessibilityHint |
+|---|---|---|
+| 통화 선택 pill (combine, flag/chevron `.accessibilityHidden(true)`) | `"통화 선택, \(currency.currencyName), \(currency.currencyUnit)"` (예: "통화 선택, 미국 달러, USD") | `"통화 선택 화면을 엽니다"` |
+| 네트워크 인디케이터 — online (combine) | `"온라인"` | (없음) |
+| 네트워크 인디케이터 — offline (combine) | `"오프라인"` | (없음) |
+| 네트워크 인디케이터 — unknown | (`.accessibilityHidden(true)`) | — |
+
+> 네트워크 인디케이터는 Phase E §3.1에서 도입. 본 §6.6에 SoT 완성 목적으로 동일 등록.
+
+**검증 가능 항목** (결재 에이전트용)
+- `CalculatorKeypad.swift` — `accessibilityLabel:` (`KeypadButton` init 파라미터 사이트, 17건), 한국어 라벨 9건(전체 지우기 / 지우기 / 삭제 / 나누기 / 곱하기 / 빼기 / 더하기 / 같음 / 소수점)
+- `CalculatorDisplay.swift` — `.accessibilityLabel(` 5건(새로고침 / 방향 전환 / 입력 / 결과 / 환율 갱신 중), `.accessibilityHint(` 2건(새로고침 / 방향 전환), `.accessibilityElement(children: .combine)` 3건(rateRow 텍스트 그룹 / inputRow / resultRow), `.accessibilityHidden(true)` 2건(`Text("·")` ×2)
+- `CalculatorToolbar.swift` — `.accessibilityElement(children: .combine)` 3건(통화 pill / online / offline), `.accessibilityLabel(` 3건(통화 pill / 온라인 / 오프라인), `.accessibilityHint(` 1건(통화 pill), `.accessibilityHidden(true)` 3건(flag / chevron / unknown placeholder)
+
+> **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.
+> **수정 이력**: [Phase H](../docs/phase-h.md)

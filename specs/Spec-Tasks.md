@@ -167,7 +167,7 @@
 | 리뷰 1.2 | 지원 통화 확장 (JPY, EUR, THB, VND, PHP, CNY 등) | High | ✅ Phase F Step 1 |
 | 리뷰 4.2 | 통화 확장 시 검색/필터 기능 추가 | High | ✅ Phase F Step 2 (countryName + currencyUnit 매칭) |
 | 리뷰 4.1 | Toast 스와이프 수동 닫기 | Low | ✅ 슬라이드 업 닫기 (`ToastModifier` DragGesture + `ToastDismissDecision`) |
-| 리뷰 5.1 | VoiceOver accessibilityLabel/Hint 추가 | Medium | 🟡 부분 (검색바 + Toolbar 네트워크 인디케이터 — 계산기 키패드/환율 영역 미적용) |
+| 리뷰 5.1 | VoiceOver accessibilityLabel/Hint 추가 | Medium | ✅ Phase H (계산기 키패드 + 환율 영역 + Toolbar 통화 pill — Spec-UI §6.6) |
 | 리뷰 6.5 | API 키 보안 강화 (CI/CD 주입 방식) | Medium | ➖ N/A (open.er-api.com 키리스 API 채택으로 항목 무효화) |
 | 리뷰 6.7 | 키 입력 debounce (성능 최적화) | Low | ⬜ |
 | Phase F UX | 검색 결과에 선택 통화 가시성(체크 핀 고정) | Low | ⬜ V2 후보 |
@@ -177,6 +177,7 @@
 | Phase F Step 3.1 검증 | EUR 부동소수 누적 시나리오 (Calculator + ExchangeRate 통합) | Low | ⬜ V2 후보 |
 | Phase G UX | AppIcon Tinted variant — grayscale L* 채널 재export (현재 RGB라 iOS 18 monochrome tint 색조가 의도와 어긋날 수 있음) | High | ⬜ V1+ TestFlight 전 |
 | Phase G UX | 런치 스크린 접근성 — Reduce Transparency / Increase Contrast 설정 시 가독성 검증 (기존 VoiceOver/Dynamic Type 백로그와 묶음) | Low | ⬜ V2 후보 |
+| Phase H UX | 통화 변경 후 VoiceOver `UIAccessibility.post(.announcement, ...)` 자동 알림 — 페르소나(손 안 보고 사용)가 swipe 안 해도 새 통화명 인지 | Medium | ⬜ V2 후보 |
 
 > **수정 이력**: [Phase F](../docs/phase-f.md), [Phase G](../docs/phase-g.md)
 

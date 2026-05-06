@@ -14,12 +14,14 @@ struct CalculatorToolbar: View {
                 HStack(spacing: 6) {
                     Text(currency.flag)
                         .font(.system(size: 18))
+                        .accessibilityHidden(true)
                     Text(currency.currencyUnit)
                         .font(.system(size: 15, weight: .semibold))
                         .foregroundStyle(Color.appTextPrimary)
                     Image(systemName: "chevron.down")
                         .font(.system(size: 12, weight: .semibold))
                         .foregroundStyle(Color.appTextSub)
+                        .accessibilityHidden(true)
                 }
                 .padding(.horizontal, 14)
                 .padding(.vertical, 8)
@@ -27,6 +29,9 @@ struct CalculatorToolbar: View {
                 .clipShape(Capsule())
             }
             .buttonStyle(.plain)
+            .accessibilityElement(children: .combine)
+            .accessibilityLabel("통화 선택, \(currency.currencyName), \(currency.currencyUnit)")
+            .accessibilityHint("통화 선택 화면을 엽니다")
 
             // 중간: 네트워크 상태 인디케이터
             networkIndicator

@@ -13,6 +13,7 @@
   - [Spec-UI §3.1 계산기 화면](../specs/Spec-UI.md#31-계산기-화면-메인) — Toolbar/Display 서브섹션에 VoiceOver 라벨 매핑 cross-link 1줄씩 추가 (§6.6 신설 섹션 참조)
   - [Spec-UI §6.6 접근성](../specs/Spec-UI.md#66-접근성) — **신설**. VoiceOver 라벨/힌트 정책 (계산기 키패드 17개 / 환율 영역 refresh·toggle·rate row / Toolbar 통화 pill) + 검증 가능 항목 (grep으로 확인 가능한 accessibility 모디파이어 카운트)
   - [Spec-Tasks §9 리뷰 5.1](../specs/Spec-Tasks.md#9-개선-백로그) — 🟡 부분 → ✅ 완료 (Phase H) 상태 갱신
+  - [Spec-Tasks §9 개선 백로그](../specs/Spec-Tasks.md#9-개선-백로그) — Phase H UX V2 백로그 1건 추가: 통화 변경 후 `UIAccessibility.post(.announcement, ...)` 자동 알림 (Step 3 팀 리뷰 UX HIGH-5)
 - **참조만 (변경 없음)**:
   - [Spec-UI §3.1 Toolbar 구성 — VoiceOver `accessibilityLabel`](../specs/Spec-UI.md#31-계산기-화면-메인) — 기존 `"온라인"`/`"오프라인"`/비표시 정책 유지 (Phase E에서 정의)
   - [Spec-UI §6.3 햅틱 피드백](../specs/Spec-UI.md#63-햅틱-피드백) — 햅틱은 VoiceOver와 독립 (둘 다 동시 발화 OK), 표 변경 없음
@@ -64,7 +65,7 @@
 
 | 요소 | accessibilityLabel | accessibilityHint |
 |---|---|---|
-| 통화 선택 pill | `"통화 선택, USD"` 형식 (flag/chevron은 hidden, currencyUnit 발화) | `"통화를 변경합니다"` |
+| 통화 선택 pill | `"통화 선택, \(currency.currencyName), \(currency.currencyUnit)"` (예: "통화 선택, 미국 달러, USD" — Step 3 팀 리뷰 반영, flag/chevron은 hidden) | `"통화 선택 화면을 엽니다"` (Step 3 팀 리뷰 반영 — state transition 명시) |
 
 ---
 
