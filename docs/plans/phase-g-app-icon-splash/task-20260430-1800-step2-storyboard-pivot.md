@@ -231,8 +231,30 @@ struct InfoPlistLaunchScreenTests {
 
 ## TDD 사이클 로그
 
-(승인 후 채움)
+### Red (2026-05-06)
+- `InfoPlistLaunchScreenTests.swift`를 storyboard 기준 2건(`infoPlist_usesLaunchStoryboard` / `launchScreenStoryboard_existsAtExpectedPath`)으로 교체
+- `xcodebuild test -only-testing:TravelCalculatorTests/InfoPlistLaunchScreenTests` → 2건 fail 확인
+  - `infoPlist_usesLaunchStoryboard`: 레거시 `UILaunchScreen` dict 잔존 + `UILaunchStoryboardName` 키 부재
+  - `launchScreenStoryboard_existsAtExpectedPath`: `LaunchScreen.storyboard` 파일 부재
+
+### Yellow (2026-05-06)
+- `TravelCalculator/LaunchScreen.storyboard` 신규 (XML 표준 Apple 템플릿 형식): bg=`BrandSplashBG` named, UIImageView image=`SplashCenter` named, Aspect Fit + safe area centerY + width≤view.width×0.8 + 1:1 ratio
+- `Info.plist` 32-39행 `UILaunchScreen` dict 제거 + `UILaunchStoryboardName=LaunchScreen` 키 추가
+- `xcodebuild test` → InfoPlistLaunchScreenTests 2건 pass
+
+### Green (2026-05-06)
+- `xcodebuild build` warning 0, error 0 (`appintestmetadataprocessor` 메시지는 사전 잡음, 본 변경과 무관)
+- Phase G 5건(`AssetCatalogRuntimeTests` 2 + `AppIconContentsTests` 1 + `InfoPlistLaunchScreenTests` 2) 전부 pass
+- `git diff TravelCalculator.xcodeproj/project.pbxproj` 빈 출력 — `fileSystemSynchronizedGroups` 자동 인식
+- 시각 검증(iPhone 16e iOS 26.2 시뮬레이터):
+  - Light 시스템 외관 → sky bg + Light SplashCenter, 잘림 없음
+  - Dark 시스템 외관 → navy bg + Dark SplashCenter, 잘림 없음
+  - splash–first screen 연속성: 시스템 다크에서 navy splash → 다크 테마 메인 UI 매치 확인 (HIG 준수)
+
+### 후속 결정 (Step 외 작업)
+- AppIcon swap 폐기 (직관 매핑으로 전환) — 시각 검증 중 사용자 폰의 Icon Appearance 기본값(Light)으로 절대다수가 navy variant를 보게 됨이 문제로 드러나 swap 해제. 자세한 사유는 `docs/phase-g.md` 결정 기록.
+- Splash 자동 전환 유지(옵션 D) — Multi-AI 토론(Gemini + Codex) 합의. icon–splash mismatch는 Apple iOS 18 Icon Appearance 분리 정책 영역으로 수용. 자세한 사유는 `docs/phase-g.md` 결정 기록.
 
 ## 팀 검증 반영
 
-(Step 6 종료 후 채움)
+(Step 6 종료 후 채움 — `/audit` 실행 결과 반영 예정)

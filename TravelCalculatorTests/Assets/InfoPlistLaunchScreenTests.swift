@@ -3,26 +3,29 @@ import Foundation
 @testable import TravelCalculator
 
 struct InfoPlistLaunchScreenTests {
-    // 빌드 산출물이 아닌 source Info.plist를 직접 파싱 — Springboard가 부팅 시 직접 소비하므로 source가 곧 계약.
-    @Test func infoPlist_uiLaunchScreen_hasExpectedKeys() throws {
-        let infoPlistURL = URL(fileURLWithPath: #filePath)
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .deletingLastPathComponent()
-            .appendingPathComponent("TravelCalculator/Info.plist")
-
+    // Springboard가 부팅 시 UILaunchStoryboardName으로 storyboard를 찾아 합성한다.
+    // Option B (UILaunchScreen dict)는 PNG scale 처리에서 잘림 — Option A (storyboard) 채택.
+    @Test func infoPlist_usesLaunchStoryboard() throws {
+        let infoPlistURL = Self.repoRoot.appendingPathComponent("TravelCalculator/Info.plist")
         let data = try Data(contentsOf: infoPlistURL)
         let plist = try PropertyListSerialization.propertyList(from: data, format: nil) as? [String: Any]
-        let launchScreen = try #require(plist?["UILaunchScreen"] as? [String: Any])
 
-        #expect(launchScreen["UIColorName"] as? String == "BrandSplashBG",
-                "UIColorName must reference BrandSplashBG colorset")
-        #expect(launchScreen["UIImageName"] as? String == "SplashCenter",
-                "UIImageName must reference SplashCenter imageset")
-        #expect(launchScreen["UIImageRespectsSafeAreaInsets"] as? Bool == true,
-                "UIImageRespectsSafeAreaInsets must be true (notch/Dynamic Island avoidance)")
+        #expect(plist?["UILaunchStoryboardName"] as? String == "LaunchScreen",
+                "UILaunchStoryboardName must reference LaunchScreen storyboard")
+        #expect(plist?["UILaunchScreen"] == nil,
+                "Legacy UILaunchScreen dict must be removed (Option B → A pivot)")
+    }
 
-        #expect(launchScreen.count == 3,
-                "UILaunchScreen must contain only the 3 expected keys (regression guard for unexpected key additions)")
+    @Test func launchScreenStoryboard_existsAtExpectedPath() {
+        let storyboardURL = Self.repoRoot.appendingPathComponent("TravelCalculator/LaunchScreen.storyboard")
+        #expect(FileManager.default.fileExists(atPath: storyboardURL.path),
+                "LaunchScreen.storyboard must exist at TravelCalculator/")
+    }
+
+    private static var repoRoot: URL {
+        URL(fileURLWithPath: #filePath)
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
+            .deletingLastPathComponent()
     }
 }
