@@ -177,15 +177,15 @@
 2. **`Assets.xcassets/AppIcon.appiconset/`** — 자산 팩 PNG 사본 + `Contents.json`. iOS 18 universal 1024 single-slot.
 3. **`project.pbxproj` build setting** — `ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon` (변경 시 spec 동시 갱신 필요).
 
-**iOS 18 3-variant 정책 + Swap 규칙**
+**iOS 18 3-variant 매핑** (직관 매핑 — 파일명 그대로)
 
-| 슬롯 | PNG (filename) | 적용 모드 |
+| 슬롯 | PNG (filename) | 적용 조건 |
 |---|---|---|
-| Any (Default) | `AppIcon-Dark-1024.png` (navy bg) | Light 시스템 모드 홈 |
-| Dark | `AppIcon-Light-1024.png` (sky gradient) | Dark 시스템 모드 홈 |
-| Tinted | `AppIcon-Tinted-1024.png` | iOS 18 Tinted 모드 |
+| Any (Default) | `AppIcon-Light-1024.png` (sky gradient) | Icon Appearance: Light(기본값) — 절대다수 사용자 |
+| Dark | `AppIcon-Dark-1024.png` (navy bg) | Icon Appearance: Dark, 또는 Auto + 시스템 다크 |
+| Tinted | `AppIcon-Tinted-1024.png` | Icon Appearance: Tinted |
 
-> **Swap 의도**: iOS는 어두운 아이콘이 Light 홈에서, 밝은 아이콘이 Dark 홈에서 가독이 더 높음. 브랜드 default가 navy(어두운 톤)인 본 프로젝트에서는 파일명과 슬롯 이름이 반대로 매핑됨 — 가이드 §3a 정책. 향후 자산 교체 시 같은 swap 규칙 유지 필요.
+> **Icon Appearance 분리 정책 인지**: iOS 18+의 "Icon Appearance"는 시스템 외관(Light/Dark)과 **독립된 사용자 설정**이다. 기본값이 Light 고정이라 시스템 다크 모드여도 자동으로 Dark variant가 선택되지 않는다. 사용자가 명시적으로 `Auto`(시스템 따라) / `Dark`(고정) / `Tinted`를 선택해야 비-Light variant가 노출된다. 앱은 4가지 variant를 제공할 뿐, 선택은 사용자 영역. 따라서 §6.5 런치 스크린의 시스템 외관 자동 전환과 아이콘 사이에 mismatch가 발생할 수 있으나, 이는 Apple의 의도된 분리 — §6.5 "splash–first screen 연속성" 검증으로 대응.
 
 **HIG 준수**
 - 1024×1024 정사각형, 모서리 마스킹 X(iOS 자동 squircle), 알파 채널 X
@@ -224,6 +224,7 @@ iOS Springboard가 부팅 시점에 `UILaunchStoryboardName` 키로 `LaunchScree
 - **Aspect Fit + width ≤ view.width × 0.8 + safe area centerY** — 마크가 노치/Dynamic Island/홈 인디케이터를 피해 safe area 안에 80% 폭으로 정사각형 비례 보존.
 - **`-Full` PNG 미반입** — 가이드 §4d의 `Splash-{Light,Dark}-Full.png`는 디자인 QA 참조용. 앱 번들 포함 금지.
 - **정적 launch** — SwiftUI 애니메이션 splash는 Apple HIG가 권장하지 않으며, system splash → 첫 frame 사이에 visible flash/re-mount seam 발생.
+- **시스템 외관 자동 전환 유지** — Splash가 시스템 다크에서 navy로 전환되어 본 앱의 다크 테마 메인 UI와 매치 → HIG의 "splash ≈ first screen" 연속성 충족. 아이콘은 §6.4 Icon Appearance 분리 정책상 사용자 설정에 좌우되므로, icon–splash mismatch는 Apple 분리 정책 영역으로 수용. Multi-AI 토론(Gemini+Codex) 합의 반영. 검증 가능 항목 "splash–first screen 연속성" 참조.
 
 **검증 가능 항목** (결재 에이전트용)
 - `BrandSplashBG.colorset/Contents.json` 존재, Light/Dark sRGB components가 가이드 hex(`#5BA8EC` / `#1E2A38`)와 일치
@@ -231,6 +232,7 @@ iOS Springboard가 부팅 시점에 `UILaunchStoryboardName` 키로 `LaunchScree
 - `TravelCalculator/LaunchScreen.storyboard` 파일 실재, root view `backgroundColor` = named ref `BrandSplashBG`, UIImageView `image` = named ref `SplashCenter`
 - `Info.plist`에 `UILaunchStoryboardName=LaunchScreen` 키 존재, 기존 `UILaunchScreen` dict 미존재
 - `Splash-{Light,Dark}-Full.png`가 앱 번들·Asset Catalog에 포함되지 않음
+- splash–first screen 연속성: 시스템 다크 모드일 때 navy splash → 다크 테마 메인 UI 매치 (시각 검증, `docs/phase-g.md` 결정 기록 참조)
 - `TravelCalculatorTests/AssetCatalogRuntimeTests/brandSplashBG_loadsFromHostAppBundle` / `TravelCalculatorTests/AssetCatalogRuntimeTests/splashCenter_loadsFromHostAppBundle` / `TravelCalculatorTests/InfoPlistLaunchScreenTests/infoPlist_usesLaunchStoryboard` / `TravelCalculatorTests/InfoPlistLaunchScreenTests/launchScreenStoryboard_existsAtExpectedPath` 통과 (`AssetCatalogRuntimeTests` 정의: `TravelCalculatorTests/Assets/AssetCatalogIntegrationTests.swift`)
 
 > **갱신 컨벤션**: spec 본문 변경 시 Phase 문서 영향 섹션과 동시 갱신. "수정 이력" 역링크는 누적 append.

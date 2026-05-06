@@ -11,7 +11,7 @@
 
 - **추가/수정한 spec 섹션**:
   - [Spec-UI §6.1 컬러 팔레트](../specs/Spec-UI.md#61-컬러-팔레트) — Step 3에서 본문 끝에 `BrandSplashBG` 예외 cross-link 1줄 추가. "뷰는 시맨틱만 참조" 규칙과 §6.5 "Color.app* 미추가"의 충돌이 grep 검증 위반으로 오판되지 않도록 명시.
-  - [Spec-UI §6.4 앱 아이콘](../specs/Spec-UI.md#64-앱-아이콘) — 신설. iOS 18 3-variant 정책(Any/Dark/Tinted), 1024×1024 단일 슬롯, 가이드 출처(Tripy brand pack), HIG 준수, 자산 교체 5스텝 절차, V1+ Tinted 게이트.
+  - [Spec-UI §6.4 앱 아이콘](../specs/Spec-UI.md#64-앱-아이콘) — 신설. iOS 18 3-variant 정책(Any/Dark/Tinted), 1024×1024 단일 슬롯, 가이드 출처(Tripy brand pack), HIG 준수, 자산 교체 5스텝 절차, V1+ Tinted 게이트. **2026-05-06 갱신**: swap 규칙 폐기 → 직관 매핑(파일명=슬롯), Icon Appearance 분리 정책 인지 단락 추가.
   - [Spec-UI §6.5 런치 스크린](../specs/Spec-UI.md#65-런치-스크린) — 신설 후 Step 2 재작성에서 Option A(`LaunchScreen.storyboard` + `UILaunchStoryboardName`) 기준으로 재작성. `BrandSplashBG` ColorSet + `SplashCenter` ImageSet 조합, "-Full" PNG 미반입 규칙, Aspect Fit + safe area centerY 정책, 정적 launch 채택.
   - [Spec-Tasks §9 개선 백로그](../specs/Spec-Tasks.md#9-개선-백로그) — Phase G UX 백로그 2건 추가: Tinted grayscale 재export (V1+ TestFlight 전 게이트, High) + 런치 스크린 접근성(Reduce Transparency / Increase Contrast).
 - **참조만 (변경 없음)**:
@@ -34,15 +34,15 @@
 
 | 원본 파일 (`/Users/SONJIYONG/tripy-appstore/dist/appstore/`) | 목적지 |
 |---|---|
-| `AppIcon-Dark-1024.png` | `Assets.xcassets/AppIcon.appiconset/` → **Any (universal)** ※ 가이드 §3a 의도적 swap |
-| `AppIcon-Light-1024.png` | `Assets.xcassets/AppIcon.appiconset/` → **Dark** |
+| `AppIcon-Light-1024.png` | `Assets.xcassets/AppIcon.appiconset/` → **Any (universal, Default)** |
+| `AppIcon-Dark-1024.png` | `Assets.xcassets/AppIcon.appiconset/` → **Dark** |
 | `AppIcon-Tinted-1024.png` | `Assets.xcassets/AppIcon.appiconset/` → **Tinted** |
 | `launch-screen/SplashCenter-Light.png` | `Assets.xcassets/SplashCenter.imageset/` → **Any** |
 | `launch-screen/SplashCenter-Dark.png` | `Assets.xcassets/SplashCenter.imageset/` → **Dark** |
 | `launch-screen/Splash-*-Full.png` | (반입 금지 — 디자인 QA 참조용) |
 | `previews/Preview-0*.png` | **본 Phase 범위 외** — App Store Connect 업로드 단계는 코드 변경 0건 |
 
-> **swap 이유** (가이드 §3a): 가이드의 "Dark" 변형(navy bg)이 브랜드 default라 Light 모드 홈에서 가독이 좋고, "Light" 변형(sky gradient)은 Dark 모드 홈에서 가독이 좋음. 따라서 파일명과 슬롯 이름이 반대로 매핑됨.
+> **매핑 정책**: 파일명과 슬롯 이름을 그대로 매칭(직관 매핑). iOS 18+ Icon Appearance 기본값이 Light라 절대다수 사용자가 sky variant를 보게 됨. swap 폐기 사유는 결정 기록 참조.
 
 ---
 
@@ -141,6 +141,9 @@ docs/
 - **`BrandNavy` / `BrandSky` 제외**: 가이드 §2 표에는 informational로 등장하나 verification checklist §7과 launch screen 실제 사용처에는 없음. 즉시 사용처 없는 dead asset 회피.
 - **App Store 미리보기 4종 제외**: 가이드 §5의 `previews/Preview-0*.png`는 App Store Connect 웹 콘솔 업로드 단계로 코드 변경 0건. 본 Phase는 앱 번들 통합 범위로 한정.
 - **Figma node-id 미갱신**: 가이드는 PNG와 색 hex만 제공하고 Figma node 출처를 명시하지 않음. `docs/figma.md`는 디자인 시스템 내부 토큰용이므로 본 Phase에서는 변경 없음.
+- **AppIcon swap 폐기 (2026-05-06)**: 초기엔 가이드 §3a에 따라 `AppIcon-Dark-1024.png`(navy) → Any, `AppIcon-Light-1024.png`(sky) → Dark 슬롯으로 swap 매핑(`63f073c`). 시각 검증 결과, 사용자 폰의 iOS 18+ Icon Appearance 기본값이 "Light" 고정이라 절대다수 사용자가 navy variant를 보게 됨 — 가이드 §3a의 "Light 모드 홈에서 navy 가독" 가정과 충돌(가이드는 사용자가 "Auto" 선택했다고 가정). 직관 매핑(파일명 = 슬롯)으로 전환하여 기본값 사용자에게 sky variant 노출. swap 규칙은 Spec-UI §6.4에서 폐기, 향후 자산 교체 시 같은 직관 매핑 유지.
+- **Splash 시스템 외관 자동 전환 유지(D 채택, 2026-05-06)**: AppIcon swap 폐기 후 "splash auto-switch + icon 정적(Light)" 조합으로 시스템 다크 모드일 때 navy splash → sky icon mismatch가 발생함을 시각 검증에서 확인. Multi-AI 토론(Gemini + Codex) 결과 양측 모두 옵션 D(splash 자동 전환 유지) 합의. 핵심 논거: Apple HIG는 splash–first screen 매치를 요구하지만 splash–icon 매치는 요구하지 않음. 본 앱 메인 UI가 시스템 다크에서 다크 테마로 전환되므로 navy splash → 다크 main UI 연속성 충족(HIG 준수). icon–splash mismatch는 Apple이 iOS 18에서 Icon Appearance를 시스템 외관과 의도적으로 분리한 정책 영역으로 수용. 추가 코드 변경 0건.
+- **storyboard width 제약 `lessThanOrEqual` (2026-05-06)**: spec-auditor Fail 1건 — storyboard `<constraint firstAttribute="width">`에 `relation` 속성 누락 시 IB 기본값 `equal`이라 spec(`§6.5: width≤×0.8`) 표현과 코드 불일치. `relation="lessThanOrEqual"` 명시. UIImageView intrinsic content size(1290) > cap이라 시각 결과는 동일, 단 spec 정합 + 미래 idiom 대비.
 
 ---
 
