@@ -27,28 +27,34 @@ struct CalculatorDisplay: View {
 
     private var rateRow: some View {
         HStack(spacing: 6) {
-            Text(displayModel.rateDisplay)
-                .font(.footnote)
-                .foregroundStyle(Color.appTextSub)
-            if isLoading {
-                ProgressView()
-                    .scaleEffect(0.6)
-                    .tint(Color.appTextSub)
-            } else if isOffline, let cachedAt {
-                Text("·")
+            HStack(spacing: 6) {
+                Text(displayModel.rateDisplay)
                     .font(.footnote)
                     .foregroundStyle(Color.appTextSub)
-                Text(Self.relativeLabel(from: cachedAt))
-                    .font(.footnote)
-                    .foregroundStyle(Color.appWarning)
-            } else if let days = daysSinceSearchDate {
-                Text("·")
-                    .font(.footnote)
-                    .foregroundStyle(Color.appTextSub)
-                Text(Self.dateLabel(for: days))
-                    .font(.footnote)
-                    .foregroundStyle(Color.appTextSub)
+                if isLoading {
+                    ProgressView()
+                        .scaleEffect(0.6)
+                        .tint(Color.appTextSub)
+                        .accessibilityLabel("환율 갱신 중")
+                } else if isOffline, let cachedAt {
+                    Text("·")
+                        .font(.footnote)
+                        .foregroundStyle(Color.appTextSub)
+                        .accessibilityHidden(true)
+                    Text(Self.relativeLabel(from: cachedAt))
+                        .font(.footnote)
+                        .foregroundStyle(Color.appWarning)
+                } else if let days = daysSinceSearchDate {
+                    Text("·")
+                        .font(.footnote)
+                        .foregroundStyle(Color.appTextSub)
+                        .accessibilityHidden(true)
+                    Text(Self.dateLabel(for: days))
+                        .font(.footnote)
+                        .foregroundStyle(Color.appTextSub)
+                }
             }
+            .accessibilityElement(children: .combine)
             Spacer()
             Button(action: onRefresh) {
                 Image(systemName: "arrow.clockwise")
@@ -57,6 +63,8 @@ struct CalculatorDisplay: View {
             }
             .disabled(isLoading)
             .buttonStyle(.plain)
+            .accessibilityLabel("새로고침")
+            .accessibilityHint("환율 정보를 다시 불러옵니다")
         }
     }
 
@@ -91,6 +99,8 @@ struct CalculatorDisplay: View {
                 .lineLimit(1)
         }
         .frame(height: 56)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("입력 통화 \(displayModel.inputDisplay.currencyCode), 금액 \(displayModel.inputDisplay.formattedAmount)")
     }
 
     // MARK: - Toggle Button
@@ -107,6 +117,8 @@ struct CalculatorDisplay: View {
                     .clipShape(Circle())
             }
             .buttonStyle(.plain)
+            .accessibilityLabel("방향 전환")
+            .accessibilityHint("입력 통화와 결과 통화를 바꿉니다")
             Spacer()
         }
         .padding(.vertical, 12)
@@ -129,6 +141,8 @@ struct CalculatorDisplay: View {
                 .lineLimit(1)
         }
         .frame(height: 56)
+        .accessibilityElement(children: .combine)
+        .accessibilityLabel("결과 통화 \(displayModel.resultDisplay.currencyCode), 금액 \(displayModel.resultDisplay.formattedAmount)")
     }
 }
 

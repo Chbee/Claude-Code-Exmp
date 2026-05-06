@@ -54,11 +54,11 @@
 
 | 요소 | accessibilityLabel | accessibilityHint |
 |---|---|---|
-| Rate row 전체 (`"1 USD = 1,350 KRW · 최신"` 등) | rate + 일자/캐시 시각 결합 텍스트 | (없음 — 정보성 텍스트) |
+| Rate row 텍스트 그룹 (`"1 USD = 1,350 KRW · 최신"` 등) | rate + 일자/캐시 시각 결합 텍스트 (자식 자동 결합, Loading 시 `"환율 갱신 중"` 추가) | (없음 — 정보성 텍스트) |
 | 새로고침 ↻ 버튼 | `"새로고침"` | `"환율 정보를 다시 불러옵니다"` |
 | 방향 전환 ↕ 버튼 | `"방향 전환"` | `"입력 통화와 결과 통화를 바꿉니다"` |
-| Input row | `"입력, USD, 1,234.56"` 형식 (combine) | (없음) |
-| Result row | `"결과, KRW, 1,672,656"` 형식 (combine) | (없음) |
+| Input row | `"입력 통화 USD, 금액 1,234.56"` 형식 (combine, Step 2 팀 리뷰 반영) | (없음) |
+| Result row | `"결과 통화 KRW, 금액 1,672,656"` 형식 (combine, Step 2 팀 리뷰 반영) | (없음) |
 
 ### CalculatorToolbar 통화 pill
 
