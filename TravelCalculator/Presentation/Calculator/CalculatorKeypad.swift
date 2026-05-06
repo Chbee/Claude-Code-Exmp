@@ -16,77 +16,77 @@ struct CalculatorKeypad: View {
             VStack(spacing: spacing) {
                 // Row 1: AC, C, ←, ÷  (4 buttons — Figma 기준 AC/C 분리)
                 HStack(spacing: spacing) {
-                    KeypadButton(label: "AC", style: .utility, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "AC", accessibilityLabel: "전체 지우기", style: .utility, width: buttonWidth, height: buttonHeight) {
                         onIntent(.allClearPressed)
                     }
-                    KeypadButton(label: "C", style: .utility, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "C", accessibilityLabel: "지우기", style: .utility, width: buttonWidth, height: buttonHeight) {
                         onIntent(.clearPressed)
                     }
-                    KeypadButton(label: "←", style: .utility, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "←", accessibilityLabel: "삭제", style: .utility, width: buttonWidth, height: buttonHeight) {
                         onIntent(.backspacePressed)
                     }
-                    KeypadButton(label: "÷", style: .operator_, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "÷", accessibilityLabel: "나누기", style: .operator_, width: buttonWidth, height: buttonHeight) {
                         onIntent(.operatorPressed(.divide))
                     }
                 }
 
                 // Row 2: 7, 8, 9, ×
                 HStack(spacing: spacing) {
-                    KeypadButton(label: "7", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "7", accessibilityLabel: "7", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(7))
                     }
-                    KeypadButton(label: "8", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "8", accessibilityLabel: "8", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(8))
                     }
-                    KeypadButton(label: "9", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "9", accessibilityLabel: "9", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(9))
                     }
-                    KeypadButton(label: "×", style: .operator_, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "×", accessibilityLabel: "곱하기", style: .operator_, width: buttonWidth, height: buttonHeight) {
                         onIntent(.operatorPressed(.multiply))
                     }
                 }
 
                 // Row 3: 4, 5, 6, -
                 HStack(spacing: spacing) {
-                    KeypadButton(label: "4", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "4", accessibilityLabel: "4", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(4))
                     }
-                    KeypadButton(label: "5", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "5", accessibilityLabel: "5", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(5))
                     }
-                    KeypadButton(label: "6", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "6", accessibilityLabel: "6", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(6))
                     }
-                    KeypadButton(label: "-", style: .operator_, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "-", accessibilityLabel: "빼기", style: .operator_, width: buttonWidth, height: buttonHeight) {
                         onIntent(.operatorPressed(.minus))
                     }
                 }
 
                 // Row 4: 1, 2, 3, +
                 HStack(spacing: spacing) {
-                    KeypadButton(label: "1", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "1", accessibilityLabel: "1", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(1))
                     }
-                    KeypadButton(label: "2", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "2", accessibilityLabel: "2", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(2))
                     }
-                    KeypadButton(label: "3", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "3", accessibilityLabel: "3", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.numberPressed(3))
                     }
-                    KeypadButton(label: "+", style: .operator_, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "+", accessibilityLabel: "더하기", style: .operator_, width: buttonWidth, height: buttonHeight) {
                         onIntent(.operatorPressed(.plus))
                     }
                 }
 
                 // Row 5: 0 (double-width), ., =
                 HStack(spacing: spacing) {
-                    KeypadButton(label: "0", style: .number, width: buttonWidth * 2 + spacing, height: buttonHeight) {
+                    KeypadButton(label: "0", accessibilityLabel: "0", style: .number, width: buttonWidth * 2 + spacing, height: buttonHeight) {
                         onIntent(.numberPressed(0))
                     }
-                    KeypadButton(label: ".", style: .number, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: ".", accessibilityLabel: "소수점", style: .number, width: buttonWidth, height: buttonHeight) {
                         onIntent(.decimalPressed)
                     }
-                    KeypadButton(label: "=", style: .equals, width: buttonWidth, height: buttonHeight) {
+                    KeypadButton(label: "=", accessibilityLabel: "같음", style: .equals, width: buttonWidth, height: buttonHeight) {
                         onIntent(.equalsPressed)
                     }
                 }
@@ -124,6 +124,7 @@ private enum ButtonStyle {
 
 private struct KeypadButton: View {
     let label: String
+    let accessibilityLabel: String
     let style: ButtonStyle
     let width: CGFloat
     let height: CGFloat
@@ -139,6 +140,7 @@ private struct KeypadButton: View {
                 .clipShape(RoundedRectangle(cornerRadius: 16))
         }
         .buttonStyle(.plain)
+        .accessibilityLabel(accessibilityLabel)
     }
 }
 
