@@ -25,7 +25,7 @@
                         <constraints>
                             <constraint firstItem="SC0-im-001" firstAttribute="centerX" secondItem="Ze5-6b-2t3" secondAttribute="centerX" id="cx-1"/>
                             <constraint firstItem="SC0-im-001" firstAttribute="centerY" secondItem="6Tk-OE-BBY" secondAttribute="centerY" id="cy-1"/>
-                            <constraint firstItem="SC0-im-001" firstAttribute="width" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.8" id="w-1"/>
+                            <constraint firstItem="SC0-im-001" firstAttribute="width" relation="lessThanOrEqual" secondItem="Ze5-6b-2t3" secondAttribute="width" multiplier="0.8" id="w-1"/>
                         </constraints>
                     </view>
                 </viewController>
