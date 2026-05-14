@@ -21,7 +21,7 @@ xcodebuild -project TravelCalculator.xcodeproj -scheme TravelCalculator -destina
 
 ## Tech Constraints
 
-- **Swift 6.0**, SwiftUI, iOS 17+ (iPhone portrait only)
+- **Swift 6.0**, SwiftUI, iOS 18.0+ (iPhone portrait only)
 - **Strict Concurrency**: `@MainActor` default, `@Sendable` 처리 필수
 - **@Observable** (not Combine's ObservableObject)
 - 숫자 포맷 로케일 고정: 소수점 `.`, 천단위 `,` — 기기 로케일 무시

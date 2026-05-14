@@ -8,7 +8,7 @@
 
 ### 아키텍처
 ```
-Claude Code (Opus 4.6 — 오케스트레이터/최종 판단)
+Claude Code (Opus 4.7 — 오케스트레이터/최종 판단)
   ├─ Gemini CLI: gemini -p "질문" → 딥 리서치, 웹 검색, API 문서
   ├─ Codex CLI: codex exec "작업" → 세컨드 오피니언 코드 생성
   ├─ /codex:rescue: 내장 스킬 → 디버깅, 리뷰
@@ -29,11 +29,13 @@ codex auth login  # 브라우저 OAuth 로그인 → ~/.codex/auth.json 저장
 ### 마일스톤별 도구 매핑
 | 마일스톤 | Claude 역할 | Gemini CLI | Codex CLI |
 |----------|------------|------------|-----------|
-| 0: 온보딩 | Sonnet 구현 | - | - |
-| 1: 계산기 화면 | Opus 설계 → Sonnet 구현 | - | 세컨드 오피니언 Reducer |
-| 2: 환율 로직 | Sonnet 구현 | **API 스펙 딥 리서치** | - |
-| 3: 오프라인 대응 | Sonnet 구현 | - | - |
-| 4: 테스트 코드 | Sonnet 구현 | - | 세컨드 오피니언 |
+| 0: 온보딩 (Phase D) | Sonnet 구현 | - | - |
+| 1: 계산기 화면 (Phase A+B) | Opus 설계 → Sonnet 구현 | - | 세컨드 오피니언 Reducer |
+| 2: 환율 로직 (Phase C) | Sonnet 구현 | **API 스펙 딥 리서치** | - |
+| 3: 오프라인 대응 (Phase E) | Sonnet 구현 | - | - |
+| 4: 테스트 코드 (Phase E) | Sonnet 구현 | - | 세컨드 오피니언 |
+| F: Currency 확장 + 검색 | Sonnet 구현 | - | 세컨드 오피니언 회귀/필터 테스트 |
+| G: App Icon + Launch Screen | Opus 설계 → Sonnet 구현 | - | audit followup 세컨드 오피니언 |
 
 ---
 

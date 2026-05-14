@@ -4,7 +4,7 @@
 
 이 레포는 **바이브 코딩(Vibe Coding)으로 생산성을 측정하기 위한 개인 실험 프로젝트**입니다.
 
-Claude Code(Opus 4.6)와 대화하며 기존
+Claude Code(Opus 4.7)와 대화하며 기존
 [TravelCalculator](https://github.com/Chbee/TravelCalculator/tree/develop)
 프로젝트를 포팅하고 완성해 나가는 과정을 기록합니다.
 
@@ -19,7 +19,7 @@ Claude Code(Opus 4.6)와 대화하며 기존
 | 항목 | 내용 |
 |------|------|
 | 원본 프로젝트 | [Chbee/TravelCalculator](https://github.com/Chbee/TravelCalculator) (develop) |
-| 원본 진행률 | 14/48 tasks (29%) — 계산기 UI 78% 완료 |
+| 포팅 시작 시점 원본 진행률 | 14/48 tasks (29%) — 계산기 UI 78% (2026-04-02 기준) |
 
 ## Tech Stack
 
@@ -30,41 +30,42 @@ Claude Code(Opus 4.6)와 대화하며 기존
 | Architecture | MVI (Model-View-Intent) |
 | Min iOS | iOS 18 (95%+ market share) |
 | Concurrency | Strict Concurrency (MainActor default) |
-| AI Tool | Claude Code (Opus 4.6, 1M context) |
+| AI Tool | Claude Code (Opus 4.7, 1M context) |
 
 ## Project Structure
 
 ```
 TravelCalculator/
-├── TravelCalculatorApp.swift        # App entry point
+├── TravelCalculatorApp.swift         # App entry point
 ├── ContentView.swift                 # Root view
-├── Core/                             # DI, Extensions, Utilities
-├── Domain/Models/                    # Currency enum
-├── Data/                             # Network, Location, Permission
+├── Core/
+│   ├── App/                          # AppStore, AppCurrencyStore (전역 @Observable)
+│   ├── Extensions/                   # Decimal+Format, Calendar+KST 등
+│   └── Haptic.swift
+├── Design/                           # Color tokens (Color+Semantic, ColorTokens)
+├── Domain/
+│   ├── Models/                       # Currency, ExchangeRate, ExchangeRateError, Operator
+│   └── Protocols/                    # ExchangeRateAPI, NetworkMonitor, CountryCode 프로토콜
+├── Data/
+│   ├── Location/                     # LocationService (CLLocationManager 추상화)
+│   └── Network/                      # ExchangeRateAPI, NetworkMonitor 구현
 └── Presentation/
     ├── Calculator/                   # MVI: 계산기 (9 files)
-    ├── CurrencySelect/               # MVI: 통화 선택 (4 files)
-    ├── Components/                   # 재사용 컴포넌트
-    └── Common/Toast/                 # 토스트 알림 시스템
+    ├── CurrencySelect/               # MVI: 통화 선택 (5 files)
+    ├── Common/Toast/                 # 토스트 알림 시스템 (6 files)
+    └── Error/                        # ExchangeRateErrorBanner
 ```
 
 ## Milestones
 
 | # | Milestone | 상태 | 설명 |
 |---|-----------|------|------|
-| 1 | Calculator UI | 🔄 포팅 중 | 사칙연산, 숫자 포맷, 통화 선택, 입력 제한 |
-| 2 | Exchange Rate | ⏳ 대기 | 한국수출입은행 API 연동, 실시간 변환 |
-| 3 | Offline Support | ⏳ 대기 | 캐시, 네트워크 모니터링, 오프라인 UI |
-| 4 | Testing | ⏳ 대기 | 유닛 테스트, 엣지 케이스 검증 |
+| 0 | 온보딩 | ✅ 완료 (Phase D) | `hasCompletedOnboarding` 플래그 + 초기 통화 선택 |
+| 1 | Calculator UI | ✅ 완료 (Phase A+B) | 사칙연산, 숫자 포맷, 통화 선택, 입력 제한 |
+| 2 | Exchange Rate | ✅ 완료 (Phase C) | open.er-api.com (USD 기준) 연동, 실시간 변환 |
+| 3 | Offline Support | ✅ 완료 (Phase E) | 캐시, 네트워크 모니터링, 오프라인 UI |
+| 4 | Testing | ✅ 완료 (Phase E) | Reducer / 환율 변환 / API 계약 테스트 |
+| F | Currency 확장 + 검색 | ✅ 완료 | 통화 확장, 검색·필터, 회귀·필터 테스트 |
+| G | App Icon + Launch Screen | ✅ 완료 | AppIcon 3 variants, Splash storyboard, Spec-UI §6.4·§6.5 |
 
-## Vibe Coding Log
-
-> 바이브 코딩 세션별 기록
-
-### Session 1 (2026-04-02)
-- 레포 분석 및 설계 플랜 수립
-- 기존 TravelCalculator 32개 파일 아키텍처 분석 완료
-- iOS 버전 점유율 분석 → 최소 iOS 18 결정
-- MVI 포팅 전략 및 iOS 26.2 strict concurrency 적응 사항 정리
-- `Infrean20260327` → `TravelCalculator` 리네이밍
-- Plan.md 및 README.md 작성
+> 세션별 진행 기록은 `git log` 및 `docs/phase-*.md`를 참조.
